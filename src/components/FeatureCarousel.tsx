@@ -88,7 +88,7 @@ export function FeatureCarousel({ cards, audienceKey, autoplayMs = 6000 }: Props
             onMouseLeave={onMouseLeave}
             onFocus={onFocus}
             onBlur={onBlur}
-            className="relative w-full max-w-3xl outline-none focus-visible:ring-2 focus-visible:ring-souply-beetDeep/40 rounded-[40px]"
+            className="relative w-full max-w-3xl outline-none focus-visible:ring-2 focus-visible:ring-beetTint-strong/40 rounded-[40px]"
             data-testid="feature-carousel"
         >
             <div className="relative min-h-[440px] md:min-h-[480px] flex items-center">
@@ -117,7 +117,12 @@ export function FeatureCarousel({ cards, audienceKey, autoplayMs = 6000 }: Props
                     type="button"
                     aria-label={t('carousel.prev')}
                     onClick={() => dispatch({ type: 'prev' })}
-                    className="size-11 rounded-full bg-white/70 backdrop-blur-md text-souply-ink ring-1 ring-white/80 shadow-card hover:bg-white transition"
+                    /* Carousel sits over the pink page, so we use
+                     * surface (white in light, dark in dark) for the
+                     * button background and ink (the inverse) for the
+                     * arrow itself — same contrast against pink in
+                     * both themes. */
+                    className="size-11 rounded-full bg-surface text-ink ring-1 ring-surface/40 shadow-card hover:opacity-90 transition"
                 >
                     <ChevronLeft className="mx-auto" size={20} />
                 </button>
@@ -134,8 +139,8 @@ export function FeatureCarousel({ cards, audienceKey, autoplayMs = 6000 }: Props
                             className={cx(
                                 'h-2 rounded-full transition-all duration-300',
                                 i === safeIndex
-                                    ? 'w-6 bg-souply-ink'
-                                    : 'w-2 bg-souply-ink/30 hover:bg-souply-ink/50',
+                                    ? 'w-6 bg-surface'
+                                    : 'w-2 bg-surface/55 hover:bg-surface/80',
                             )}
                         />
                     ))}
@@ -145,7 +150,12 @@ export function FeatureCarousel({ cards, audienceKey, autoplayMs = 6000 }: Props
                     type="button"
                     aria-label={t('carousel.next')}
                     onClick={() => dispatch({ type: 'next' })}
-                    className="size-11 rounded-full bg-white/70 backdrop-blur-md text-souply-ink ring-1 ring-white/80 shadow-card hover:bg-white transition"
+                    /* Carousel sits over the pink page, so we use
+                     * surface (white in light, dark in dark) for the
+                     * button background and ink (the inverse) for the
+                     * arrow itself — same contrast against pink in
+                     * both themes. */
+                    className="size-11 rounded-full bg-surface text-ink ring-1 ring-surface/40 shadow-card hover:opacity-90 transition"
                 >
                     <ChevronRight className="mx-auto" size={20} />
                 </button>

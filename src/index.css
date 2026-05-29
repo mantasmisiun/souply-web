@@ -2,32 +2,140 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * Theme tokens — single source of truth for every adaptive colour.
+ *
+ *   :root                     → light theme (default)
+ *   [data-theme="dark"]       → dark theme (set on <html> by ThemeProvider)
+ *
+ * Values are written as RGB triplets (no `rgb()` wrapper) so Tailwind
+ * can compose them with opacity modifiers via the configured
+ *   rgb(var(--name) / <alpha-value>)
+ * pattern in tailwind.config.js.
+ *
+ * Both palettes mirror basket-app/constants/theme.ts so the web
+ * identity matches the mobile app token-for-token.
+ */
+
 :root {
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  font-feature-settings: 'ss01', 'cv11';
-  color-scheme: light;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    /* Surfaces */
+    --surface:         255 255 255;   /* white  — primary panel */
+    --surface-muted:   243 244 246;   /* mist   — quiet bg fills */
+    --surface-subtle:  250 250 250;   /* almost-white surfaces */
+    --surface-inset:   246 246 246;
+
+    /* Text */
+    --ink:        31 27 29;           /* primary text */
+    --ink-soft:   91 83 88;           /* secondary text */
+    --ink-faint:  155 148 152;        /* muted / disabled */
+
+    /* Edges */
+    --edge:         230 222 221;
+    --edge-subtle:  240 236 235;
+
+    /* Brand-tinted backgrounds (these flip between themes; the
+     *  saturated brand pinks themselves stay constant). */
+    --beet-tint:    253 231 237;      /* pale pink bg */
+    --beet-strong:  212 75 108;       /* saturated pink for accents */
+
+    /* Soft accent — the mobile basket-app uses this for the
+     *  expanded-category wash. */
+    --accent:       240 220 226;
+    --accent-wash:  248 235 240;
+
+    /* Create-template "wash" — the colour the Kurti šabloną card
+     * is painted in AND the colour the entire page transitions to
+     * when the create flow opens. Same value in both places so the
+     * card expansion looks like the card is "painting" the page. */
+    --create-wash:  251 243 230;
+}
+
+[data-theme="dark"] {
+    /* Surfaces — near-black with elevated cards (iOS dark-mode style) */
+    --surface:         28 28 30;
+    --surface-muted:   42 42 44;
+    --surface-subtle:  26 23 24;
+    --surface-inset:   35 32 33;
+
+    /* Text */
+    --ink:        242 242 247;
+    --ink-soft:   160 160 166;
+    --ink-faint:  108 108 112;
+
+    /* Edges */
+    --edge:         58 58 60;
+    --edge-subtle:  42 42 44;
+
+    /* Pink tints get inverted on dark — the muted bg is a deep
+     *  burgundy, the saturated accent text uses a lifted pink that
+     *  stays legible against dark surfaces. */
+    --beet-tint:    58 31 38;
+    --beet-strong:  251 154 177;
+
+    /* Soft accent (expanded category highlight) */
+    --accent:       92 51 64;
+    --accent-wash:  42 26 31;
+
+    /* Create-template wash — a lifted warm-dark surface (not near-black)
+     * so the create flow reads as a *lighter* room you walk into from
+     * the pink page, not a void. Cards painted in this token sit
+     * comfortably on top of the same colour at 85% opacity over the
+     * pink page on the dashboard. */
+    --create-wash:  48 44 52;
+}
+
+:root {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'ss01', 'cv11';
+    color-scheme: light dark;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 html, body, #root {
-  height: 100%;
-  margin: 0;
-  background: #EB6784; /* Souply beet — page background */
+    height: 100%;
+    margin: 0;
+    background: #EB6784; /* Souply beet — page background, never adapts */
 }
 
 #root {
-  isolation: isolate;
+    isolation: isolate;
 }
 
 /* Tabular numerics for stats so 1 234 lines up with 99 in the dashboard. */
 .nums { font-variant-numeric: tabular-nums; }
 
+/* Left-slide entrance for product cards.
+ *
+ * Replaces per-item `motion.li` + Framer variants in ProductsPanel /
+ * search results. With 200+ products in a single L2, Framer's per-
+ * element variant orchestration was blocking the main thread for tens
+ * of seconds when the L2 changed (and prevented the user from closing
+ * the tab). CSS keyframes run on the compositor — the browser can
+ * even pause them when the tab is in the background, and they cost
+ * effectively zero JS.
+ *
+ * Stagger via a `--i` index var the JSX sets per-card. We cap the
+ * delay at index 30 so the 200th card doesn't wait 7 seconds; past
+ * the cap everything snaps in together — invisible to the user
+ * because they're already scrolling. */
+@keyframes cardEnter {
+    from { opacity: 0; transform: translateX(-28px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+.card-enter {
+    animation: cardEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(min(var(--i, 0), 30) * 35ms + 50ms);
+    /* Promote to its own layer so the slide-in is GPU-accelerated and
+     * doesn't trigger layout recalcs in neighbouring cards. */
+    will-change: transform, opacity;
+}
+
 /* Used by template-card placeholder mockups so the icon panel feels
  * tactile without needing real screenshots tonight. */
 .mockup-grad {
-  background:
-    radial-gradient(120% 80% at 10% 0%, rgba(255,255,255,.18), transparent 60%),
-    linear-gradient(135deg, #F8D4DE 0%, #EB6784 65%, #D44B6C 100%);
+    background:
+        radial-gradient(120% 80% at 10% 0%, rgba(255,255,255,.18), transparent 60%),
+        linear-gradient(135deg, #F8D4DE 0%, #EB6784 65%, #D44B6C 100%);
 }

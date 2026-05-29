@@ -1,9 +1,20 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { LogOut, Sparkles } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '@/state/auth';
+import { useTemplates } from '@/state/templates';
 import { sampleProfile } from '@/data/sampleTemplates';
+import { ltPluralSuffix } from '@/lib/ltPlural';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { ThemeToggle } from './ThemeToggle';
+
+interface Props {
+    /** Asks the parent (App) to open the logout-confirm dialog. App
+     *  owns the dialog so it can sequence the un-merging animation
+     *  precisely after Yes — the rail itself is unmounted mid-animation
+     *  and a locally-owned modal would disappear with it. */
+    onLogoutRequest?: () => void;
+}
 
 const fmt = (n: number) => new Intl.NumberFormat('lt-LT', { maximumFractionDigits: 0 }).format(n);
 
@@ -19,12 +30,27 @@ const fmt = (n: number) => new Intl.NumberFormat('lt-LT', { maximumFractionDigit
  * size morph for the eye — `initial=opacity:0 → opacity:1` with a small
  * delay reads as "panel arrived first, contents settled second."
  */
-export function DashboardRail() {
-    const { t } = useTranslation();
+export function DashboardRail({ onLogoutRequest }: Props = {}) {
+    const { t, i18n } = useTranslation();
     const { user, logout } = useAuth();
+    const { totals } = useTemplates();
     const profile = sampleProfile;
     const name = user?.name ?? profile.name;
     const handle = user?.handle ?? profile.handle;
+    // Fallback to a direct logout (no animation) when App hasn't wired
+    // the confirm flow — defensive, never expected in production.
+    const handleLogout = onLogoutRequest ?? logout;
+
+    /** Pluralise stat labels for LT using CLDR rules. EN's noun list
+     *  collapses to one/other which i18next handles automatically, but
+     *  we route through the same suffix path for one consistent label
+     *  resolution lookup. */
+    const labelFor = (base: 'templates' | 'uses', count: number) => {
+        const suffix = i18n.language === 'lt'
+            ? ltPluralSuffix(count)
+            : (count === 1 ? 'one' : 'other');
+        return t(`dashboard.stats.${base}_${suffix}`);
+    };
 
     return (
         <motion.div
@@ -33,50 +59,47 @@ export function DashboardRail() {
             transition={{ delay: 0.2, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col h-full p-7 md:p-8 gap-7"
         >
-            <header className="flex items-center justify-between">
+            <header className="flex items-center justify-between gap-2">
                 <span className="grid place-items-center size-9 rounded-2xl bg-souply-beet text-white font-display font-bold shadow-card">
                     S
                 </span>
-                <LanguageSwitcher />
+                <div className="flex items-center gap-1.5">
+                    <ThemeToggle />
+                    <LanguageSwitcher />
+                </div>
             </header>
 
             {/* Identity block */}
             <section>
                 <div className="flex items-center gap-3">
-                    <div className="size-14 rounded-full bg-gradient-to-br from-souply-beetMuted to-souply-beet ring-1 ring-white shadow-card grid place-items-center">
+                    <div className="size-14 rounded-full bg-gradient-to-br from-beetTint to-souply-beet ring-1 ring-white/15 shadow-card grid place-items-center">
                         <span className="font-display text-xl font-bold text-white">
                             {name.split(' ').map((s) => s[0]).slice(0, 2).join('')}
                         </span>
                     </div>
                     <div className="leading-tight">
-                        <div className="text-sm font-semibold text-souply-ink">{name}</div>
-                        <div className="text-xs text-souply-slate">{t('dashboard.username', { handle })}</div>
+                        <div className="text-sm font-semibold text-ink">{name}</div>
+                        <div className="text-xs text-ink-soft">{t('dashboard.username', { handle })}</div>
                     </div>
                 </div>
             </section>
 
-            {/* Stats grid */}
-            <section className="grid grid-cols-2 gap-2 nums">
-                <StatTile label={t('dashboard.stats.templates')} value={String(profile.stats.templates)} />
-                <StatTile label={t('dashboard.stats.uses')}      value={fmt(profile.stats.uses)} />
-                <StatTile label={t('dashboard.stats.savings')}   value={`${fmt(Number(profile.stats.savingsEur))} €`} accent />
-                <StatTile label={t('dashboard.stats.followers')} value={fmt(profile.stats.followers)} />
+            {/* Stats — three tiles read from the live templates
+                provider. Followers tile parked until the creator
+                profile aggregator endpoint lands and there's something
+                real to count. */}
+            <section className="grid grid-cols-3 gap-2 nums">
+                <StatTile label={labelFor('templates', totals.templates)} value={String(totals.templates)} />
+                <StatTile label={labelFor('uses', totals.uses)}           value={fmt(totals.uses)} />
+                <StatTile label={t('dashboard.stats.savings')}            value={`${fmt(totals.savings)} €`} accent />
             </section>
-
-            <button
-                type="button"
-                className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-souply-ink text-white text-sm font-semibold shadow-card hover:bg-black transition"
-            >
-                <Sparkles size={16} />
-                {t('dashboard.templates.newCta')}
-            </button>
 
             <div className="flex-1" />
 
             <button
                 type="button"
-                onClick={logout}
-                className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-souply-slate hover:bg-souply-mist hover:text-souply-ink text-sm font-medium transition"
+                onClick={handleLogout}
+                className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-ink-soft hover:bg-white/5 hover:text-ink text-sm font-medium transition"
             >
                 <LogOut size={14} /> {t('dashboard.logout')}
             </button>
@@ -86,11 +109,11 @@ export function DashboardRail() {
 
 function StatTile({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
     return (
-        <div className="p-3 rounded-2xl bg-souply-mist/70 ring-1 ring-souply-border/70">
-            <div className={accent ? 'text-souply-beetDeep font-bold text-lg leading-none' : 'text-souply-ink font-bold text-lg leading-none'}>
+        <div className="p-3 rounded-2xl bg-surface-muted ring-1 ring-white/5">
+            <div className={accent ? 'text-beetTint-strong font-bold text-lg leading-none' : 'text-ink font-bold text-lg leading-none'}>
                 {value}
             </div>
-            <div className="text-[10px] uppercase tracking-wider text-souply-slate mt-1">{label}</div>
+            <div className="text-[10px] uppercase tracking-wider text-ink-soft mt-1">{label}</div>
         </div>
     );
 }

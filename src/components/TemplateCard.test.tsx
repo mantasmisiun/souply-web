@@ -13,51 +13,64 @@ const tpl: SampleTemplate = {
     autoUpdate: true,
     itemCount: 5,
     useCount: 12,
+    visitCount: 47,
     collectiveSavingsEur: '34.00',
+    createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    cover: ['#FDE7ED', '#EB6784'],
+    coverColor: '#EB6784',
+    coverImage: { kind: 'preset' as const, iconKey: 'basket' },
     emoji: '🧪',
 };
+
+const noop = () => {};
 
 describe('TemplateCard', () => {
     beforeEach(async () => { await i18n.changeLanguage('lt'); });
 
-    it('renders title, visibility tag, and auto-update tag', () => {
-        renderWith(<TemplateCard template={tpl} onDelete={() => {}} />);
+    it('renders title and visibility tag, no longer renders auto badge', () => {
+        renderWith(
+            <TemplateCard template={tpl} onOpen={noop} onShare={noop} onDuplicate={noop} onDelete={noop} />,
+        );
         expect(screen.getByText('Testas')).toBeInTheDocument();
         expect(screen.getByText(i18n.t('dashboard.templates.tagPublic'))).toBeInTheDocument();
-        expect(screen.getByText(i18n.t('dashboard.templates.tagAuto'))).toBeInTheDocument();
+        // Auto badge was deliberately removed from the card — verify
+        // it isn't rendered even though autoUpdate=true on the row.
+        expect(screen.queryByText(i18n.t('dashboard.templates.tagAuto'))).toBeNull();
     });
 
-    it('opens inline delete confirm, requires explicit confirm to call onDelete', async () => {
+    it('delegates delete to the parent (no inline confirm)', async () => {
         const user = userEvent.setup();
         const onDelete = vi.fn();
-        renderWith(<TemplateCard template={tpl} onDelete={onDelete} />);
-
-        // The action row icon button and the confirm CTA share the
-        // localised "Ištrinti" label — disambiguate by position rather
-        // than re-labelling, since both labels are intentionally the
-        // same word in the design.
-        const allDelete = () =>
-            screen.getAllByRole('button', { name: i18n.t('dashboard.templates.action.delete') });
-
-        await user.click(allDelete()[0]);
-        expect(screen.getByText(i18n.t('dashboard.templates.deleteConfirmTitle'))).toBeInTheDocument();
-
-        await user.click(screen.getByRole('button', { name: i18n.t('dashboard.templates.cancel') }));
-        expect(onDelete).not.toHaveBeenCalled();
-
-        await user.click(allDelete()[0]);
-        await user.click(screen.getByRole('button', { name: i18n.t('dashboard.templates.deleteConfirm') }));
-        expect(onDelete).toHaveBeenCalledWith(99);
+        renderWith(
+            <TemplateCard template={tpl} onOpen={noop} onShare={noop} onDuplicate={noop} onDelete={onDelete} />,
+        );
+        await user.click(screen.getByRole('button', { name: i18n.t('dashboard.templates.action.delete') }));
+        // Card just emits intent — parent (DashboardGrid) opens the
+        // ConfirmDialog. So the card itself shouldn't show the
+        // confirm copy.
+        expect(screen.queryByText(i18n.t('dashboard.templates.deleteConfirmTitle'))).toBeNull();
+        expect(onDelete).toHaveBeenCalledWith(tpl);
     });
 
-    it('exposes the 6 primary action buttons', () => {
-        renderWith(<TemplateCard template={tpl} onDelete={() => {}} />);
-        for (const key of ['open', 'share', 'stats', 'duplicate', 'archive', 'delete']) {
-            expect(
-                screen.getByRole('button', { name: i18n.t(`dashboard.templates.action.${key}`) }),
-            ).toBeInTheDocument();
-        }
+    it('fires onOpen / onShare / onDuplicate / onDelete from the action row', async () => {
+        const user = userEvent.setup();
+        const onOpen = vi.fn();
+        const onShare = vi.fn();
+        const onDuplicate = vi.fn();
+        const onDelete = vi.fn();
+        renderWith(
+            <TemplateCard template={tpl} onOpen={onOpen} onShare={onShare} onDuplicate={onDuplicate} onDelete={onDelete} />,
+        );
+        await user.click(screen.getByRole('button', { name: i18n.t('dashboard.templates.action.open') }));
+        await user.click(screen.getByRole('button', { name: i18n.t('dashboard.templates.action.share') }));
+        await user.click(screen.getByRole('button', { name: i18n.t('dashboard.templates.action.duplicate') }));
+        await user.click(screen.getByRole('button', { name: i18n.t('dashboard.templates.action.delete') }));
+        expect(onOpen).toHaveBeenCalledWith(tpl);
+        expect(onShare).toHaveBeenCalledWith(tpl);
+        expect(onDuplicate).toHaveBeenCalledWith(tpl);
+        expect(onDelete).toHaveBeenCalledWith(tpl);
+        // Stats + archive should be GONE from the action row.
+        expect(screen.queryByRole('button', { name: i18n.t('dashboard.templates.action.stats') })).toBeNull();
+        expect(screen.queryByRole('button', { name: i18n.t('dashboard.templates.action.archive') })).toBeNull();
     });
 });

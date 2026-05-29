@@ -3,21 +3,34 @@ import type { ReactElement, ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/i18n';
 import { AuthProvider } from '@/state/auth';
+import { TemplatesProvider } from '@/state/templates';
+import { CreateTemplateProvider } from '@/state/createTemplate';
+import { TemplateViewProvider } from '@/state/templateView';
+import { ThemeProvider } from '@/state/theme';
 
 /**
- * Test render helper. Wraps the unit-under-test in the providers it
- * actually needs (i18n + auth). Anything heavier (router, react-query)
- * gets added per-test rather than baked in here, so a switcher test
- * doesn't accidentally rely on a route segment for free.
+ * Test render helper. Wraps the unit-under-test in every provider the
+ * runtime tree carries (theme + i18n + auth + templates + createTemplate).
+ * Templates context fetches `/api/basket-templates/user/{userId}` on
+ * mount, so tests that mount components which transitively read it
+ * should mock `fetch` first (see `src/App.test.tsx`).
  */
 export function renderWith(
     ui: ReactElement,
     opts?: Omit<RenderOptions, 'wrapper'>,
 ) {
     const Wrapper = ({ children }: { children: ReactNode }) => (
-        <I18nextProvider i18n={i18n}>
-            <AuthProvider>{children}</AuthProvider>
-        </I18nextProvider>
+        <ThemeProvider>
+            <I18nextProvider i18n={i18n}>
+                <AuthProvider>
+                    <TemplatesProvider>
+                        <CreateTemplateProvider>
+                            <TemplateViewProvider>{children}</TemplateViewProvider>
+                        </CreateTemplateProvider>
+                    </TemplatesProvider>
+                </AuthProvider>
+            </I18nextProvider>
+        </ThemeProvider>
     );
     return render(ui, { wrapper: Wrapper, ...opts });
 }

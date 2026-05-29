@@ -1,136 +1,125 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-    ArrowUpRight, BarChart3, Copy, MoreHorizontal, Share2, Trash2, Archive,
-    Wand2, Globe2, Link as LinkIcon, Lock,
+    ArrowUpRight, Copy, Share2, Trash2,
+    Globe2, Link as LinkIcon, Lock,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { SampleTemplate } from '@/data/sampleTemplates';
+import { findPreset } from '@/data/coverPresets';
 import { cx } from '@/lib/cx';
+import { ease } from '@/lib/motion';
+
+/** True when the row has been edited since creation (updatedAt is
+ *  strictly newer than createdAt). The card switches its date stat
+ *  between "Sukurta" and "Atnaujinta" based on this. */
+function wasEdited(t: SampleTemplate): boolean {
+    return new Date(t.updatedAt).getTime() > new Date(t.createdAt).getTime();
+}
 
 interface Props {
     template: SampleTemplate;
-    onDelete: (id: number) => void;
+    onOpen: (t: SampleTemplate) => void;
+    onShare: (t: SampleTemplate) => void;
+    onDuplicate: (t: SampleTemplate) => void;
+    onDelete: (t: SampleTemplate) => void;
 }
 
 const fmtEur = (n: number) =>
     new Intl.NumberFormat('lt-LT', { maximumFractionDigits: 0 }).format(n);
 
-function relative(iso: string, t: (k: string, v?: Record<string, unknown>) => string): string {
-    const diff = Date.now() - new Date(iso).getTime();
-    const mins = Math.round(diff / 60000);
-    if (mins < 60) return t('dashboard.templates.updated', { when: `${Math.max(1, mins)} min.` });
-    const hours = Math.round(mins / 60);
-    if (hours < 24) return t('dashboard.templates.updated', { when: `${hours} val.` });
-    const days = Math.round(hours / 24);
-    return t('dashboard.templates.updated', { when: `${days} d.` });
+/** Short numeric date used in the dashboard stat row. We want
+ *  "2025-05-23" / locale-equivalent — NOT a "2 val." relative
+ *  string — because once a template is older than a few days the
+ *  relative form gets meaningless ("47 d." reads worse than a date). */
+function shortDate(iso: string, locale: string): string {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString(locale);
 }
 
 /**
  * Dashboard template card. Heftier than the mobile list-row equivalent
- * on purpose — desktop has the pixel budget for: cover band with
- * gradient + emoji, name, three visibility/auto tags, three-stat row
- * (uses · saved · updated), and the six-action row (open / share /
- * stats / duplicate / archive / delete-with-confirm).
+ * on purpose — desktop has the pixel budget for: cover band with cover
+ * avatar, name, three-stat row (uses · saved · updated), and the four-
+ * action row (open / share / duplicate / delete).
  *
- * The delete confirm is inline (slide-down) instead of a modal so
- * keyboard flow stays on the card and the rest of the grid doesn't
- * dim — feels lighter for a destructive action that's reversible by
- * tomorrow's server-side soft-delete.
+ * `layoutId="template-${id}"` connects the card to the full-screen
+ * template-open surface in App.tsx, so Atverti morphs the card into a
+ * detail view the same way Kurti šabloną morphs into the create
+ * surface. Card-level destructive UX (delete) and copy actions live
+ * in modals owned by DashboardGrid; the card just emits intent.
  */
-export function TemplateCard({ template, onDelete }: Props) {
-    const { t } = useTranslation();
-    const [confirmOpen, setConfirmOpen] = useState(false);
-
+export function TemplateCard({ template, onOpen, onShare, onDuplicate, onDelete }: Props) {
+    const { t, i18n } = useTranslation();
+    const edited = wasEdited(template);
+    const dateValue = shortDate(edited ? template.updatedAt : template.createdAt, i18n.language);
+    const dateLabel = t(edited ? 'dashboard.templates.statsUpdated' : 'dashboard.templates.statsCreated');
     return (
         <motion.article
             layout
+            layoutId={`template-${template.id}`}
+            transition={{ layout: { duration: 0.45, ease: ease.soft } }}
             whileHover={{ y: -3 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 18 }}
-            className="group relative overflow-hidden rounded-3xl bg-white ring-1 ring-souply-border/80 shadow-card hover:shadow-pop transition-shadow"
+            className="group relative overflow-hidden rounded-3xl bg-createWash ring-1 ring-edge shadow-card hover:shadow-pop transition-shadow"
         >
-            {/* Cover band */}
+            {/* Cover band — solid `coverColor`, same hex that drives
+                the basket's left edge + bookmark icon in the consumer
+                app. Cover circle on the left shows either the chosen
+                preset icon or the uploaded photo; mirrors the avatar
+                the basket-app puts on the bookmark for a signed-in
+                creator so the identity is consistent across surfaces. */}
             <div
                 className="relative h-28"
-                style={{ background: `linear-gradient(135deg, ${template.cover[0]} 0%, ${template.cover[1]} 100%)` }}
+                style={{ backgroundColor: template.coverColor }}
             >
                 <div className="absolute inset-0 flex items-center justify-between px-5">
-                    <span className="text-4xl drop-shadow-sm">{template.emoji}</span>
-                    <div className="flex flex-col items-end gap-1">
-                        <VisibilityTag visibility={template.visibility} t={t} />
-                        {template.autoUpdate && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/85 text-souply-beetDeep text-[10px] font-semibold">
-                                <Wand2 size={10} /> {t('dashboard.templates.tagAuto')}
-                            </span>
-                        )}
-                    </div>
+                    <CoverAvatar
+                        image={template.coverImage}
+                        bgColor={template.coverColor}
+                    />
+                    {/* Auto-update badge removed deliberately — the
+                        information lives in the stats row + open view
+                        instead. Visibility tag stays as the single
+                        identity badge on the cover. */}
+                    <VisibilityTag visibility={template.visibility} t={t} />
                 </div>
             </div>
 
             {/* Body */}
             <div className="p-5 flex flex-col gap-4">
                 <div>
-                    <h3 className="text-lg font-semibold text-souply-ink leading-tight">{template.name}</h3>
-                    <div className="text-xs text-souply-slate mt-0.5">
+                    <h3 className="text-lg font-semibold text-ink leading-tight">{template.name}</h3>
+                    <div className="text-xs text-ink-soft mt-0.5">
                         {template.itemCount} {template.itemCount === 1 ? 'prekė' : (template.itemCount < 10 ? 'prekės' : 'prekių')}
                     </div>
                 </div>
 
-                <dl className="grid grid-cols-3 gap-3 py-3 border-y border-souply-border/60 nums">
-                    <Stat label={t('dashboard.templates.uses', { count: '' }).replace(/\{\{.*?\}\}/g, '').trim() || 'Naudojimai'}
-                          value={new Intl.NumberFormat('lt-LT').format(template.useCount)} />
-                    <Stat label="Sutaupyta" value={`${fmtEur(Number(template.collectiveSavingsEur))} €`} accent />
-                    <Stat label="Atnaujinta" value={relative(template.updatedAt, t).replace(/^Atnaujinta /, '').replace(/^Updated /, '')} />
+                <dl className="grid grid-cols-3 gap-3 py-3 border-y border-edge nums">
+                    <Stat label={t('dashboard.templates.statsUses')}        value={new Intl.NumberFormat('lt-LT').format(template.useCount)} />
+                    <Stat label={t('dashboard.templates.statsHelpedSave')}  value={`${fmtEur(Number(template.collectiveSavingsEur))} €`} accent />
+                    <Stat label={dateLabel}                                  value={dateValue} />
                 </dl>
 
-                {/* Action row */}
+                {/* Action row — lean: open is the primary CTA;
+                    share, duplicate, delete cover the day-to-day. */}
                 <div className="flex items-center gap-1.5">
-                    <PrimaryAction icon={ArrowUpRight} label={t('dashboard.templates.action.open')} />
-                    <IconBtn icon={Share2}  label={t('dashboard.templates.action.share')} />
-                    <IconBtn icon={BarChart3} label={t('dashboard.templates.action.stats')} />
-                    <IconBtn icon={Copy}     label={t('dashboard.templates.action.duplicate')} />
-                    <IconBtn icon={Archive}  label={t('dashboard.templates.action.archive')} />
-                    <IconBtn icon={Trash2}   label={t('dashboard.templates.action.delete')} danger onClick={() => setConfirmOpen(true)} />
-                    <button
-                        aria-label="More"
-                        className="ml-auto size-8 grid place-items-center rounded-lg text-souply-slate hover:bg-souply-mist transition"
-                    >
-                        <MoreHorizontal size={16} />
-                    </button>
+                    <PrimaryAction
+                        icon={ArrowUpRight}
+                        label={t('dashboard.templates.action.open')}
+                        onClick={() => onOpen(template)}
+                    />
+                    {/* Share button is gated on visibility — a private
+                        template has no useful URL or QR, so we just
+                        don't surface the affordance. Toggle via the
+                        rail slider (create flow) or the open-view
+                        slider (Atverti) to flip back to Public. */}
+                    {template.visibility !== 'private' && (
+                        <IconBtn icon={Share2} label={t('dashboard.templates.action.share')} onClick={() => onShare(template)} />
+                    )}
+                    <IconBtn icon={Copy}   label={t('dashboard.templates.action.duplicate')} onClick={() => onDuplicate(template)} />
+                    <IconBtn icon={Trash2} label={t('dashboard.templates.action.delete')} danger onClick={() => onDelete(template)} />
                 </div>
             </div>
-
-            {/* Inline delete confirm */}
-            <AnimatePresence>
-                {confirmOpen && (
-                    <motion.div
-                        initial={{ y: 8, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: 8, opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="absolute inset-x-3 bottom-3 rounded-2xl bg-souply-ink text-white p-4 shadow-pop"
-                    >
-                        <div className="text-sm font-semibold">{t('dashboard.templates.deleteConfirmTitle')}</div>
-                        <div className="text-xs opacity-80 mb-3">{t('dashboard.templates.deleteConfirmBody')}</div>
-                        <div className="flex gap-2 justify-end">
-                            <button
-                                type="button"
-                                onClick={() => setConfirmOpen(false)}
-                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/15 transition"
-                            >
-                                {t('dashboard.templates.cancel')}
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => onDelete(template.id)}
-                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-souply-beet hover:bg-souply-beetDeep transition"
-                            >
-                                {t('dashboard.templates.deleteConfirm')}
-                            </button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </motion.article>
     );
 }
@@ -140,22 +129,23 @@ function Stat({ label, value, accent = false }: { label: string; value: string; 
         <div className="text-center">
             <div className={cx(
                 'text-base font-bold leading-none',
-                accent ? 'text-souply-beetDeep' : 'text-souply-ink',
+                accent ? 'text-beetTint-strong' : 'text-ink',
             )}>
                 {value}
             </div>
-            <div className="text-[10px] uppercase tracking-wider text-souply-slate mt-1">
+            <div className="text-[10px] uppercase tracking-wider text-ink-soft mt-1">
                 {label}
             </div>
         </div>
     );
 }
 
-function PrimaryAction({ icon: Icon, label }: { icon: typeof ArrowUpRight; label: string }) {
+function PrimaryAction({ icon: Icon, label, onClick }: { icon: typeof ArrowUpRight; label: string; onClick: () => void }) {
     return (
         <button
             type="button"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-souply-ink text-white text-xs font-semibold hover:bg-black transition"
+            onClick={onClick}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-souply-beet text-white text-xs font-semibold hover:bg-souply-beetDeep transition"
         >
             <Icon size={14} />
             {label}
@@ -180,12 +170,35 @@ function IconBtn({
             className={cx(
                 'size-8 grid place-items-center rounded-lg transition',
                 danger
-                    ? 'text-souply-slate hover:bg-souply-beetMuted hover:text-souply-beetDeep'
-                    : 'text-souply-slate hover:bg-souply-mist hover:text-souply-ink',
+                    ? 'text-ink-soft hover:bg-beetTint hover:text-beetTint-strong'
+                    : 'text-ink-soft hover:bg-surface-muted hover:text-ink',
             )}
         >
             <Icon size={15} />
         </button>
+    );
+}
+
+function CoverAvatar({ image, bgColor }: { image: SampleTemplate['coverImage']; bgColor: string }) {
+    /* Both preset and emoji variants render the same way — a glyph
+     * on top of the cover-coloured circle (with a soft black overlay
+     * so the edges contrast). Preset just looks up the glyph via
+     * iconKey; emoji uses the picked string directly. No image kind
+     * any more — uploads got dropped in favour of the Custom emoji
+     * picker. */
+    const glyph = image.kind === 'preset' ? findPreset(image.iconKey).emoji : image.emoji;
+    return (
+        <div
+            className="size-14 rounded-full grid place-items-center ring-2 ring-white/40 shadow-card"
+            style={{
+                backgroundColor: bgColor,
+                backgroundImage: 'linear-gradient(rgba(0,0,0,.18), rgba(0,0,0,.18))',
+            }}
+        >
+            <span className="text-2xl leading-none select-none" aria-hidden>
+                {glyph}
+            </span>
+        </div>
     );
 }
 
@@ -201,8 +214,12 @@ function VisibilityTag({
         private:  { Icon: Lock,     label: t('dashboard.templates.tagPrivate') },
     } as const;
     const { Icon, label } = map[visibility];
+    /* `bg-surface text-ink` swaps both colours with the theme: light
+     * paper + dark text in light mode, dark surface + light text in
+     * dark mode. The old `bg-white/85 text-ink` rendered as light text
+     * on a white pill in dark mode — invisible. */
     return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/85 text-souply-ink text-[10px] font-semibold">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface text-ink text-[10px] font-semibold shadow-card">
             <Icon size={10} /> {label}
         </span>
     );

@@ -3,14 +3,18 @@ import type { ReactNode } from 'react';
 
 /**
  * Auth state. Tonight: a single in-memory boolean populated by clicking
- * the OAuth buttons (no network). Tomorrow this same hook gets a real
- * `login(provider)` that talks to souply-api and stores the issued JWT
- * in an httpOnly cookie; the rest of the app doesn't change.
- *
- * The shape is deliberately small so the wire-up tomorrow is a contract
- * widening, not a rewrite.
+ * the OAuth buttons. The dev OAuth path reads `VITE_DEV_USER_ID` from
+ * `.env.local` so the dashboard can fetch templates for a real user in
+ * `Basket-DB-Test` without needing a real JWT. Tomorrow this same hook
+ * gets a real `login(provider)` that talks to souply-api and stores
+ * the issued JWT in an httpOnly cookie; the rest of the app doesn't
+ * change.
  */
 interface User {
+    /** Server-side UUID, used as the `userId` URL segment for every
+     *  templates / baskets endpoint. Anonymous + verified users carry
+     *  the same shape. */
+    id: string;
     name: string;
     handle: string;
 }

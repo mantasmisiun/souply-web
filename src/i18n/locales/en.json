@@ -1,7 +1,7 @@
 {
   "brand": {
     "name": "Souply",
-    "tagline": "Save on what you actually buy."
+    "tagline": "Shop smart."
   },
   "lang": {
     "lt": "Lithuanian",
@@ -25,6 +25,20 @@
     "thanks": "Thanks! Your invite lands within a day.",
     "creatorLogin": "Creator login",
     "createCreator": "Create creator account",
+    "creatorIntroTitle": "Creator account",
+    "creatorIntroBody": "Regular shoppers don't need an account — Souply works anonymously. A creator account is only for people who want to share their templates publicly.",
+    "creatorIntroBullet1": "You post your grocery hauls on social media",
+    "creatorIntroBullet2": "You write recipes and want followers to grab the ingredients in one tap",
+    "creatorIntroBullet3": "You want your @handle on every basket created from your template",
+    "creatorBenefitsHeading": "Who it's for",
+    "creatorPersona1": "Meal planner",
+    "creatorBenefit1": "No more spreadsheet lists — your weekly plan becomes a basket in one tap.",
+    "creatorPersona2": "Dietitian",
+    "creatorBenefit2": "Your specific brands found in seconds; clients see where to buy them cheapest.",
+    "creatorPersona3": "Recipe writer",
+    "creatorBenefit3": "A QR code under your recipe becomes a basket on the reader's phone.",
+    "creatorPersona4": "Social creator",
+    "creatorBenefit4": "A follower taps the link under your video and finds the products at their preferred store.",
     "loginGoogle": "Continue with Google",
     "loginApple": "Continue with Apple",
     "back": "Back"
@@ -44,14 +58,38 @@
     "welcome": "Welcome, {{name}}",
     "username": "@{{handle}}",
     "stats": {
-      "templates": "Templates",
-      "uses": "Uses",
       "savings": "Saved",
-      "followers": "Followers"
+      "templates_one": "Template",
+      "templates_few": "Templates",
+      "templates_other": "Templates",
+      "uses_one": "Use",
+      "uses_few": "Uses",
+      "uses_other": "Uses",
+      "followers_one": "Follower",
+      "followers_few": "Followers",
+      "followers_other": "Followers"
     },
     "templates": {
       "title": "Your templates",
       "newCta": "New template",
+      "createCardLabel": "Create template",
+      "createTitle": "New template",
+      "createNamePlaceholder": "Template name",
+      "createNameLabel": "Name",
+      "createItemsHeading": "Template items",
+      "createItemsEmpty": "Add products from the categories or search on the left.",
+      "createBrowseTitle": "Categories",
+      "createSearchPlaceholder": "Search products…",
+      "createSave": "Save template",
+      "createCancel": "Cancel",
+      "createSearchNoResults": "No results",
+      "createSearchHint": "Type at least 2 characters",
+      "createBackToCategories": "Back to categories",
+      "createAddBtn": "Add",
+      "addToTemplate": "To template",
+      "createAddedBadge": "Added",
+      "createRemoveLabel": "Remove",
+      "createQuantityLabel": "Quantity",
       "empty": "No templates yet. Create your first one in the mobile app.",
       "uses": "{{count}} uses",
       "saved": "Saved {{amount}} €",
@@ -66,14 +104,95 @@
         "stats": "Stats",
         "duplicate": "Duplicate",
         "archive": "Archive",
-        "delete": "Delete"
+        "delete": "Delete",
+        "edit": "Edit",
+        "close": "Close"
       },
       "deleteConfirmTitle": "Delete template?",
       "deleteConfirmBody": "This can't be undone.",
       "deleteConfirm": "Yes, delete",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "back": "Back",
+      "tabPreview": "Preview",
+      "tabStats": "Stats",
+      "openProducts": "Products",
+      "visibilityLabel": "Visibility",
+      "statsVisits": "Visits",
+      "statsUses": "Times used",
+      "statsHelpedSave": "You helped save",
+      "statsCreated": "Created",
+      "statsUpdated": "Updated",
+      "statsVisitsExplainer": "Link opens and QR scans.",
+      "statsUsesExplainer": "Shopping lists generated from this template.",
+      "statsHelpedSaveExplainer": "Total saved by all visitors.",
+      "statsExplainerOpen": "About this metric",
+      "statsExplainerClose": "Back to value",
+      "viewSave": "Done",
+      "viewNoChanges": "No changes",
+      "share": {
+        "title": "Share this template",
+        "body": "Anyone with the link will land in the cheapest store carrying these items.",
+        "link": "Link",
+        "copyLink": "Copy link",
+        "copied": "Copied!",
+        "downloadQr": "Download QR (PNG)",
+        "disabledPrivate": "This template is private — switch visibility to Public to share."
+      },
+      "duplicate": {
+        "title": "Duplicate template",
+        "body": "We'll create a copy with the same products. You can change the name and cover.",
+        "nameLabel": "New template name",
+        "copySuffix": "_copy",
+        "create": "Create copy"
+      }
     },
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "logoutConfirm": {
+      "title": "Sign out?",
+      "body": "Your creator dashboard will close and you'll go back to the landing page.",
+      "yes": "Yes, sign out",
+      "no": "Cancel"
+    }
+  },
+  "browse": {
+    "include": "Include"
+  },
+  "amountPicker": {
+    "weighable": "Sold by weight",
+    "packages_one": "Pack: {{value}} {{unit}}",
+    "packages_other": "Packs: {{min}} – {{max}} {{unit}}",
+    "label": "How much to include?",
+    "hintWeighable": "Quantity will be weighed in store",
+    "hintPackages": "Quantity will be rounded up to the next pack",
+    "add": "Add",
+    "cancel": "Cancel",
+    "jokeTitle": "Ha ha, nice number!",
+    "jokeBody": "{{value}} {{unit}} — looks less like a grocery list and more like a math problem. You sure?",
+    "jokeContinue": "Continue",
+    "jokeCancel": "Cancel"
+  },
+  "cover": {
+    "label": "Cover picture",
+    "changeLabel": "Change",
+    "customAction": "Pick an emoji",
+    "presetHint": "Pick a popular one or tap the last button to browse the full list.",
+    "back": "Back",
+    "emojiGroup": {
+      "fruit":   "Fruit",
+      "veg":     "Vegetables",
+      "protein": "Protein",
+      "grain":   "Bread & grains",
+      "meal":    "Meals",
+      "sweet":   "Sweets",
+      "drink":   "Drinks"
+    },
+    "preset": {
+      "salad": "Salad",
+      "avocado": "Avocado",
+      "protein": "Protein",
+      "apple": "Apple",
+      "smoothie": "Smoothie"
+    }
   },
   "features": {
     "user": {

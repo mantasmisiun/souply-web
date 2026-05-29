@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
+import { Check, ChevronRight } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { ThemeToggle } from './ThemeToggle';
 import { BetaSignup } from './BetaSignup';
 import { CreatorAuthPanel } from './CreatorAuthPanel';
 import { cx } from '@/lib/cx';
@@ -12,11 +13,14 @@ interface Props {
     view: View;
     onOpenCreatorAuth: () => void;
     onBackToVisitor: () => void;
-    onAuthenticated: () => void;
+    onAuthenticated: (mode: 'login' | 'signup') => void;
     /** When true, band is animating to merge with the left-edge
      *  dashboard panel — outer page handles the position, this just
      *  fades its content out so the merge reads as one motion. */
     isMerging?: boolean;
+    /** Forwarded straight to CreatorAuthPanel so the clicked CTA shows
+     *  a spinner while App.tsx waits on the auth + templates fetch. */
+    pendingAuthMode?: 'login' | 'signup' | null;
 }
 
 /**
@@ -39,6 +43,7 @@ export function SideBand({
     view,
     onOpenCreatorAuth, onBackToVisitor, onAuthenticated,
     isMerging = false,
+    pendingAuthMode = null,
 }: Props) {
     const { t } = useTranslation();
     const year = new Date().getFullYear();
@@ -46,7 +51,7 @@ export function SideBand({
     return (
         <div
             className={cx(
-                'relative h-full w-full bg-white rounded-l-[40px] md:rounded-[40px] shadow-band',
+                'relative h-full w-full bg-surface rounded-l-[40px] md:rounded-[40px] shadow-band',
                 'overflow-hidden',
             )}
             data-testid="side-band"
@@ -58,9 +63,12 @@ export function SideBand({
             />
 
             <div className="flex flex-col h-full p-7 md:p-8">
-                <header className="flex items-center justify-between">
+                <header className="flex items-center justify-between gap-2">
                     <BrandMark />
-                    <LanguageSwitcher />
+                    <div className="flex items-center gap-1.5">
+                        <ThemeToggle />
+                        <LanguageSwitcher />
+                    </div>
                 </header>
 
                 <AnimatePresence mode="wait">
@@ -78,16 +86,17 @@ export function SideBand({
                             <CreatorAuthPanel
                                 onSubmit={onAuthenticated}
                                 onBack={onBackToVisitor}
+                                pending={pendingAuthMode}
                             />
                         )}
 
-                        <footer className="text-[11px] text-souply-slate/80 leading-relaxed">
+                        <footer className="text-[11px] text-ink-soft/80 leading-relaxed">
                             <div className="flex items-center gap-3 mb-2">
-                                <a href="#" className="hover:text-souply-ink transition">{t('footer.privacy')}</a>
+                                <a href="#" className="hover:text-ink transition">{t('footer.privacy')}</a>
                                 <span className="opacity-30">·</span>
-                                <a href="#" className="hover:text-souply-ink transition">{t('footer.terms')}</a>
+                                <a href="#" className="hover:text-ink transition">{t('footer.terms')}</a>
                                 <span className="opacity-30">·</span>
-                                <a href="#" className="hover:text-souply-ink transition">{t('footer.contact')}</a>
+                                <a href="#" className="hover:text-ink transition">{t('footer.contact')}</a>
                             </div>
                             <div>{t('footer.rights', { year })}</div>
                         </footer>
@@ -106,8 +115,8 @@ function BrandMark() {
                 S
             </span>
             <div className="leading-tight">
-                <div className="text-sm font-semibold tracking-tight text-souply-ink">{t('brand.name')}</div>
-                <div className="text-[10px] text-souply-slate/80 uppercase tracking-[0.18em]">.lt</div>
+                <div className="text-sm font-semibold tracking-tight text-ink">{t('brand.name')}</div>
+                <div className="text-[10px] text-ink-soft/80 uppercase tracking-[0.18em]">.lt</div>
             </div>
         </div>
     );
@@ -115,15 +124,45 @@ function BrandMark() {
 
 function VisitorBody({ onOpenCreatorAuth }: { onOpenCreatorAuth: () => void }) {
     const { t } = useTranslation();
+    const bullets = [
+        t('cta.creatorIntroBullet1'),
+        t('cta.creatorIntroBullet2'),
+        t('cta.creatorIntroBullet3'),
+    ];
     return (
         <div className="flex flex-col gap-7">
             <BetaSignup />
 
-            <div className="pt-2 border-t border-souply-border/60">
+            {/* Creator explainer + CTA. Lives under the divider so the
+                beta-tester (top) and would-be creator (bottom) paths are
+                visually separated. The explainer copy is shared with the
+                mobile app's Šablonas → Statistika tab so creators see the
+                same framing on both surfaces. */}
+            <div className="pt-5 border-t border-edge/60 flex flex-col gap-3">
+                <h4 className="text-sm font-semibold text-ink">
+                    {t('cta.creatorIntroTitle')}
+                </h4>
+                <p className="text-xs text-ink-soft leading-relaxed">
+                    {t('cta.creatorIntroBody')}
+                </p>
+                <ul className="flex flex-col gap-1.5">
+                    {bullets.map((line) => (
+                        <li key={line} className="flex items-start gap-2 text-xs text-ink-soft leading-snug">
+                            <Check size={12} className="mt-[3px] shrink-0 text-souply-beet" />
+                            <span>{line}</span>
+                        </li>
+                    ))}
+                </ul>
+
                 <button
                     type="button"
                     onClick={onOpenCreatorAuth}
-                    className="group w-full inline-flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-souply-ink text-white text-sm font-semibold shadow-card hover:bg-black transition"
+                    /* `bg-ink text-surface` swaps both colours with the
+                     * theme: dark button + light text in light mode,
+                     * light button + dark text in dark mode. Always
+                     * high-contrast against the band, never competes
+                     * with the pink beta CTA above. */
+                    className="mt-2 group w-full inline-flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-ink text-surface text-sm font-semibold shadow-card hover:opacity-90 transition"
                 >
                     <span>{t('cta.creatorLogin')}</span>
                     <ChevronRight size={16} className="opacity-80 group-hover:translate-x-0.5 transition-transform" />

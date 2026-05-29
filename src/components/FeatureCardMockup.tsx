@@ -18,14 +18,18 @@ export function FeatureCardMockup({ icon: Icon, title, body }: Props) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-[1fr_minmax(0,260px)] gap-8 items-center w-full">
             <div className="text-left">
-                <div className="inline-flex items-center gap-2 mb-5 px-3 py-1 rounded-full bg-souply-beetMuted text-souply-beetDeep text-[11px] font-semibold tracking-wider uppercase">
+                <div className="inline-flex items-center gap-2 mb-5 px-3 py-1 rounded-full bg-beetTint text-beetTint-strong text-[11px] font-semibold tracking-wider uppercase">
                     <span className="size-1.5 rounded-full bg-souply-beet" />
                     Souply
                 </div>
-                <h2 className="font-display font-bold text-souply-ink tracking-tight text-3xl md:text-4xl lg:text-5xl leading-[1.05] mb-4">
+                {/* On the pink page we want the inverse of the
+                 *  surface tokens — white-ish text in light theme,
+                 *  dark text in dark theme — so the words always
+                 *  contrast against pink, not against the band. */}
+                <h2 className="font-display font-bold text-surface tracking-tight text-3xl md:text-4xl lg:text-5xl leading-[1.05] mb-4">
                     {title}
                 </h2>
-                <p className="text-souply-slate text-base md:text-lg leading-relaxed max-w-md">
+                <p className="text-surface/80 text-base md:text-lg leading-relaxed max-w-md">
                     {body}
                 </p>
             </div>
@@ -39,7 +43,7 @@ export function FeatureCardMockup({ icon: Icon, title, body }: Props) {
                 <div className="relative w-[220px] h-[440px] rounded-[40px] mockup-grad shadow-pop ring-1 ring-white/40">
                     {/* Faux notch + screen content */}
                     <div className="absolute inset-x-0 top-2 h-6 flex justify-center">
-                        <span className="w-20 h-5 rounded-full bg-souply-ink/40" />
+                        <span className="w-20 h-5 rounded-full bg-ink/40" />
                     </div>
                     <div className="absolute inset-3 top-10 rounded-[28px] bg-white/15 backdrop-blur-[2px] ring-1 ring-white/30 flex items-center justify-center">
                         <Icon size={84} strokeWidth={1.4} className="text-white/90 drop-shadow-md" />

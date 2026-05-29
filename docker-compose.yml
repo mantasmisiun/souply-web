@@ -1,0 +1,58 @@
+# docker-compose for deploying souply-web to OMV at /opt/souply/souply-web.
+#
+# Unlike souply-api this app has no ../shared dependency, so the build
+# context is this directory (not the parent).
+#
+# Build + run from /opt/souply/souply-web:
+#   docker compose build
+#   docker compose up -d
+#   docker compose logs -f
+#
+# Traefik (on the Pi) routes souply.manofoto.dpdns.org → 192.168.1.212:8085.
+# The container listens on :80; we publish it on host 8085.
+#
+# BUILD-time:  VITE_API_BASE_URL is baked into the JS bundle (browser
+#              talks to the public API). Change it for prod via the
+#              build arg below.
+# RUNTIME:     SSR_API_URL / PUBLIC_ORIGIN / OG_FALLBACK_IMAGE drive the
+#              /t/:slug prerender in server/index.js.
+
+services:
+  souply-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Browser → public API (baked into the bundle at build time).
+        VITE_API_BASE_URL: https://api.souply.manofoto.dpdns.org
+        # TEST-ONLY simulated login until real OAuth (Phase 3) lands.
+        # souply_production is a Basket_DB copy; this UUID is the dev
+        # user. Remove this whole block + the simulated login for prod.
+        VITE_DEV_USER_ID: 00000000-0000-0000-0000-000000000000
+        VITE_DEV_USER_NAME: Mantas Misiūnas
+        VITE_DEV_USER_HANDLE: mantasm
+    container_name: souply-web
+    restart: unless-stopped
+
+    # 8085 is free on OMV (8080=vault, 8082=seafile, 8090=qbit,
+    # 8091=filebrowser, 8096=jellyfin all taken). Matches the Traefik
+    # service target.
+    ports:
+      - "8085:80"
+
+    environment:
+      # server→souply-api for the share-link prerender. Internal host
+      # address so the fetch doesn't round-trip out through Traefik.
+      SSR_API_URL: http://192.168.1.212:3001
+      # canonical public origin for og:url (→ https://souply.lt in prod)
+      PUBLIC_ORIGIN: https://souply.manofoto.dpdns.org
+      # default share image until the dynamic per-template OG endpoint
+      # ships. Drop a 1200×630 PNG at public/og-default.png.
+      OG_FALLBACK_IMAGE: https://souply.manofoto.dpdns.org/og-default.png
+
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:80/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

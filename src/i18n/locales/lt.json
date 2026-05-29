@@ -1,7 +1,7 @@
 {
   "brand": {
     "name": "Souply",
-    "tagline": "Taupyk dėl to, ką tikrai perki."
+    "tagline": "Apsipirk išmaniai."
   },
   "lang": {
     "lt": "Lietuvių",
@@ -25,6 +25,20 @@
     "thanks": "Ačiū! Kvietimas atkeliaus per parą.",
     "creatorLogin": "Kūrėjo prisijungimas",
     "createCreator": "Sukurti kūrėjo paskyrą",
+    "creatorIntroTitle": "Kūrėjo paskyra",
+    "creatorIntroBody": "Įprasti pirkėjai neprivalo turėti paskyros — Souply veikia anonimiškai. Kūrėjo paskyra reikalinga tik tada, jei nori dalintis savo šablonais viešai.",
+    "creatorIntroBullet1": "Kuri savo apsipirkimo turinį ir dalinies juo socialiniuose tinkluose",
+    "creatorIntroBullet2": "Rašai receptus ir nori, kad sekėjai matytų reikalingų prekių sąrašą",
+    "creatorIntroBullet3": "Nori, kad tavo @vardas liktų ant kiekvieno krepšelio, sukurto iš tavo šablono",
+    "creatorBenefitsHeading": "Kam tai tinka?",
+    "creatorPersona1": "Mitybos planuotojas",
+    "creatorBenefit1": "Klientui nereikia sąrašo Excel'yje — savaitės valgiaraštis virsta krepšeliu vienu paspaudimu.",
+    "creatorPersona2": "Dietologas",
+    "creatorBenefit2": "Tavo specifiniai produktai surandami per sekundes; klientas matys, kur juos pigiausiai gauti.",
+    "creatorPersona3": "Receptų autorius",
+    "creatorBenefit3": "QR kodas po tavo receptu tampa krepšeliu kliento telefone.",
+    "creatorPersona4": "Soc. tinklų kūrėjas",
+    "creatorBenefit4": "Sekėjas paliečia nuorodą po vaizdo įrašu ir randa reikalingus produktus jam patogioje parduotuvėje.",
     "loginGoogle": "Tęsti su Google",
     "loginApple": "Tęsti su Apple",
     "back": "Atgal"
@@ -44,14 +58,38 @@
     "welcome": "Sveika(s), {{name}}",
     "username": "@{{handle}}",
     "stats": {
-      "templates": "Šablonų",
-      "uses": "Pasinaudojimų",
       "savings": "Sutaupyta",
-      "followers": "Sekėjų"
+      "templates_one": "Šablonas",
+      "templates_few": "Šablonai",
+      "templates_other": "Šablonų",
+      "uses_one": "Pasinaudojimas",
+      "uses_few": "Pasinaudojimai",
+      "uses_other": "Pasinaudojimų",
+      "followers_one": "Sekėjas",
+      "followers_few": "Sekėjai",
+      "followers_other": "Sekėjų"
     },
     "templates": {
       "title": "Tavo šablonai",
       "newCta": "Naujas šablonas",
+      "createCardLabel": "Kurti šabloną",
+      "createTitle": "Naujas šablonas",
+      "createNamePlaceholder": "Šablono pavadinimas",
+      "createNameLabel": "Pavadinimas",
+      "createItemsHeading": "Šablono prekės",
+      "createItemsEmpty": "Pridėk prekių iš kairės kategorijų sąrašo arba per paiešką.",
+      "createBrowseTitle": "Kategorijos",
+      "createSearchPlaceholder": "Ieškoti prekių…",
+      "createSave": "Išsaugoti šabloną",
+      "createCancel": "Atšaukti",
+      "createSearchNoResults": "Nieko nerasta",
+      "createSearchHint": "Įveskite bent 2 simbolius",
+      "createBackToCategories": "Grįžti į kategorijas",
+      "createAddBtn": "Pridėti",
+      "addToTemplate": "Į šabloną",
+      "createAddedBadge": "Pridėta",
+      "createRemoveLabel": "Pašalinti",
+      "createQuantityLabel": "Kiekis",
       "empty": "Dar nėra šablonų. Sukurk pirmąjį iš mobilios aplikacijos.",
       "uses": "{{count}} kartų",
       "saved": "Sutaupyta {{amount}} €",
@@ -66,14 +104,95 @@
         "stats": "Statistika",
         "duplicate": "Dubliuoti",
         "archive": "Archyvuoti",
-        "delete": "Ištrinti"
+        "delete": "Ištrinti",
+        "edit": "Redaguoti",
+        "close": "Uždaryti"
       },
       "deleteConfirmTitle": "Ištrinti šabloną?",
       "deleteConfirmBody": "Šis veiksmas negrįžtamas.",
       "deleteConfirm": "Taip, ištrinti",
-      "cancel": "Atšaukti"
+      "cancel": "Atšaukti",
+      "back": "Atgal",
+      "tabPreview": "Peržiūra",
+      "tabStats": "Statistika",
+      "openProducts": "Prekės",
+      "visibilityLabel": "Matomumas",
+      "statsVisits": "Apsilankymai",
+      "statsUses": "Kartai",
+      "statsHelpedSave": "Padėjai sutaupyti",
+      "statsCreated": "Sukurta",
+      "statsUpdated": "Atnaujinta",
+      "statsVisitsExplainer": "Nuorodos atidarymai ir QR nuskaitymai.",
+      "statsUsesExplainer": "Sugeneruoti pirkinių sąrašai iš šablono.",
+      "statsHelpedSaveExplainer": "Visų lankytojų sutaupyta suma.",
+      "statsExplainerOpen": "Apie šį rodiklį",
+      "statsExplainerClose": "Atgal į vertę",
+      "viewSave": "Užbaigti",
+      "viewNoChanges": "Pakeitimų nėra",
+      "share": {
+        "title": "Pasidalink šablonu",
+        "body": "Bet kas su nuoroda gaus tą patį krepšelį pigiausioje parduotuvėje.",
+        "link": "Nuoroda",
+        "copyLink": "Kopijuoti nuorodą",
+        "copied": "Nukopijuota!",
+        "downloadQr": "Atsisiųsti QR (PNG)",
+        "disabledPrivate": "Šablonas privatus — perjunk matomumą į „Vieša“, kad galėtum dalintis."
+      },
+      "duplicate": {
+        "title": "Dubliuoti šabloną",
+        "body": "Sukursime kopiją su tomis pačiomis prekėmis. Pavadinimą ir viršelį gali pakeisti.",
+        "nameLabel": "Naujo šablono pavadinimas",
+        "copySuffix": "_kopija",
+        "create": "Kurti kopiją"
+      }
     },
-    "logout": "Atsijungti"
+    "logout": "Atsijungti",
+    "logoutConfirm": {
+      "title": "Atsijungti?",
+      "body": "Tavo kūrėjo darbalaukis užsidarys ir grįši į pradžios puslapį.",
+      "yes": "Taip, atsijungti",
+      "no": "Atšaukti"
+    }
+  },
+  "browse": {
+    "include": "Įtraukti"
+  },
+  "amountPicker": {
+    "weighable": "Parduodama pagal svorį",
+    "packages_one": "Pakuotė: {{value}} {{unit}}",
+    "packages_other": "Pakuotės: {{min}} – {{max}} {{unit}}",
+    "label": "Kiek įtraukti?",
+    "hintWeighable": "Kiekis bus pasvertas parduotuvėje",
+    "hintPackages": "Kiekis bus suapvalintas pagal pakuotės dydį",
+    "add": "Pridėti",
+    "cancel": "Atšaukti",
+    "jokeTitle": "Cha cha, gražus skaičius!",
+    "jokeBody": "{{value}} {{unit}} — tai jau ne pirkinių sąrašas, o matematikos uždavinys. Tikrai tiek reikia?",
+    "jokeContinue": "Tęsti",
+    "jokeCancel": "Atšaukti"
+  },
+  "cover": {
+    "label": "Viršelio paveikslėlis",
+    "changeLabel": "Keisti",
+    "customAction": "Pasirinkti emoji",
+    "presetHint": "Pasirink iš populiarių arba paspausk paskutinį mygtuką, kad atvertum visus.",
+    "back": "Atgal",
+    "emojiGroup": {
+      "fruit":   "Vaisiai",
+      "veg":     "Daržovės",
+      "protein": "Baltymai",
+      "grain":   "Duona ir grūdai",
+      "meal":    "Patiekalai",
+      "sweet":   "Saldumynai",
+      "drink":   "Gėrimai"
+    },
+    "preset": {
+      "salad": "Salotos",
+      "avocado": "Avokadas",
+      "protein": "Baltymai",
+      "apple": "Obuolys",
+      "smoothie": "Kokteilis"
+    }
   },
   "features": {
     "user": {
