@@ -1,0 +1,111 @@
+{
+  "brand": {
+    "name": "Souply",
+    "tagline": "Taupyk dėl to, ką tikrai perki."
+  },
+  "lang": {
+    "lt": "Lietuvių",
+    "en": "English",
+    "short": { "lt": "LT", "en": "EN" }
+  },
+  "audience": {
+    "user": "Naudotojui",
+    "creator": "Kūrėjui",
+    "switchToCreator": "Esu kūrėja(s)",
+    "switchToUser": "Esu naudotoja(s)"
+  },
+  "cta": {
+    "joinBeta": "Prisijunk prie beta testavimo",
+    "joinBetaSub": "Pasirink telefoną — atsiųsime kvietimą.",
+    "iosLabel": "iOS",
+    "androidLabel": "Android",
+    "namePlaceholder": "Vardas Pavardė",
+    "emailPlaceholder": "tu@email.lt",
+    "send": "Gauti kvietimą",
+    "thanks": "Ačiū! Kvietimas atkeliaus per parą.",
+    "creatorLogin": "Kūrėjo prisijungimas",
+    "createCreator": "Sukurti kūrėjo paskyrą",
+    "loginGoogle": "Tęsti su Google",
+    "loginApple": "Tęsti su Apple",
+    "back": "Atgal"
+  },
+  "carousel": {
+    "prev": "Ankstesnė",
+    "next": "Kita",
+    "dotLabel": "Skaidrė {{n}}"
+  },
+  "footer": {
+    "rights": "© {{year}} Souply. Visos teisės saugomos.",
+    "privacy": "Privatumas",
+    "terms": "Sąlygos",
+    "contact": "Kontaktai"
+  },
+  "dashboard": {
+    "welcome": "Sveika(s), {{name}}",
+    "username": "@{{handle}}",
+    "stats": {
+      "templates": "Šablonų",
+      "uses": "Pasinaudojimų",
+      "savings": "Sutaupyta",
+      "followers": "Sekėjų"
+    },
+    "templates": {
+      "title": "Tavo šablonai",
+      "newCta": "Naujas šablonas",
+      "empty": "Dar nėra šablonų. Sukurk pirmąjį iš mobilios aplikacijos.",
+      "uses": "{{count}} kartų",
+      "saved": "Sutaupyta {{amount}} €",
+      "updated": "Atnaujinta {{when}}",
+      "tagPublic": "Vieša",
+      "tagUnlisted": "Su nuoroda",
+      "tagPrivate": "Privati",
+      "tagAuto": "Auto-atnaujinama",
+      "action": {
+        "open": "Atverti",
+        "share": "Dalintis",
+        "stats": "Statistika",
+        "duplicate": "Dubliuoti",
+        "archive": "Archyvuoti",
+        "delete": "Ištrinti"
+      },
+      "deleteConfirmTitle": "Ištrinti šabloną?",
+      "deleteConfirmBody": "Šis veiksmas negrįžtamas.",
+      "deleteConfirm": "Taip, ištrinti",
+      "cancel": "Atšaukti"
+    },
+    "logout": "Atsijungti"
+  },
+  "features": {
+    "user": {
+      "compare": { "title": "Visos parduotuvės vienoje vietoje", "body": "Maxima, Rimi, IKI, Norfa, Lidl — viena paieška, viena kaina." },
+      "scan": { "title": "Skenuok kvitą — gauk įžvalgas", "body": "Pirmą kartą Lietuvoje — kvitas virsta įpročių žemėlapiu." },
+      "habits": { "title": "Šablonas, kuris kuriasi pats", "body": "Įkelk 3 kvitus iš 2 parduotuvių — Souply pasiūlys tavo savaitės krepšelį." },
+      "discounts": { "title": "Nuolaidos vienu žvilgsniu", "body": "Visos akcijos visose grandinėse vienoje juostoje, atnaujinama kasdien." },
+      "history": { "title": "Kainų istorija", "body": "Matyk, ar dabar pigiau nei prieš mėnesį — kiekvienai prekei." },
+      "bestStore": { "title": "Pigiausia parduotuvė tavo krepšeliui", "body": "Iškart parodysime, kuri parduotuvė tave šįkart taupo daugiausiai." },
+      "perKg": { "title": "Mokėk už kilogramą, ne už pakuotę", "body": "Automatinis vienetinės kainos perskaičiavimas — 250 g vs 1 kg." },
+      "gamify": { "title": "Tavo profilis, tavo žaidimas", "body": "Lygiai, taškai ir balsavimai už geriausius pasiūlymus." },
+      "quickRepeat": { "title": "Pakartok pirkimą per 5 sekundes", "body": "Vienas mygtukas — šablonas tampa krepšeliu pigiausioje parduotuvėje." },
+      "multiStore": { "title": "Krepšelis kelioms parduotuvėms", "body": "Norfa + Lidl + Rimi — Souply parodys, kur ką pirkti." },
+      "alts": { "title": "Pakeisk prekę vienu mostelėjimu", "body": "Per brangu? Pasiūlysime alternatyvą už 30 % mažesnę kainą." },
+      "monthly": { "title": "Mėnesinis sutaupymo praneši mas", "body": "Kas mėnesį parodysime, kiek sutaupei lyginant su brangiausiu pasirinkimu." },
+      "recovery": { "title": "Pamesti kvitai? Susigrąžinsi paskyrą", "body": "Trijų kvitų užtenka, kad atgautum visą istoriją naujame telefone." },
+      "shared": { "title": "Šeimynos krepšelis", "body": "Dalinkis šablonu su namiškiais — visi mato tą patį sąrašą." },
+      "seasonal": { "title": "Sezoniniai pikai vienoje vietoje", "body": "Avietės liepą, mandarinai gruodį — kainos pagal sezoną." },
+      "veggie": { "title": "Augalų valgytojams", "body": "Filtruok, žymėk ir matyk, kur pigiausia veganiška lentyna." },
+      "voice": { "title": "Diktuok pirkinių sąrašą", "body": "Pasakyk „pienas, duona, kiaušiniai“ — Souply suras pigiausią." },
+      "weekly": { "title": "Savaitės taupiklis", "body": "Pirmadienį atsiųsime, kaip sutaupyti 8–15 € šią savaitę." },
+      "noAccount": { "title": "Be paskyros, be reklamų", "body": "Naršyk ir palygink iškart — paskyra reikalinga tik šablonams." },
+      "lt": { "title": "Lietuviams, Lietuvoje", "body": "Kainos iš tikrų Lietuvos parduotuvių. Realiu laiku." }
+    },
+    "creator": {
+      "share": { "title": "Pasidalink savo krepšeliu", "body": "Sukurk šabloną, gauk QR ir nuorodą — taupymas keliauja kartu." },
+      "savings": { "title": "Sek bendrą sutaupymą", "body": "Realiu laiku stebėk, kiek tavo sekėjai sutaupė pagal tavo šabloną." },
+      "recipe": { "title": "Receptas → krepšelis → parduotuvė", "body": "Receptas virsta sąrašu, sąrašas — pigiausia parduotuve sekėjui." },
+      "publish": { "title": "Šablonai, kuriuos perka tūkstančiai", "body": "Vienas šablonas, daug pasinaudojimų — augink poveikį be reklamų." },
+      "profile": { "title": "Viešas profilis @tavovardas", "body": "Visi tavo šablonai vienoje puslapyje — pasidalink kartą, dirba visada." },
+      "auto": { "title": "Auto-atnaujinimas pagal tavo kvitus", "body": "Tavo šabloninas mokosi iš tavo paties pirkimų." },
+      "stats": { "title": "Statistika ir auditorija", "body": "Per dieną, savaitę, mėnesį — kas tavo šablonus naudoja ir kur." }
+    }
+  }
+}

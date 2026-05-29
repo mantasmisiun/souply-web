@@ -1,0 +1,111 @@
+{
+  "brand": {
+    "name": "Souply",
+    "tagline": "Save on what you actually buy."
+  },
+  "lang": {
+    "lt": "Lithuanian",
+    "en": "English",
+    "short": { "lt": "LT", "en": "EN" }
+  },
+  "audience": {
+    "user": "For shoppers",
+    "creator": "For creators",
+    "switchToCreator": "I'm a creator",
+    "switchToUser": "I'm a shopper"
+  },
+  "cta": {
+    "joinBeta": "Join the beta",
+    "joinBetaSub": "Pick your phone — we'll send the invite.",
+    "iosLabel": "iOS",
+    "androidLabel": "Android",
+    "namePlaceholder": "Full name",
+    "emailPlaceholder": "you@email.com",
+    "send": "Get my invite",
+    "thanks": "Thanks! Your invite lands within a day.",
+    "creatorLogin": "Creator login",
+    "createCreator": "Create creator account",
+    "loginGoogle": "Continue with Google",
+    "loginApple": "Continue with Apple",
+    "back": "Back"
+  },
+  "carousel": {
+    "prev": "Previous",
+    "next": "Next",
+    "dotLabel": "Slide {{n}}"
+  },
+  "footer": {
+    "rights": "© {{year}} Souply. All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "contact": "Contact"
+  },
+  "dashboard": {
+    "welcome": "Welcome, {{name}}",
+    "username": "@{{handle}}",
+    "stats": {
+      "templates": "Templates",
+      "uses": "Uses",
+      "savings": "Saved",
+      "followers": "Followers"
+    },
+    "templates": {
+      "title": "Your templates",
+      "newCta": "New template",
+      "empty": "No templates yet. Create your first one in the mobile app.",
+      "uses": "{{count}} uses",
+      "saved": "Saved {{amount}} €",
+      "updated": "Updated {{when}}",
+      "tagPublic": "Public",
+      "tagUnlisted": "Unlisted",
+      "tagPrivate": "Private",
+      "tagAuto": "Auto-update",
+      "action": {
+        "open": "Open",
+        "share": "Share",
+        "stats": "Stats",
+        "duplicate": "Duplicate",
+        "archive": "Archive",
+        "delete": "Delete"
+      },
+      "deleteConfirmTitle": "Delete template?",
+      "deleteConfirmBody": "This can't be undone.",
+      "deleteConfirm": "Yes, delete",
+      "cancel": "Cancel"
+    },
+    "logout": "Sign out"
+  },
+  "features": {
+    "user": {
+      "compare": { "title": "Every store, one search", "body": "Maxima, Rimi, IKI, Norfa, Lidl — one query, one price." },
+      "scan": { "title": "Scan the receipt — get the story", "body": "Lithuania's first receipt-to-insights mapping." },
+      "habits": { "title": "A template that builds itself", "body": "Upload 3 receipts from 2 stores — Souply drafts your weekly basket." },
+      "discounts": { "title": "All discounts in one feed", "body": "Every promo from every chain in one continuously updated strip." },
+      "history": { "title": "Price history", "body": "See whether it's cheaper now than a month ago — per product." },
+      "bestStore": { "title": "The cheapest store for your basket", "body": "We tell you which store saves you most this week." },
+      "perKg": { "title": "Pay per kilo, not per pack", "body": "Automatic per-unit price across 250 g vs 1 kg." },
+      "gamify": { "title": "Your profile, your game", "body": "Levels, points, and votes for the best deals." },
+      "quickRepeat": { "title": "Repeat your shop in 5 seconds", "body": "One tap — template becomes a basket in the cheapest store." },
+      "multiStore": { "title": "A basket spread across stores", "body": "Norfa + Lidl + Rimi — we'll tell you what to buy where." },
+      "alts": { "title": "Swap a product with one tap", "body": "Too expensive? We'll offer a 30% cheaper alternative." },
+      "monthly": { "title": "Monthly savings report", "body": "Each month, see what you saved vs the priciest option." },
+      "recovery": { "title": "Lost receipts? Get your account back", "body": "Three receipts is enough to restore your history on a new phone." },
+      "shared": { "title": "Family basket", "body": "Share a template with your household — everyone sees the same list." },
+      "seasonal": { "title": "Seasonal peaks, surfaced", "body": "Raspberries in July, tangerines in December — see seasonal pricing." },
+      "veggie": { "title": "For plant-based eaters", "body": "Filter, tag, and find the cheapest vegan shelf." },
+      "voice": { "title": "Dictate your list", "body": "Say \"milk, bread, eggs\" — Souply finds the cheapest." },
+      "weekly": { "title": "Weekly saver", "body": "Mondays we'll show you how to save 8–15 € this week." },
+      "noAccount": { "title": "No account, no ads", "body": "Browse and compare immediately — sign up only for templates." },
+      "lt": { "title": "Made in Lithuania", "body": "Real prices from real Lithuanian stores. Real time." }
+    },
+    "creator": {
+      "share": { "title": "Share your basket", "body": "Build a template, get a QR + link — savings travel along." },
+      "savings": { "title": "Track collective savings", "body": "See in real time how much your followers saved using your template." },
+      "recipe": { "title": "Recipe → basket → store", "body": "Recipes turn into lists, lists into the cheapest store for the viewer." },
+      "publish": { "title": "Templates thousands shop", "body": "One template, many uses — grow your reach without ads." },
+      "profile": { "title": "Public profile @yourname", "body": "All your templates on one page — share once, always working." },
+      "auto": { "title": "Auto-update from your receipts", "body": "Your template learns from your own purchases." },
+      "stats": { "title": "Stats and audience", "body": "Daily, weekly, monthly — see who uses your templates and where." }
+    }
+  }
+}
