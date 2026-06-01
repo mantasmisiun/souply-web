@@ -59,7 +59,7 @@ export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onBack, pending
                 {/* Real Google sign-in (GIS renders Google's own button).
                     Renders nothing if VITE_GOOGLE_CLIENT_ID is unset — the
                     dev bypass below still covers sign-in then. */}
-                <div className="min-h-[44px] grid place-items-center">
+                <div className="min-h-[44px]">
                     <GoogleSignInButton onCredential={onGoogleCredential} disabled={busy} />
                 </div>
                 <button

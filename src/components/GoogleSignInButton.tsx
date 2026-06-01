@@ -64,14 +64,18 @@ export function GoogleSignInButton({
                         if (resp?.credential) cbRef.current(resp.credential);
                     },
                 });
+                // Match the panel width (GIS caps at 400) so the button
+                // fills the row like the Apple button instead of a fixed
+                // 320px white box centred in a wider container.
+                const width = Math.min(Math.round(ref.current.offsetWidth) || 320, 400);
                 window.google.accounts.id.renderButton(ref.current, {
-                    theme: 'outline',
+                    theme: 'filled_black',     // dark pill — matches the Apple button + dark panel
                     size: 'large',
                     type: 'standard',
                     text: 'continue_with',
                     shape: 'pill',
-                    logo_alignment: 'center',
-                    width: 320,
+                    logo_alignment: 'left',
+                    width,
                 });
             })
             .catch(() => { /* offline / blocked — dev bypass remains available */ });
