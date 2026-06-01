@@ -86,6 +86,7 @@ export function GoogleSignInButton({
     return (
         <div
             ref={ref}
+            className="gsi-host"
             aria-disabled={disabled}
             style={{ opacity: disabled ? 0.5 : 1, pointerEvents: disabled ? 'none' : 'auto' }}
         />

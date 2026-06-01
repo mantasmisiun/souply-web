@@ -139,3 +139,14 @@ html, body, #root {
         radial-gradient(120% 80% at 10% 0%, rgba(255,255,255,.18), transparent 60%),
         linear-gradient(135deg, #F8D4DE 0%, #EB6784 65%, #D44B6C 100%);
 }
+
+/* Google Identity Services renders its button inside an iframe whose
+ * element background defaults to white — on our dark auth panel that
+ * shows as a white rectangle around the (rounded, filled_black) pill.
+ * Force the host + iframe background transparent so only the pill shows. */
+.gsi-host,
+.gsi-host > div,
+.gsi-host iframe {
+    background-color: transparent !important;
+    color-scheme: light;
+}
