@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
+import { PublicTemplateView } from './pages/PublicTemplateView';
+import { AuthCallback } from './pages/AuthCallback';
+import { LegalPage } from './pages/LegalPage';
+import { NotFound } from './pages/NotFound';
 import { SideBand } from './components/SideBand';
 import { FeatureCarousel } from './components/FeatureCarousel';
 import { DashboardRail } from './components/DashboardRail';
@@ -17,6 +22,10 @@ import { useCreateTemplate } from './state/createTemplate';
 import { useTemplates } from './state/templates';
 import { useTemplateView } from './state/templateView';
 import { useThemeMode } from './state/theme';
+import { useSyncDashboardUrl } from './hooks/useSyncDashboardUrl';
+import { COVER_GRADIENT_OVERLAY } from './lib/coverGradient';
+import { DEV_AUTH_ENABLED, DEV_USER } from './lib/devAuth';
+import { oauthSignIn, toAppUser } from './lib/auth';
 import { ease, dur } from './lib/motion';
 
 /**
@@ -50,9 +59,34 @@ import { ease, dur } from './lib/motion';
  */
 type Phase = 'idle' | 'auth-pending' | 'merging' | 'dashboard' | 'un-merging';
 
+/**
+ * Top-level route host. The landing + dashboard experience (the
+ * morph/phase machine) lives in `LandingOrDashboard`, rendered at BOTH
+ * `/` and `/dashboard` — the SAME component instance at the same tree
+ * position, so navigating between them doesn't unmount the band and the
+ * layoutId morphs survive (Step 2 wires the login→/dashboard nav + auth
+ * guard). The other routes are standalone surfaces with their own
+ * layouts.
+ */
 export default function App() {
+    return (
+        <Routes>
+            <Route path="/" element={<LandingOrDashboard />} />
+            <Route path="/dashboard" element={<LandingOrDashboard />} />
+            <Route path="/t/:slug" element={<PublicTemplateView />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/legal/privacy" element={<LegalPage kind="privacy" />} />
+            <Route path="/legal/terms" element={<LegalPage kind="terms" />} />
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+    );
+}
+
+function LandingOrDashboard() {
     const { t } = useTranslation();
-    const { isAuthed, login, logout } = useAuth();
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
+    const { isAuthed, restoring, login, logout } = useAuth();
     const { active: creating, coverColor, setCoverColor } = useCreateTemplate();
     const { viewing: viewingTemplate, tab: viewingTab } = useTemplateView();
     const { ready: templatesReady } = useTemplates();
@@ -61,6 +95,10 @@ export default function App() {
     const [phase, setPhase] = useState<Phase>(isAuthed ? 'dashboard' : 'idle');
     const [pendingAuthMode, setPendingAuthMode] = useState<'login' | 'signup' | null>(null);
     const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+
+    // Bridge the open-surface state (?t=:id / ?tab=edit / ?create=1) to the
+    // URL so the back button closes surfaces and ?t=:id deep-links work.
+    useSyncDashboardUrl();
 
     /* Page background flips between brand pink (default) and a neutral
      * wash when the create-template flow is active. Cream in light and
@@ -83,16 +121,51 @@ export default function App() {
      */
     const onAuthenticated = (mode: 'login' | 'signup') => {
         if (phase !== 'idle') return; // double-tap guard
+        // DEV BYPASS — gated by lib/devAuth (build flag + host guard).
+        // When disabled (prod build) this branch is dead-code-eliminated
+        // and the dev UUID never ships. Real Google/Apple OAuth replaces
+        // the bypass here in Phase 5; for now a disabled bypass means the
+        // CTA simply doesn't authenticate (the dev button isn't rendered
+        // either, so this is unreachable in prod until Phase 5).
+        if (!DEV_AUTH_ENABLED) {
+            console.warn('[auth] dev bypass disabled in this build; real OAuth lands in Phase 5');
+            return;
+        }
         setPendingAuthMode(mode);
         setPhase('auth-pending');
-        // Dev-mode userId comes from .env.local (VITE_DEV_USER_ID); in
-        // production the JWT exchange will mint this from the OAuth
-        // claims and the env-var path is never read.
-        const devUserId   = import.meta.env.VITE_DEV_USER_ID   ?? '';
-        const devUserName = import.meta.env.VITE_DEV_USER_NAME ?? 'Mantas Misiūnas';
-        const devHandle   = import.meta.env.VITE_DEV_USER_HANDLE ?? 'mantasm';
-        login({ id: devUserId, name: devUserName, handle: devHandle });
+        login({ id: DEV_USER.id, name: DEV_USER.name, handle: DEV_USER.handle });
     };
+
+    /**
+     * Real Google sign-in. GIS hands us the ID-token credential; we
+     * exchange it at /api/auth/oauth (which sets the session cookie and
+     * returns the verified user), then drive the same phase machine as
+     * the dev bypass so the merge animation plays. On failure we fall
+     * back to the landing state.
+     */
+    const onGoogleCredential = async (idToken: string) => {
+        if (phase !== 'idle') return;
+        setPendingAuthMode('login');
+        setPhase('auth-pending');
+        try {
+            const { user } = await oauthSignIn({ provider: 'google', idToken });
+            login(toAppUser(user));
+        } catch {
+            setPendingAuthMode(null);
+            setPhase('idle');
+        }
+    };
+
+    /**
+     * Restore: once /api/auth/me settles with a cookie-authed creator,
+     * jump straight to the dashboard (no merge replay — a reload
+     * shouldn't animate). Only fires from the idle landing state.
+     */
+    useEffect(() => {
+        if (!restoring && isAuthed && phase === 'idle') {
+            setPhase('dashboard');
+        }
+    }, [restoring, isAuthed, phase]);
 
     /**
      * Gate 1: auth-pending → merging once templates are loaded.
@@ -156,6 +229,37 @@ export default function App() {
         }, dur.band * 1000 + 60);
         return () => window.clearTimeout(tail);
     }, [phase, logout]);
+
+    /**
+     * Route ⟷ phase sync. The phase machine owns the ANIMATION; the URL
+     * just follows it on the two TERMINAL phases (not mid-transition),
+     * so login lands on /dashboard, logout returns to /, and an authed
+     * direct-load of / is pushed to /dashboard — without replaying the
+     * merge slide mid-flight. Navigating between / and /dashboard keeps
+     * the SAME LandingOrDashboard instance mounted (same route element
+     * type/position), so the band + layoutId morphs are never torn down.
+     */
+    useEffect(() => {
+        if (phase === 'dashboard' && pathname !== '/dashboard') {
+            navigate('/dashboard', { replace: true });
+        } else if (phase === 'idle' && pathname !== '/') {
+            navigate('/', { replace: true });
+        }
+    }, [phase, pathname, navigate]);
+
+    /**
+     * Auth guard. A logged-out visit to /dashboard (direct nav, refresh
+     * after logout, bookmark) bounces to the landing page. Wired to
+     * today's simulated `isAuthed`; Phase 5 swaps only the source. Done
+     * as an in-component effect rather than a <RequireAuth> wrapper on
+     * purpose — a wrapper would change the route element type between
+     * / and /dashboard and unmount the morphing band.
+     */
+    useEffect(() => {
+        if (!isAuthed && pathname === '/dashboard') {
+            navigate('/', { replace: true });
+        }
+    }, [isAuthed, pathname, navigate]);
 
     const features = audience === 'user' ? userFeatures : creatorFeatures;
     // Carousel rides the whole landing/morph window — mounted from
@@ -345,6 +449,7 @@ export default function App() {
                         onOpenCreatorAuth={() => setBandView('creator-auth')}
                         onBackToVisitor={() => setBandView('visitor')}
                         onAuthenticated={onAuthenticated}
+                        onGoogleCredential={onGoogleCredential}
                     />
                 )}
             </motion.div>
@@ -376,7 +481,7 @@ export default function App() {
                     animate={{ backgroundColor: coverColor }}
                     transition={{ duration: 0.25 }}
                     className="absolute top-0 left-0 right-0 h-16 shadow-card"
-                    style={{ zIndex: 3, pointerEvents: viewingTab === 'edit' ? 'auto' : 'none' }}
+                    style={{ zIndex: 3, pointerEvents: viewingTab === 'edit' ? 'auto' : 'none', backgroundImage: COVER_GRADIENT_OVERLAY }}
                 >
                     {viewingTab === 'edit' && (
                         <div className="h-full flex items-center justify-end px-7 md:px-10">
@@ -408,6 +513,25 @@ export default function App() {
                 >
                     <CreateTemplateView />
                 </motion.section>
+            )}
+            {/* Page-level coloured top band for the create flow — same
+                treatment as the Atverti bar so the colour extends behind
+                the rail's rounded-corner cutout (zIndex 3: above the
+                surface at z=2, below the band at z=10). The create flow
+                is always "editing", so the CoverColorPicker is always
+                shown on the right. CreateTemplateView's own bar was
+                removed in favour of this so the two flows match. */}
+            {phase === 'dashboard' && !viewingTemplate && creating && (
+                <motion.div
+                    animate={{ backgroundColor: coverColor }}
+                    transition={{ duration: 0.25 }}
+                    className="absolute top-0 left-0 right-0 h-16 shadow-card"
+                    style={{ zIndex: 3, backgroundImage: COVER_GRADIENT_OVERLAY }}
+                >
+                    <div className="h-full flex items-center justify-end px-7 md:px-10">
+                        <CoverColorPicker value={coverColor} onChange={setCoverColor} />
+                    </div>
+                </motion.div>
             )}
 
             <ConfirmDialog

@@ -3,6 +3,28 @@
     "name": "Souply",
     "tagline": "Apsipirk išmaniai."
   },
+  "pages": {
+    "notFound": {
+      "title": "Puslapis nerastas",
+      "body": "Tokio puslapio nėra arba jis buvo perkeltas.",
+      "home": "Grįžti į pradžią"
+    },
+    "legal": {
+      "privacyTitle": "Privatumo politika",
+      "termsTitle": "Naudojimosi sąlygos",
+      "placeholder": "Turinys netrukus bus paskelbtas."
+    },
+    "authCallback": {
+      "signingIn": "Jungiamasi…"
+    },
+    "publicTemplate": {
+      "loading": "Kraunama…",
+      "notFound": "Šablonas nerastas arba yra privatus.",
+      "items": "{{count}} prekės",
+      "by": "Sąrašas nuo {{handle}}",
+      "openInApp": "Atidaryti programėlėje"
+    }
+  },
   "lang": {
     "lt": "Lietuvių",
     "en": "English",
@@ -23,6 +45,7 @@
     "emailPlaceholder": "tu@email.lt",
     "send": "Gauti kvietimą",
     "thanks": "Ačiū! Kvietimas atkeliaus per parą.",
+    "sendError": "Kažkas nepavyko — bandyk dar kartą.",
     "creatorLogin": "Kūrėjo prisijungimas",
     "createCreator": "Sukurti kūrėjo paskyrą",
     "creatorIntroTitle": "Kūrėjo paskyra",

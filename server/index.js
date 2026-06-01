@@ -40,6 +40,16 @@ const SSR_API_URL = (process.env.SSR_API_URL || 'http://192.168.1.212:3001').rep
 const PUBLIC_ORIGIN = (process.env.PUBLIC_ORIGIN || 'https://souply.manofoto.dpdns.org').replace(/\/$/, '');
 const OG_FALLBACK_IMAGE = process.env.OG_FALLBACK_IMAGE || `${PUBLIC_ORIGIN}/og-default.png`;
 
+// Default OG/Twitter card for every page that isn't a specific template
+// (landing, dashboard, etc.). Domain-driven by PUBLIC_ORIGIN so there's
+// nothing to hardcode for the souply.lt switch.
+const DEFAULT_OG = {
+    title: 'Souply — apsipirk išmaniai',
+    description: 'Lietuvos maisto kainos vienoje vietoje — palygink kainas, sek nuolaidas, kurk pirkinių sąrašus.',
+    url: PUBLIC_ORIGIN,
+    image: OG_FALLBACK_IMAGE,
+};
+
 // Read the built shell once at boot. If it's missing the build step
 // didn't run — fail fast rather than serve 404s for every route.
 const indexHtml = readFileSync(path.join(DIST, 'index.html'), 'utf-8');
@@ -130,8 +140,11 @@ app.use(
 );
 
 // ── SPA fallback ────────────────────────────────────────────────────
+// Every non-template route (landing, dashboard, …) gets the default OG
+// card so the homepage — the most-shared URL — previews with the brand
+// image + title instead of a bare shell.
 app.get('*', (_req, res) => {
-    res.set('Cache-Control', 'no-cache').type('html').send(indexHtml);
+    res.set('Cache-Control', 'no-cache').type('html').send(injectMeta(indexHtml, DEFAULT_OG));
 });
 
 app.listen(PORT, () => {

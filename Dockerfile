@@ -29,13 +29,20 @@ COPY . .
 ARG VITE_API_BASE_URL=https://api.souply.manofoto.dpdns.org
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
-# TEST-ONLY simulated login (no OAuth yet). Empty by default so a prod
-# build can NEVER silently bake a dev user — only the test compose
-# passes real values. DELETE these + the simulated login in Phase 3
-# when real OAuth lands (see project_souply_web_launch memory, B-10).
+# Google Identity Services Web client ID (public; safe to bake).
+ARG VITE_GOOGLE_CLIENT_ID=
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+
+# TEST-ONLY dev-auth bypass (no real OAuth until Phase 5). ALL empty by
+# default so a prod build can NEVER bake the bypass — only the test
+# compose passes these. `VITE_ENABLE_DEV_AUTH` is the gate: when unset,
+# lib/devAuth's DEV_AUTH_ENABLED is a const false and the whole bypass
+# (button + dev UUID) is tree-shaken out of the bundle.
+ARG VITE_ENABLE_DEV_AUTH=
 ARG VITE_DEV_USER_ID=
 ARG VITE_DEV_USER_NAME=
 ARG VITE_DEV_USER_HANDLE=
+ENV VITE_ENABLE_DEV_AUTH=$VITE_ENABLE_DEV_AUTH
 ENV VITE_DEV_USER_ID=$VITE_DEV_USER_ID
 ENV VITE_DEV_USER_NAME=$VITE_DEV_USER_NAME
 ENV VITE_DEV_USER_HANDLE=$VITE_DEV_USER_HANDLE

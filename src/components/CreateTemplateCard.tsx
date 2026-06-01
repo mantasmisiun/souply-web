@@ -23,7 +23,13 @@ export function CreateTemplateCard({ onPress }: Props) {
         <motion.button
             type="button"
             onClick={onPress}
-            layout
+            /* No `layout` here on purpose: the parent `__create` wrapper
+             * owns the layoutId="create-surface" morph (a 0.45s tween).
+             * An inner `layout` prop ran a competing SPRING layout
+             * animation that lagged and settled behind the tween, so the
+             * button stuttered/oscillated right as the shrink-back
+             * finished. whileHover/whileTap are transform-based and keep
+             * working without it. */
             whileHover={{ y: -3 }}
             whileTap={{ scale: 0.99 }}
             transition={{ type: 'spring', stiffness: 220, damping: 22 }}
@@ -36,6 +42,13 @@ export function CreateTemplateCard({ onPress }: Props) {
              * the surface. Other dashboard cards use the same
              * token at the same opacity so the grid reads as one
              * family. */
+            /* Inline, warm-tinted shadow (see TemplateCard) — lighter
+             * than the filled tiles so the empty "create" slot reads as
+             * lower in the hierarchy, but still lifts off the pink page. */
+            style={{
+                boxShadow:
+                    '0 14px 30px -18px rgba(74,20,38,.36), 0 6px 14px -8px rgba(74,20,38,.28)',
+            }}
             className="group w-full h-full min-h-[300px] rounded-3xl bg-createWash/85
                        border-2 border-dashed border-createWash
                        hover:bg-createWash transition

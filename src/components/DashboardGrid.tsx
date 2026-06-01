@@ -11,38 +11,10 @@ import { useTemplates } from '@/state/templates';
 import { useCreateTemplate, type CoverImage } from '@/state/createTemplate';
 import { useTemplateView } from '@/state/templateView';
 import { useThemeMode } from '@/state/theme';
-import { sampleCoverFor, sampleTemplates } from '@/data/sampleTemplates';
-import { getCoverOverride } from '@/lib/coverOverrides';
+import { sampleTemplates } from '@/data/sampleTemplates';
+import { toCardData } from '@/lib/templateCard';
 import type { SampleTemplate } from '@/data/sampleTemplates';
-import type { BasketTemplate } from '@/lib/templates';
 import { ease, dur } from '@/lib/motion';
-
-function toCardData(row: BasketTemplate): SampleTemplate {
-    const cover = sampleCoverFor(row.id);
-    // Client-side override map wins so the creator's chosen colour +
-    // emoji preset persist across refreshes until souply-api stores
-    // them as real columns. See lib/coverOverrides.ts for the TODO.
-    const override = getCoverOverride(row.id);
-    return {
-        id: row.id,
-        name: row.name,
-        visibility: row.visibility,
-        autoUpdate: row.autoUpdate === 1,
-        itemCount: row.itemCount,
-        useCount: row.useCount,
-        // TODO(api): backfill visitCount from the share-redirect /
-        // QR-scan counter once souply-api ships the aggregator. For
-        // now anonymous rows show 0 — the stats card surfaces the
-        // explainer either way so the creator knows what's tracked.
-        visitCount: 0,
-        collectiveSavingsEur: row.collectiveSavingsEur,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
-        coverColor: override?.coverColor ?? cover.coverColor,
-        coverImage: override?.coverImage ?? cover.coverImage,
-        emoji: cover.emoji,
-    };
-}
 
 /**
  * Right side of the dashboard. Pulls the templates list from the

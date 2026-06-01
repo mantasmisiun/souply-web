@@ -1,14 +1,18 @@
 import { useTranslation } from 'react-i18next';
 import {
-    ArrowLeft, BookOpen, CalendarDays, Loader2, Smartphone, Stethoscope,
+    ArrowLeft, BookOpen, CalendarDays, Loader2, Smartphone, Stethoscope, Wrench,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { AppleMark, GoogleMark } from './BrandMarks';
+import { AppleMark } from './BrandMarks';
+import { GoogleSignInButton } from './GoogleSignInButton';
+import { DEV_AUTH_ENABLED } from '@/lib/devAuth';
 
 interface Props {
-    /** Two CTAs that look identical visually; analytics distinguishes
-     *  the funnel server-side based on which one fired. */
+    /** Apple + dev-bypass CTA. (Google now uses the real GIS button via
+     *  `onGoogleCredential`.) */
     onSubmit: (mode: 'login' | 'signup') => void;
+    /** Real Google sign-in: GIS hands up the ID-token credential. */
+    onGoogleCredential: (idToken: string) => void;
     onBack: () => void;
     /** Which CTA, if any, is currently waiting on the auth + templates
      *  fetch round-trip. The clicked button swaps its brand mark for
@@ -28,7 +32,7 @@ interface Props {
  *      block shows an icon + role name + a one-sentence "this is what
  *      it does for YOU". Spaced out enough to be scannable, not a wall.
  */
-export function CreatorAuthPanel({ onSubmit, onBack, pending = null }: Props) {
+export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onBack, pending = null }: Props) {
     const { t } = useTranslation();
     const personas: { icon: LucideIcon; nameKey: string; bodyKey: string }[] = [
         { icon: CalendarDays, nameKey: 'cta.creatorPersona1', bodyKey: 'cta.creatorBenefit1' },
@@ -51,18 +55,13 @@ export function CreatorAuthPanel({ onSubmit, onBack, pending = null }: Props) {
 
             <h3 className="text-base font-semibold text-ink">{t('cta.creatorLogin')}</h3>
 
-            <div className="flex flex-col gap-2">
-                <button
-                    type="button"
-                    onClick={() => onSubmit('login')}
-                    disabled={busy}
-                    className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-surface ring-1 ring-edge text-ink text-sm font-semibold shadow-card hover:bg-surface-muted transition disabled:cursor-not-allowed disabled:hover:bg-surface"
-                >
-                    {pending === 'login'
-                        ? <Loader2 size={16} className="animate-spin text-souply-beet" />
-                        : <GoogleMark size={16} />}
-                    {t('cta.loginGoogle')}
-                </button>
+            <div className="flex flex-col gap-2 items-stretch">
+                {/* Real Google sign-in (GIS renders Google's own button).
+                    Renders nothing if VITE_GOOGLE_CLIENT_ID is unset — the
+                    dev bypass below still covers sign-in then. */}
+                <div className="min-h-[44px] grid place-items-center">
+                    <GoogleSignInButton onCredential={onGoogleCredential} disabled={busy} />
+                </div>
                 <button
                     type="button"
                     onClick={() => onSubmit('signup')}
@@ -77,6 +76,23 @@ export function CreatorAuthPanel({ onSubmit, onBack, pending = null }: Props) {
                         : <AppleMark size={16} />}
                     {t('cta.loginApple')}
                 </button>
+
+                {/* DEV-ONLY bypass — rendered only when the dev-auth gate
+                    is on (test/dev builds). Tree-shaken out of production
+                    builds entirely (DEV_AUTH_ENABLED is a const false
+                    there), so this shortcut can never reach prod. Until
+                    Phase 5 ships real OAuth, the Google/Apple buttons
+                    above also route through this same gated bypass. */}
+                {DEV_AUTH_ENABLED && (
+                    <button
+                        type="button"
+                        onClick={() => onSubmit('login')}
+                        disabled={busy}
+                        className="mt-1 inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl border-2 border-dashed border-souply-beet/50 text-souply-beet text-xs font-bold uppercase tracking-wide hover:bg-beetTint transition disabled:cursor-not-allowed"
+                    >
+                        <Wrench size={13} /> Dev sign-in (skip auth → 000…)
+                    </button>
+                )}
             </div>
 
             {/* Persona blocks — spaced for breathing room, body type

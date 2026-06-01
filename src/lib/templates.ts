@@ -126,3 +126,34 @@ export const deleteTemplateItem = (templateId: number, itemId: number) =>
  *  draft fields are out of scope. */
 export const patchTemplate = (id: number, body: PatchTemplateBody) =>
     api.patch<void>(`/api/basket-templates/${id}`, body);
+
+/** Public shared-template payload returned by GET /api/t/{slug}. Shape
+ *  mirrors the server's `resolveSlug`: a `template` block plus the
+ *  resolved item list. Used by the read-only public /t/:slug view. */
+export interface SharedTemplate {
+    template: {
+        id: number;
+        name: string;
+        creatorHandle: string | null;
+        useCount: number;
+        visibility: 'public' | 'unlisted' | 'private';
+        cheapestChainId: number | null;
+        cheapestTotalEur: number | null;
+        runnerUpTotalEur: number | null;
+        mostExpensiveTotalEur: number | null;
+        calculatedAt: string | null;
+    };
+    items: Array<{
+        productId: number;
+        productName: string;
+        quantity: number;
+        unit: string | null;
+        imageUrls: (string | null)[] | null;
+    }>;
+}
+
+/** GET /api/t/{slug}. Public, unauthenticated — the surface a visitor
+ *  lands on from a QR / share link. 404s when the slug is unknown or
+ *  the template is private. */
+export const getSharedTemplate = (slug: string) =>
+    api.get<SharedTemplate>(`/api/t/${encodeURIComponent(slug)}`);

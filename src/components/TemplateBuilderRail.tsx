@@ -9,6 +9,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
 import { CoverPicturePicker } from './CoverPicturePicker';
 import { VisibilitySlider } from './VisibilitySlider';
+import { setCoverOverride } from '@/lib/coverOverrides';
 
 interface Props {
     /** Called after a successful save so App can swap surfaces back
@@ -62,10 +63,16 @@ export function TemplateBuilderRail({ onSaved, onCancel }: Props) {
         const id = await save(user.id);
         setSubmitting(false);
         if (id !== null) {
+            // Persist the chosen cover (colour + emoji) so the dashboard
+            // card paints what the creator picked — without this the card
+            // falls back to the deterministic sampleCoverFor(id) "random"
+            // colour. Mirrors the Atverti edit flow's save.
+            // TODO(api): drop once BasketTemplate carries cover columns.
+            setCoverOverride(id, { coverColor, coverImage });
             await refresh();
             onSaved();
         }
-    }, [user?.id, save, refresh, onSaved]);
+    }, [user?.id, save, refresh, onSaved, coverColor, coverImage]);
 
     const canSave = name.trim().length > 0 && items.length > 0 && !submitting && !saving;
 

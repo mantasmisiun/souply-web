@@ -63,7 +63,13 @@ export default {
       boxShadow: {
         band: '0 1px 0 rgba(255,255,255,.7) inset, 0 30px 60px -20px rgba(31,27,29,.35), 0 14px 28px -12px rgba(31,27,29,.25), 0 4px 10px -4px rgba(31,27,29,.18)',
         card: '0 1px 0 rgba(255,255,255,.6) inset, 0 12px 30px -16px rgba(31,27,29,.22), 0 4px 12px -6px rgba(31,27,29,.14)',
-        pop:  '0 18px 40px -16px rgba(31,27,29,.28)',
+        // `tile` = the dashboard-card elevation. Heftier, more layered
+        // than `card` (a contact shadow + mid + wide ambient) so the
+        // grid reads as floating tiles. Kept separate from `card` so the
+        // many small surfaces using `card` (pills, avatars) don't get
+        // over-shadowed.
+        tile: '0 1px 0 rgba(255,255,255,.6) inset, 0 22px 48px -24px rgba(31,27,29,.32), 0 10px 22px -12px rgba(31,27,29,.20), 0 2px 6px -3px rgba(31,27,29,.13)',
+        pop:  '0 22px 48px -16px rgba(31,27,29,.30), 0 10px 22px -10px rgba(31,27,29,.20)',
       },
       borderRadius: {
         '4xl': '32px',

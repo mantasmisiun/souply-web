@@ -8,6 +8,7 @@ import type { SampleTemplate } from '@/data/sampleTemplates';
 import { findPreset } from '@/data/coverPresets';
 import { cx } from '@/lib/cx';
 import { ease } from '@/lib/motion';
+import { COVER_GRADIENT_OVERLAY } from '@/lib/coverGradient';
 
 /** True when the row has been edited since creation (updatedAt is
  *  strictly newer than createdAt). The card switches its date stat
@@ -60,7 +61,18 @@ export function TemplateCard({ template, onOpen, onShare, onDuplicate, onDelete 
             layoutId={`template-${template.id}`}
             transition={{ layout: { duration: 0.45, ease: ease.soft } }}
             whileHover={{ y: -3 }}
-            className="group relative overflow-hidden rounded-3xl bg-createWash ring-1 ring-edge shadow-card hover:shadow-pop transition-shadow"
+            /* Shadow is an INLINE style (not a Tailwind token) on purpose:
+             * it renders without depending on a tailwind.config reload,
+             * and it's tinted warm-dark (beet-brown) rather than grey so
+             * it actually reads against the saturated pink dashboard
+             * page — a neutral grey shadow vanishes on pink. Border (not
+             * ring) so the inline box-shadow doesn't clobber the ring's
+             * own box-shadow. */
+            className="group relative overflow-hidden rounded-3xl bg-createWash border border-edge transition-transform"
+            style={{
+                boxShadow:
+                    '0 1px 0 rgba(255,255,255,.55) inset, 0 20px 40px -20px rgba(74,20,38,.45), 0 9px 18px -10px rgba(74,20,38,.34), 0 2px 6px -2px rgba(74,20,38,.30)',
+            }}
         >
             {/* Cover band — solid `coverColor`, same hex that drives
                 the basket's left edge + bookmark icon in the consumer
@@ -70,7 +82,15 @@ export function TemplateCard({ template, onOpen, onShare, onDuplicate, onDelete 
                 creator so the identity is consistent across surfaces. */}
             <div
                 className="relative h-28"
-                style={{ backgroundColor: template.coverColor }}
+                style={{
+                    backgroundColor: template.coverColor,
+                    // Colour on the left, fading to near-white on the right
+                    // (lit-from-left look). Subtle inset shadow at the
+                    // bottom edge so the cover reads as a raised panel
+                    // sitting above the card body.
+                    backgroundImage: COVER_GRADIENT_OVERLAY,
+                    boxShadow: 'inset 0 -10px 16px -12px rgba(31,27,29,.22)',
+                }}
             >
                 <div className="absolute inset-0 flex items-center justify-between px-5">
                     <CoverAvatar

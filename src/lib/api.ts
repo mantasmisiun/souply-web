@@ -45,6 +45,10 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
     const res = await fetch(url, {
         ...opts,
         headers,
+        // Send/receive the httpOnly session cookie (set by /api/auth/oauth)
+        // on every request so verified-only endpoints authenticate. CORS
+        // on souply-api has credentials:true + an explicit origin allowlist.
+        credentials: 'include',
         body: opts.body === undefined ? undefined : JSON.stringify(opts.body),
     });
 

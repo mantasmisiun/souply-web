@@ -3,6 +3,28 @@
     "name": "Souply",
     "tagline": "Shop smart."
   },
+  "pages": {
+    "notFound": {
+      "title": "Page not found",
+      "body": "This page doesn't exist or has moved.",
+      "home": "Back to home"
+    },
+    "legal": {
+      "privacyTitle": "Privacy Policy",
+      "termsTitle": "Terms of Service",
+      "placeholder": "Content coming soon."
+    },
+    "authCallback": {
+      "signingIn": "Signing in…"
+    },
+    "publicTemplate": {
+      "loading": "Loading…",
+      "notFound": "Template not found or is private.",
+      "items": "{{count}} items",
+      "by": "List by {{handle}}",
+      "openInApp": "Open in the app"
+    }
+  },
   "lang": {
     "lt": "Lithuanian",
     "en": "English",
@@ -23,6 +45,7 @@
     "emailPlaceholder": "you@email.com",
     "send": "Get my invite",
     "thanks": "Thanks! Your invite lands within a day.",
+    "sendError": "Something went wrong — please try again.",
     "creatorLogin": "Creator login",
     "createCreator": "Create creator account",
     "creatorIntroTitle": "Creator account",

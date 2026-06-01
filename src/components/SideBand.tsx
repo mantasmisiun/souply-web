@@ -14,6 +14,8 @@ interface Props {
     onOpenCreatorAuth: () => void;
     onBackToVisitor: () => void;
     onAuthenticated: (mode: 'login' | 'signup') => void;
+    /** Real Google sign-in: GIS hands up the ID-token credential. */
+    onGoogleCredential: (idToken: string) => void;
     /** When true, band is animating to merge with the left-edge
      *  dashboard panel — outer page handles the position, this just
      *  fades its content out so the merge reads as one motion. */
@@ -41,7 +43,7 @@ interface Props {
  */
 export function SideBand({
     view,
-    onOpenCreatorAuth, onBackToVisitor, onAuthenticated,
+    onOpenCreatorAuth, onBackToVisitor, onAuthenticated, onGoogleCredential,
     isMerging = false,
     pendingAuthMode = null,
 }: Props) {
@@ -85,6 +87,7 @@ export function SideBand({
                         ) : (
                             <CreatorAuthPanel
                                 onSubmit={onAuthenticated}
+                                onGoogleCredential={onGoogleCredential}
                                 onBack={onBackToVisitor}
                                 pending={pendingAuthMode}
                             />

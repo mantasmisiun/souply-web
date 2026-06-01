@@ -16,6 +16,7 @@ describe('SideBand', () => {
                 onOpenCreatorAuth={noop}
                 onBackToVisitor={noop}
                 onAuthenticated={noop}
+                onGoogleCredential={noop}
             />,
         );
         expect(screen.getByText(i18n.t('cta.joinBeta'))).toBeInTheDocument();
@@ -31,13 +32,14 @@ describe('SideBand', () => {
                 onOpenCreatorAuth={onOpenCreatorAuth}
                 onBackToVisitor={() => {}}
                 onAuthenticated={() => {}}
+                onGoogleCredential={() => {}}
             />,
         );
         await user.click(screen.getByRole('button', { name: i18n.t('cta.creatorLogin') }));
         expect(onOpenCreatorAuth).toHaveBeenCalledOnce();
     });
 
-    it('in creator-auth view, OAuth buttons call onAuthenticated with the right mode', async () => {
+    it('in creator-auth view, Apple + dev buttons call onAuthenticated with the right mode', async () => {
         const user = userEvent.setup();
         const onAuthenticated = vi.fn();
         renderWith(
@@ -46,11 +48,15 @@ describe('SideBand', () => {
                 onOpenCreatorAuth={() => {}}
                 onBackToVisitor={() => {}}
                 onAuthenticated={onAuthenticated}
+                onGoogleCredential={() => {}}
             />,
         );
-        await user.click(screen.getByRole('button', { name: new RegExp(i18n.t('cta.loginGoogle'), 'i') }));
-        expect(onAuthenticated).toHaveBeenLastCalledWith('login');
+        // Google is now the real GIS button (no onAuthenticated). Apple
+        // still routes through onAuthenticated('signup'); the gated dev
+        // bypass routes through onAuthenticated('login').
         await user.click(screen.getByRole('button', { name: new RegExp(i18n.t('cta.loginApple'), 'i') }));
         expect(onAuthenticated).toHaveBeenLastCalledWith('signup');
+        await user.click(screen.getByRole('button', { name: /skip auth/i }));
+        expect(onAuthenticated).toHaveBeenLastCalledWith('login');
     });
 });

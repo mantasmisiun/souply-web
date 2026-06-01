@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "start": "node server/index.js",
+    "verify:prod-clean": "VITE_ENABLE_DEV_AUTH= VITE_DEV_USER_ID= VITE_DEV_USER_NAME= VITE_DEV_USER_HANDLE= vite build && if grep -rqE '00000000-0000-0000-0000-000000000000|skip auth' dist; then echo '❌ dev-auth leaked into prod build' >&2; exit 1; else echo '✅ prod build clean — no dev-auth in bundle'; fi",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",

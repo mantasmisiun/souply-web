@@ -4,7 +4,7 @@ import { ArrowLeft, Loader2, Minus, Plus, Save, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/state/auth';
 import { useTemplateView } from '@/state/templateView';
-import { useCreateTemplate, type DraftItem, type DraftVisibility } from '@/state/createTemplate';
+import { useCreateTemplate, type DraftItem, type DraftVisibility, type CoverImage } from '@/state/createTemplate';
 import { useTemplates } from '@/state/templates';
 import { CoverPicturePicker } from './CoverPicturePicker';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -59,15 +59,25 @@ export function TemplateViewRail() {
     // values).
     const [seededName, setSeededName] = useState<string>('');
     const [seededVisibility, setSeededVisibility] = useState<DraftVisibility>('private');
+    const [seededCoverColor, setSeededCoverColor] = useState<string>('');
+    const [seededCoverImage, setSeededCoverImage] = useState<CoverImage | null>(null);
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         if (!viewing) return;
         setSeededName(viewing.name);
         setSeededVisibility(viewing.visibility === 'public' ? 'public' : 'private');
+        // Cover baselines so a colour/emoji change flips the Save button
+        // to enabled — templateView.open seeds createTemplate from these
+        // same values, so on open current === seeded (not dirty).
+        setSeededCoverColor(viewing.coverColor);
+        setSeededCoverImage(viewing.coverImage);
     }, [viewing?.id]);
 
-    const dirty = name !== seededName || visibility !== seededVisibility;
+    const coverDirty =
+        coverColor !== seededCoverColor ||
+        JSON.stringify(coverImage) !== JSON.stringify(seededCoverImage);
+    const dirty = name !== seededName || visibility !== seededVisibility || coverDirty;
     const canSave = dirty && !submitting && !saving;
 
     const onSubmit = useCallback(async () => {

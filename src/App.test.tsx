@@ -21,16 +21,20 @@ import App from './App';
 describe('<App /> login transition', () => {
     beforeEach(async () => { await i18n.changeLanguage('lt'); });
 
-    it('starts on landing and lands on the dashboard after OAuth', async () => {
+    it('starts on landing and lands on the dashboard after sign-in', async () => {
         const user = userEvent.setup();
         renderWith(<App />);
 
         expect(screen.getByText(i18n.t('cta.joinBeta'))).toBeInTheDocument();
         expect(screen.queryByText(i18n.t('dashboard.templates.title'))).not.toBeInTheDocument();
 
+        // Real Google sign-in is the GIS button (not present in jsdom);
+        // drive the flow via the gated dev-bypass button instead, which
+        // exercises the same phase machine (auth-pending → merge →
+        // dashboard).
         await user.click(screen.getByRole('button', { name: i18n.t('cta.creatorLogin') }));
-        const googleBtn = await screen.findByRole('button', { name: new RegExp(i18n.t('cta.loginGoogle'), 'i') });
-        await user.click(googleBtn);
+        const devBtn = await screen.findByRole('button', { name: /skip auth/i });
+        await user.click(devBtn);
 
         await waitFor(
             () => expect(screen.getByText(i18n.t('dashboard.templates.title'))).toBeInTheDocument(),
@@ -38,4 +42,12 @@ describe('<App /> login transition', () => {
         );
         expect(screen.queryByText(i18n.t('cta.joinBeta'))).not.toBeInTheDocument();
     }, 10000);
+
+    it('bounces a logged-out visit to /dashboard back to the landing page', async () => {
+        renderWith(<App />, { route: '/dashboard' });
+        // The in-component auth guard redirects to "/" on mount, so the
+        // visitor sees the landing CTA, never the dashboard.
+        expect(await screen.findByText(i18n.t('cta.joinBeta'))).toBeInTheDocument();
+        expect(screen.queryByText(i18n.t('dashboard.templates.title'))).not.toBeInTheDocument();
+    });
 });
