@@ -1,4 +1,5 @@
 import { api } from './api';
+import type { CoverImage } from '@/state/createTemplate';
 
 /**
  * BasketTemplate row shape returned by the souply-api templates list
@@ -20,6 +21,7 @@ export interface BasketTemplate {
     creatorHandle: string | null;
     sourceTemplateId: number | null;
     useCount: number;
+    visitCount: number;
     /** mysql2 returns DECIMAL as string — preserved end-to-end so we
      *  don't lose precision converting to Number in the API layer. */
     collectiveSavingsEur: string;
@@ -29,8 +31,13 @@ export interface BasketTemplate {
     snapshotCalculatedAt: string | null;
     lastAutoUpdateDelta: number | null;
     lastAutoUpdateAt: string | null;
+    /** Server-owned cover identity (was localStorage-only before). */
+    coverColor: string | null;
+    coverImage: CoverImage | null;
     createdAt: string;
     updatedAt: string;
+    /** Set only on content edits (name / cover / items); null = never edited. */
+    editedAt: string | null;
     itemCount: number;
 }
 
@@ -46,11 +53,13 @@ export const deleteTemplate = (id: number) =>
 export interface CreateTemplateBody {
     userId: string;
     name: string;
-    autoUpdate?: boolean;
     /** Defaults server-side to 'private' if omitted. Web sends this
      *  explicitly so the creator's choice in the rail slider applies
      *  on the first INSERT — no follow-up PATCH to set visibility. */
     visibility?: 'private' | 'unlisted' | 'public';
+    /** Server-owned cover identity, applied on the first INSERT. */
+    coverColor?: string | null;
+    coverImage?: CoverImage | null;
     items?: Array<{
         productId: number;
         quantity: number;
@@ -74,8 +83,9 @@ export const createTemplate = (body: CreateTemplateBody) =>
 
 export interface PatchTemplateBody {
     name?: string;
-    autoUpdate?: boolean;
     visibility?: 'private' | 'unlisted' | 'public';
+    coverColor?: string | null;
+    coverImage?: CoverImage | null;
 }
 
 /** POST /api/basket-templates/{id}/items. Appends a single item to
@@ -120,16 +130,16 @@ export const deleteTemplateItem = (templateId: number, itemId: number) =>
     api.del<void>(`/api/basket-templates/${templateId}/items/${itemId}`);
 
 /** PATCH /api/basket-templates/{id}. Updates the metadata fields the
- *  server accepts (name / autoUpdate / visibility). Returns 204 on
- *  success. Item-list edits go through dedicated item endpoints; for
- *  the Redaguoti flow tonight we only PATCH name so the rest of the
- *  draft fields are out of scope. */
+ *  server accepts (name / visibility / coverColor / coverImage) and
+ *  returns the updated template. Item-list edits go through the
+ *  dedicated item endpoints. */
 export const patchTemplate = (id: number, body: PatchTemplateBody) =>
     api.patch<void>(`/api/basket-templates/${id}`, body);
 
-/** Public shared-template payload returned by GET /api/t/{slug}. Shape
- *  mirrors the server's `resolveSlug`: a `template` block plus the
- *  resolved item list. Used by the read-only public /t/:slug view. */
+/** Public shared-template payload returned by GET /api/t/{slug}. Matches
+ *  the server's `resolveSlug` exactly: a `template` block, a `snapshot`
+ *  block (price comparison; all null until the template is calculated),
+ *  and the resolved item list. Used by the read-only public /t/:slug view. */
 export interface SharedTemplate {
     template: {
         id: number;
@@ -137,6 +147,10 @@ export interface SharedTemplate {
         creatorHandle: string | null;
         useCount: number;
         visibility: 'public' | 'unlisted' | 'private';
+        coverColor: string | null;
+        coverImage: CoverImage | null;
+    };
+    snapshot: {
         cheapestChainId: number | null;
         cheapestTotalEur: number | null;
         runnerUpTotalEur: number | null;
@@ -157,3 +171,18 @@ export interface SharedTemplate {
  *  the template is private. */
 export const getSharedTemplate = (slug: string) =>
     api.get<SharedTemplate>(`/api/t/${encodeURIComponent(slug)}`);
+
+export interface ShareLinkResult {
+    slug: string;
+    url: string;
+    visibility: 'unlisted' | 'public';
+    qrUrl: string | null;
+    qrDataUrl: string | null;
+}
+
+/** POST /api/basket-templates/{id}/share — mint (or reuse) the share slug +
+ *  snapshot + branded QR. Cookie-authenticated; the server enforces ownership.
+ *  The returned `slug` is what actually resolves at /t/:slug — the dashboard
+ *  must build the link from it, not the numeric id. */
+export const shareTemplate = (id: number) =>
+    api.post<ShareLinkResult>(`/api/basket-templates/${id}/share`, {});

@@ -1,7 +1,7 @@
 import {
-    BarChart3, Bell, BookOpen, Bot, Calendar, CalendarHeart, ClipboardList, Coins, Filter,
-    Gauge, History, KeyRound, Leaf, LineChart, Mic, Repeat2, ScanLine, Share2, Sparkles,
-    Sprout, Store, Trophy, Users, UserSquare2, Wallet,
+    BarChart3, Bell, BookOpen, Calendar, CalendarHeart, ClipboardList, Coins, Eye, Filter,
+    Gauge, History, LineChart, Repeat2, Route, ScanLine, Share2, ShieldCheck, Sparkles,
+    Sprout, Store, Users, UserSquare2,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -18,11 +18,11 @@ import type { LucideIcon } from 'lucide-react';
 
 export type FeatureId =
     | 'compare' | 'scan' | 'habits' | 'discounts' | 'history' | 'bestStore' | 'perKg'
-    | 'gamify' | 'quickRepeat' | 'multiStore' | 'alts' | 'monthly' | 'recovery'
-    | 'shared' | 'seasonal' | 'veggie' | 'voice' | 'weekly' | 'noAccount' | 'lt';
+    | 'quickRepeat' | 'multiStore' | 'route' | 'monthly' | 'privacy'
+    | 'shared' | 'seasonal' | 'noAccount' | 'lt';
 
 export type CreatorFeatureId =
-    | 'share' | 'savings' | 'recipe' | 'publish' | 'profile' | 'auto' | 'stats';
+    | 'share' | 'savings' | 'recipe' | 'publish' | 'profile' | 'visibility' | 'stats';
 
 export interface FeatureCard<TId extends string = string> {
     id: TId;
@@ -39,17 +39,13 @@ export const userFeatures: FeatureCard<FeatureId>[] = [
     { id: 'history',     icon: History,       i18n: 'features.user.history' },
     { id: 'bestStore',   icon: Gauge,         i18n: 'features.user.bestStore' },
     { id: 'perKg',       icon: LineChart,     i18n: 'features.user.perKg' },
-    { id: 'gamify',      icon: Trophy,        i18n: 'features.user.gamify' },
     { id: 'quickRepeat', icon: Repeat2,       i18n: 'features.user.quickRepeat' },
     { id: 'multiStore',  icon: Filter,        i18n: 'features.user.multiStore' },
-    { id: 'alts',        icon: Coins,         i18n: 'features.user.alts' },
+    { id: 'route',       icon: Route,         i18n: 'features.user.route' },
     { id: 'monthly',     icon: Calendar,      i18n: 'features.user.monthly' },
-    { id: 'recovery',    icon: KeyRound,      i18n: 'features.user.recovery' },
+    { id: 'privacy',     icon: ShieldCheck,   i18n: 'features.user.privacy' },
     { id: 'shared',      icon: Users,         i18n: 'features.user.shared' },
     { id: 'seasonal',    icon: CalendarHeart, i18n: 'features.user.seasonal' },
-    { id: 'veggie',      icon: Leaf,          i18n: 'features.user.veggie' },
-    { id: 'voice',       icon: Mic,           i18n: 'features.user.voice' },
-    { id: 'weekly',      icon: Wallet,        i18n: 'features.user.weekly' },
     { id: 'noAccount',   icon: Sprout,        i18n: 'features.user.noAccount' },
     { id: 'lt',          icon: ClipboardList, i18n: 'features.user.lt' },
 ];
@@ -59,7 +55,7 @@ export const creatorFeatures: FeatureCard<CreatorFeatureId>[] = [
     { id: 'savings',  icon: Coins,       i18n: 'features.creator.savings' },
     { id: 'recipe',   icon: BookOpen,    i18n: 'features.creator.recipe' },
     { id: 'publish',  icon: Sparkles,    i18n: 'features.creator.publish' },
-    { id: 'profile',  icon: UserSquare2, i18n: 'features.creator.profile' },
-    { id: 'auto',     icon: Bot,         i18n: 'features.creator.auto' },
-    { id: 'stats',    icon: BarChart3,   i18n: 'features.creator.stats' },
+    { id: 'profile',    icon: UserSquare2, i18n: 'features.creator.profile' },
+    { id: 'visibility', icon: Eye,         i18n: 'features.creator.visibility' },
+    { id: 'stats',      icon: BarChart3,   i18n: 'features.creator.stats' },
 ];

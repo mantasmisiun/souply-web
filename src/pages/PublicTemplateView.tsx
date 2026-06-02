@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
+import { Loader2, HelpCircle } from 'lucide-react';
 import { getSharedTemplate, type SharedTemplate } from '@/lib/templates';
+import { findPreset } from '@/data/coverPresets';
+import type { CoverImage } from '@/state/createTemplate';
+
+/** Resolve a cover image to its emoji glyph (preset → looked-up emoji). */
+function coverEmoji(image: CoverImage | null): string | null {
+    if (!image) return null;
+    return image.kind === 'emoji' ? image.emoji : findPreset(image.iconKey).emoji;
+}
 
 /**
  * Read-only public template view at /t/:slug — the surface a visitor
@@ -25,6 +33,7 @@ export function PublicTemplateView() {
     const { t } = useTranslation();
     const [data, setData] = useState<SharedTemplate | null>(null);
     const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
+    const [showHelp, setShowHelp] = useState(false);
 
     useEffect(() => {
         if (!slug) { setState('error'); return; }
@@ -60,8 +69,32 @@ export function PublicTemplateView() {
         );
     }
 
-    const { template, items } = data;
+    // The creator turned this template private after sharing. The link still
+    // resolves (not a 404) but there's nothing to act on — explain it.
+    if (data.template.visibility === 'private') {
+        return (
+            <div className="min-h-screen grid place-items-center bg-createWash px-6 text-center">
+                <div className="max-w-md">
+                    <div className="text-4xl mb-3" aria-hidden>🔒</div>
+                    <h1 className="text-lg font-bold mb-1">{t('pages.publicTemplate.privateTitle')}</h1>
+                    <p className="text-sm text-ink-soft mb-6">{t('pages.publicTemplate.privateBody')}</p>
+                    <Link to="/" className="text-sm font-semibold text-souply-beet hover:underline">
+                        {t('brand.name')}
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    const { template, snapshot, items } = data;
     const handle = template.creatorHandle ? `@${template.creatorHandle}` : t('brand.name');
+    const emoji = coverEmoji(template.coverImage);
+    // "Save up to €X" — only when the template has been calculated (snapshot
+    // present) and the priciest store actually costs more than the cheapest.
+    const saveUpTo =
+        snapshot.mostExpensiveTotalEur != null && snapshot.cheapestTotalEur != null
+            ? Math.max(0, snapshot.mostExpensiveTotalEur - snapshot.cheapestTotalEur)
+            : null;
 
     return (
         <div className="min-h-screen bg-createWash text-ink">
@@ -70,11 +103,40 @@ export function PublicTemplateView() {
                     {t('brand.name')}
                 </Link>
 
+                {/* Cover band — same colour + emoji the creator chose, now
+                    server-owned so it matches the dashboard + the app. */}
+                <div
+                    className="mt-5 h-28 rounded-2xl grid place-items-center shadow-card overflow-hidden"
+                    style={{ backgroundColor: template.coverColor ?? '#EB6784' }}
+                >
+                    {emoji && <span className="text-5xl" aria-hidden>{emoji}</span>}
+                </div>
+
                 <header className="mt-5 mb-6">
                     <h1 className="text-2xl font-bold">{template.name}</h1>
                     <p className="text-sm text-ink-soft mt-1">
                         {t('pages.publicTemplate.items', { count: items.length })} · {t('pages.publicTemplate.by', { handle })}
                     </p>
+                    {saveUpTo != null && saveUpTo > 0 && (
+                        <div className="mt-3">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-souply-beet/10 text-souply-beet text-sm font-bold px-3 py-1.5">
+                                {t('pages.publicTemplate.saveUpTo', { amount: saveUpTo.toFixed(2) })}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowHelp((v) => !v)}
+                                    aria-label={t('pages.publicTemplate.saveUpToHelp')}
+                                    className="inline-grid place-items-center rounded-full hover:bg-souply-beet/15 transition"
+                                >
+                                    <HelpCircle size={15} />
+                                </button>
+                            </span>
+                            {showHelp && (
+                                <p className="mt-2 max-w-prose text-xs text-ink-soft leading-relaxed">
+                                    {t('pages.publicTemplate.saveUpToHelp')}
+                                </p>
+                            )}
+                        </div>
+                    )}
                 </header>
 
                 <ul className="space-y-2">

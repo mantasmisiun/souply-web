@@ -16,7 +16,7 @@ type Platform = 'ios' | 'android';
  * and the picker doubles as a hint that Souply ships native, not just web.
  */
 export function BetaSignup() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [platform, setPlatform] = useState<Platform>('ios');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -33,7 +33,8 @@ export function BetaSignup() {
         setError(false);
         setSubmitting(true);
         try {
-            await submitBetaSignup({ name: trimmedName, email: trimmedEmail, platform });
+            const lang = i18n.language?.startsWith('en') ? 'en' : 'lt';
+            await submitBetaSignup({ name: trimmedName, email: trimmedEmail, platform, lang });
             setDone(true);
             setName('');
             setEmail('');

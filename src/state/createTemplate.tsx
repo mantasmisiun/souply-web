@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 import type { ReactNode } from 'react';
 import type { ProductRow } from '@/lib/products';
 import { createTemplate as apiCreateTemplate, patchTemplate as apiPatchTemplate, patchTemplateItem, deleteTemplateItem } from '@/lib/templates';
-import { ApiError } from '@/lib/api';
 import { DEFAULT_COVER_COLOR } from '@/lib/coverColors';
 import { DEFAULT_PRESET_KEY } from '@/data/coverPresets';
 import { resolveCanonicalStep, resolveDisplayUnit } from '@/lib/canonicalStep';
@@ -32,6 +31,10 @@ export interface DraftSeed {
     coverImage: CoverImage;
     items: DraftItem[];
     visibility: DraftVisibility;
+    /** The template's real server-side visibility (3-state). Lets save()
+     *  preserve `unlisted` when the creator doesn't touch the public
+     *  toggle. Defaults to `visibility` when omitted (fresh create/dup). */
+    originalVisibility?: 'private' | 'unlisted' | 'public';
     /** Pass the existing template id when seeding for Redaguoti so
      *  the save call PATCHes instead of inserting a new row. */
     editingId: number | null;
@@ -148,6 +151,12 @@ export function CreateTemplateProvider({ children }: { children: ReactNode }) {
     const [coverColor, setCoverColorState] = useState<string>(DEFAULT_COVER_COLOR);
     const [coverImage, setCoverImageState] = useState<CoverImage>(DEFAULT_COVER_IMAGE);
     const [visibility, setVisibilityState] = useState<DraftVisibility>('private');
+    // The template's true server-side visibility when editing. The slider is
+    // binary (private/public), but a template can be `unlisted` (shared by
+    // link). We preserve that on save unless the creator actually flips the
+    // public toggle — otherwise editing an unlisted template would silently
+    // downgrade it to private and kill its live share link.
+    const [originalVisibility, setOriginalVisibility] = useState<'private' | 'unlisted' | 'public'>('private');
     const [editingId, setEditingId] = useState<number | null>(null);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -159,6 +168,7 @@ export function CreateTemplateProvider({ children }: { children: ReactNode }) {
         setCoverColorState(DEFAULT_COVER_COLOR);
         setCoverImageState(DEFAULT_COVER_IMAGE);
         setVisibilityState('private');
+        setOriginalVisibility('private');
         setEditingId(null);
         setError(null);
     }, []);
@@ -170,6 +180,7 @@ export function CreateTemplateProvider({ children }: { children: ReactNode }) {
         setCoverColorState(draft.coverColor);
         setCoverImageState(draft.coverImage);
         setVisibilityState(draft.visibility);
+        setOriginalVisibility(draft.originalVisibility ?? draft.visibility);
         setEditingId(draft.editingId);
         setError(null);
     }, []);
@@ -181,6 +192,7 @@ export function CreateTemplateProvider({ children }: { children: ReactNode }) {
         setCoverColorState(DEFAULT_COVER_COLOR);
         setCoverImageState(DEFAULT_COVER_IMAGE);
         setVisibilityState('private');
+        setOriginalVisibility('private');
         setEditingId(null);
         setError(null);
         setSaving(false);
@@ -308,31 +320,34 @@ export function CreateTemplateProvider({ children }: { children: ReactNode }) {
             // we cover name updates so Redaguoti round-trips cleanly.
             // Duplicate / fresh-create both fall through to the POST
             // branch since their `editingId` is null.
+            // Preserve `unlisted`: only send a visibility change when the
+            // creator actually flipped the public toggle. If the toggle's
+            // public-ness matches the original, keep the server's true
+            // value (so an unlisted/shared template stays unlisted).
+            const wasPublic = originalVisibility === 'public';
+            const isPublic = visibility === 'public';
+            const targetVisibility: 'private' | 'unlisted' | 'public' =
+                isPublic === wasPublic ? originalVisibility : (isPublic ? 'public' : 'private');
+
             if (editingId != null) {
-                try {
-                    await apiPatchTemplate(editingId, { name: name.trim(), visibility });
-                } catch (err) {
-                    // Publish wall — `visibility=public` requires
-                    // a verified Bearer token (souply-api intentional
-                    // gate). In dev there's no OAuth yet, so a 401 /
-                    // 412 here would surface as a save failure
-                    // even though the server has already applied the
-                    // name update (the controller runs the rename
-                    // BEFORE the visibility check). Treat the call
-                    // as success so the editor closes cleanly; the
-                    // visibility flip stays as a local UI preference
-                    // until the auth pipeline lands.
-                    if (!(err instanceof ApiError) || (err.status !== 401 && err.status !== 412)) {
-                        throw err;
-                    }
-                }
+                // Publish-wall errors (401 auth-required / 412 username-required)
+                // now surface as real save errors — OAuth is live, so a failed
+                // publish must NOT be silently treated as success.
+                await apiPatchTemplate(editingId, {
+                    name: name.trim(),
+                    visibility: targetVisibility,
+                    coverColor,
+                    coverImage,
+                });
                 cancel();
                 return editingId;
             }
             const result = await apiCreateTemplate({
                 userId,
                 name: name.trim(),
-                visibility,
+                visibility: targetVisibility,
+                coverColor,
+                coverImage,
                 items: items.map((it, i) => ({
                     productId: it.productId,
                     quantity: it.quantity,
@@ -347,7 +362,7 @@ export function CreateTemplateProvider({ children }: { children: ReactNode }) {
             setSaving(false);
             return null;
         }
-    }, [name, items, visibility, editingId, cancel]);
+    }, [name, items, visibility, originalVisibility, coverColor, coverImage, editingId, cancel]);
 
     const value = useMemo<State>(
         () => ({ active, name, items, coverColor, coverImage, visibility, editingId, saving, error, open, openWithDraft, cancel, setName, setCoverColor, setCoverImage, setVisibility, setItems: setItemsAction, setItemServerId, addProduct, setQuantity, increment, decrement, removeItem, save }),

@@ -47,6 +47,22 @@ export const listProductsByL2 = (l2Id: number) =>
 export const searchProducts = (query: string) =>
     api.get<ProductRow[]>(`/api/products/search?q=${encodeURIComponent(query)}`);
 
+/** Sentinel "category" id for the Nuolaidos (discounts) shortcut in the
+ *  create-template browser. Negative so it never collides with a real
+ *  category id; ProductsPanel branches on it to load discounted products. */
+export const DISCOUNTS_L2_ID = -1;
+
+/** GET /api/products/discounted — products with an active promo, as the
+ *  DiscountedProductSummary rows. Maps `productId` → `id` so the row drops
+ *  straight into the same ProductRow / amount-picker flow as a category. */
+export const listDiscountedProducts = async (): Promise<ProductRow[]> => {
+    const rows = await api.get<Array<ProductRow & { productId?: number }>>('/api/products/discounted');
+    return (Array.isArray(rows) ? rows : []).map((r) => ({
+        ...r,
+        id: r.id ?? (r.productId as number),
+    }));
+};
+
 /** Pick the first non-null URL from the polymorphic `imageUrls` field. */
 export function firstImageUrl(raw: ProductRow['imageUrls']): string | null {
     if (!raw) return null;

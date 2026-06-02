@@ -123,6 +123,15 @@ app.get('/t/:slug', async (req, res) => {
     }
 });
 
+// ── Apple Universal Links association ───────────────────────────────
+// The AASA file is extension-less, so express.static would serve it as
+// octet-stream. Apple wants JSON — serve it explicitly before static.
+app.get('/.well-known/apple-app-site-association', (_req, res) => {
+    res.type('application/json').sendFile(
+        path.join(DIST, '.well-known', 'apple-app-site-association'),
+    );
+});
+
 // ── Static assets ───────────────────────────────────────────────────
 // Hashed bundles are fingerprinted → cache hard. index.html itself must
 // never cache or a deploy serves a stale shell pointing at gone assets.

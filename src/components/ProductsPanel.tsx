@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useCreateTemplate } from '@/state/createTemplate';
 import { listSubcategories, type Category } from '@/lib/categories';
-import { listProductsByL2, type ProductRow as ProductRowData } from '@/lib/products';
+import { listProductsByL2, listDiscountedProducts, DISCOUNTS_L2_ID, type ProductRow as ProductRowData } from '@/lib/products';
 import { ProductRow } from './ProductRow';
 import { ProductGridSkeleton } from './ProductCardSkeleton';
 import { cx } from '@/lib/cx';
@@ -60,6 +60,20 @@ export function ProductsPanel({ l2, onAddRequest }: Props) {
     useEffect(() => {
         if (!l2) return;
         let cancelled = false;
+        // Nuolaidos shortcut: one flat list of discounted products, no L3
+        // chips (discounts span every category, so subcategory filters
+        // don't apply).
+        if (l2.id === DISCOUNTS_L2_ID) {
+            listDiscountedProducts()
+                .catch(() => [])
+                .then((prods) => {
+                    if (cancelled) return;
+                    setProducts(Array.isArray(prods) ? prods : []);
+                    setL3([]);
+                })
+                .finally(() => { if (!cancelled) setProductsLoading(false); });
+            return () => { cancelled = true; };
+        }
         Promise.all([
             listProductsByL2(l2.id).catch(() => []),
             listSubcategories(l2.id).catch(() => []),

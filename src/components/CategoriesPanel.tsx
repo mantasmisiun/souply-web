@@ -2,7 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
 import { listL1Categories, listSubcategories, type Category } from '@/lib/categories';
+import { DISCOUNTS_L2_ID } from '@/lib/products';
 import { cx } from '@/lib/cx';
+
+/** Pseudo-category for the Nuolaidos shortcut — selecting it makes
+ *  ProductsPanel load discounted products instead of a category. */
+const DISCOUNTS_CAT: Category = { id: DISCOUNTS_L2_ID, name: 'Nuolaidos', parentCategoryId: null };
 
 const CATEGORY_ICONS: Record<string, string> = {
     'Daržovės ir vaisiai': '🫜',
@@ -76,8 +81,28 @@ export function CategoriesPanel({ selectedL2Id, onSelectL2 }: Props) {
         if (parentOfSelected != null) setExpandedL1(parentOfSelected);
     }, [parentOfSelected]);
 
+    const discountsSelected = selectedL2Id === DISCOUNTS_L2_ID;
+
     return (
         <div className="h-full flex flex-col">
+            {/* Nuolaidos shortcut — pinned above the category tree, mirrors
+                the mobile app's discounts card. Selecting it loads the
+                flat discounted-product list into the add flow. */}
+            <button
+                type="button"
+                onClick={() => onSelectL2(DISCOUNTS_CAT, DISCOUNTS_CAT)}
+                className={cx(
+                    'mb-2 w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl text-left transition-colors',
+                    'border-l-[3px] shadow-card ring-1',
+                    discountsSelected
+                        ? 'bg-beetTint ring-souply-beet/40 border-l-souply-beet'
+                        : 'bg-surface ring-edge-subtle border-l-surface/0 hover:bg-surface-muted',
+                )}
+            >
+                <span className="text-lg" aria-hidden>🔥</span>
+                <span className="text-sm font-semibold text-ink">Nuolaidos</span>
+            </button>
+
             {l1Loading ? (
                 <div className="grid place-items-center py-10 text-souply-beet">
                     <Loader2 className="animate-spin" size={22} />

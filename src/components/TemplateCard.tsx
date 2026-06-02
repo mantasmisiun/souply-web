@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     ArrowUpRight, Copy, Share2, Trash2,
-    Globe2, Link as LinkIcon, Lock,
+    Globe2, Link as LinkIcon, Lock, HelpCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { SampleTemplate } from '@/data/sampleTemplates';
@@ -9,12 +10,15 @@ import { findPreset } from '@/data/coverPresets';
 import { cx } from '@/lib/cx';
 import { ease } from '@/lib/motion';
 import { COVER_GRADIENT_OVERLAY } from '@/lib/coverGradient';
+import { StatsHelpDialog } from './StatsHelpDialog';
 
 /** True when the row has been edited since creation (updatedAt is
  *  strictly newer than createdAt). The card switches its date stat
  *  between "Sukurta" and "Atnaujinta" based on this. */
 function wasEdited(t: SampleTemplate): boolean {
-    return new Date(t.updatedAt).getTime() > new Date(t.createdAt).getTime();
+    // `editedAt` is set only on real content edits (name/cover/items); we no
+    // longer use updatedAt, which the server auto-bumps on counters/shares.
+    return t.editedAt != null;
 }
 
 interface Props {
@@ -52,8 +56,9 @@ function shortDate(iso: string, locale: string): string {
  */
 export function TemplateCard({ template, onOpen, onShare, onDuplicate, onDelete }: Props) {
     const { t, i18n } = useTranslation();
+    const [helpOpen, setHelpOpen] = useState(false);
     const edited = wasEdited(template);
-    const dateValue = shortDate(edited ? template.updatedAt : template.createdAt, i18n.language);
+    const dateValue = shortDate(edited ? template.editedAt! : template.createdAt, i18n.language);
     const dateLabel = t(edited ? 'dashboard.templates.statsUpdated' : 'dashboard.templates.statsCreated');
     return (
         <motion.article
@@ -107,14 +112,25 @@ export function TemplateCard({ template, onOpen, onShare, onDuplicate, onDelete 
 
             {/* Body */}
             <div className="p-5 flex flex-col gap-4">
-                <div>
-                    <h3 className="text-lg font-semibold text-ink leading-tight">{template.name}</h3>
-                    <div className="text-xs text-ink-soft mt-0.5">
-                        {template.itemCount} {template.itemCount === 1 ? 'prekė' : (template.itemCount < 10 ? 'prekės' : 'prekių')}
+                <div className="flex items-start justify-between gap-2">
+                    <div>
+                        <h3 className="text-lg font-semibold text-ink leading-tight">{template.name}</h3>
+                        <div className="text-xs text-ink-soft mt-0.5">
+                            {template.itemCount} {template.itemCount === 1 ? 'prekė' : (template.itemCount < 10 ? 'prekės' : 'prekių')}
+                        </div>
                     </div>
+                    <button
+                        type="button"
+                        onClick={() => setHelpOpen(true)}
+                        aria-label={t('dashboard.templates.statsHelpTitle')}
+                        className="shrink-0 size-7 grid place-items-center rounded-full text-ink-soft hover:bg-surface-muted hover:text-ink transition"
+                    >
+                        <HelpCircle size={16} />
+                    </button>
                 </div>
 
-                <dl className="grid grid-cols-3 gap-3 py-3 border-y border-edge nums">
+                <dl className="grid grid-cols-2 gap-3 py-3 border-y border-edge nums">
+                    <Stat label={t('dashboard.templates.statsVisits')}      value={new Intl.NumberFormat('lt-LT').format(template.visitCount)} />
                     <Stat label={t('dashboard.templates.statsUses')}        value={new Intl.NumberFormat('lt-LT').format(template.useCount)} />
                     <Stat label={t('dashboard.templates.statsHelpedSave')}  value={`${fmtEur(Number(template.collectiveSavingsEur))} €`} accent />
                     <Stat label={dateLabel}                                  value={dateValue} />
@@ -140,6 +156,8 @@ export function TemplateCard({ template, onOpen, onShare, onDuplicate, onDelete 
                     <IconBtn icon={Trash2} label={t('dashboard.templates.action.delete')} danger onClick={() => onDelete(template)} />
                 </div>
             </div>
+
+            <StatsHelpDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
         </motion.article>
     );
 }

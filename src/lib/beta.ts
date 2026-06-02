@@ -7,4 +7,5 @@ export const submitBetaSignup = (body: {
     name: string;
     email: string;
     platform: 'ios' | 'android';
+    lang?: 'lt' | 'en';
 }) => api.post<{ ok: true }>('/api/beta-signups', body);

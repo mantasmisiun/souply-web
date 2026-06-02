@@ -10,7 +10,6 @@ import { CoverPicturePicker } from './CoverPicturePicker';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
 import { VisibilitySlider } from './VisibilitySlider';
-import { setCoverOverride } from '@/lib/coverOverrides';
 import { cx } from '@/lib/cx';
 
 /**
@@ -82,14 +81,9 @@ export function TemplateViewRail() {
 
     const onSubmit = useCallback(async () => {
         if (!user?.id || !viewing) return;
-        // Persist the cover choices BEFORE save tears down the local
-        // createTemplate state. The dashboard card reads this on the
-        // next render and paints what the creator picked, not the
-        // deterministic sample colour. TODO(api): drop once
-        // BasketTemplate carries coverColor + coverImageKey.
-        if (viewing.id > 0) {
-            setCoverOverride(viewing.id, { coverColor, coverImage });
-        }
+        // Cover (colour + emoji) is persisted server-side by save()'s PATCH,
+        // so it syncs across devices, reaches the app, and shows on the
+        // public share page.
         setSubmitting(true);
         const id = await save(user.id);
         setSubmitting(false);

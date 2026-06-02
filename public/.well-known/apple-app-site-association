@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "REPLACE_WITH_APPLE_TEAM_ID.lt.souply.app",
+          "REPLACE_WITH_APPLE_TEAM_ID.lt.souply.app.dev"
+        ],
+        "components": [
+          { "/": "/t/*", "comment": "Shared template links" },
+          { "/": "/@*", "comment": "Creator profile links" }
+        ]
+      }
+    ]
+  }
+}

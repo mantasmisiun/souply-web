@@ -28,12 +28,33 @@ interface Props {
  * onBlur (and on Enter) so an in-progress edit doesn't fight the
  * colour-wheel handle for state.
  */
+const LAST_COLOR_KEY = 'souply.cover-last-custom-color';
+
 export function CoverColorPicker({ value, onChange }: Props) {
     const [open, setOpen] = useState(false);
     const [hexInput, setHexInput] = useState(value);
+    const [lastCustom, setLastCustom] = useState<string | null>(null);
     const rootRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => { setHexInput(value); }, [value]);
+    useEffect(() => {
+        try { setLastCustom(localStorage.getItem(LAST_COLOR_KEY)); } catch { /* private mode */ }
+    }, []);
+
+    const isPreset = COVER_COLOR_SWATCHES.some((s) => s.toLowerCase() === value.toLowerCase());
+    // The eyedropper shows the current custom colour (or the cached brand
+    // colour) on its background, so it doubles as a one-tap brand swatch.
+    const chip = isPreset ? lastCustom : value;
+
+    /** Apply a custom (non-preset) colour and cache it as the last brand
+     *  colour. Only the most recent value is kept. */
+    const applyCustom = (hex: string) => {
+        onChange(hex);
+        if (isValidHex(hex)) {
+            setLastCustom(hex);
+            try { localStorage.setItem(LAST_COLOR_KEY, hex); } catch { /* private mode */ }
+        }
+    };
 
     // Outside-click + Escape to close. Anchored to the picker root so
     // clicking inside the popover (the wheel handle, the hex input)
@@ -56,7 +77,7 @@ export function CoverColorPicker({ value, onChange }: Props) {
 
     const commitHex = () => {
         const next = hexInput.startsWith('#') ? hexInput : `#${hexInput}`;
-        if (isValidHex(next)) onChange(next);
+        if (isValidHex(next)) applyCustom(next);
         else setHexInput(value);
     };
 
@@ -83,19 +104,27 @@ export function CoverColorPicker({ value, onChange }: Props) {
                 );
             })}
 
-            {/* Custom hex picker */}
+            {/* Custom colour — eyedropper painted with the current/last custom
+                colour. Tapping switches to the cached brand colour (if any) and
+                opens the wheel to tweak it. */}
             <button
                 type="button"
                 aria-label="Pasirinkti pasirinktinę spalvą"
                 aria-expanded={open}
-                onClick={() => setOpen((v) => !v)}
+                aria-pressed={!isPreset}
+                onClick={() => {
+                    if (!open && isPreset && lastCustom) onChange(lastCustom);
+                    setOpen((v) => !v);
+                }}
                 className={cx(
                     'size-7 rounded-full grid place-items-center transition-transform',
-                    'bg-white/20 ring-1 ring-white/40 hover:scale-110 hover:bg-white/30 text-white',
-                    open && 'scale-110 bg-white/30',
+                    'ring-1 ring-white/40 hover:scale-110 text-white',
+                    !chip && 'bg-white/20 hover:bg-white/30',
+                    (open || !isPreset) && 'scale-110 ring-2 ring-white',
                 )}
+                style={chip ? { backgroundColor: chip } : undefined}
             >
-                <Pipette size={14} />
+                <Pipette size={14} className="drop-shadow" />
             </button>
 
             <AnimatePresence>
@@ -115,7 +144,7 @@ export function CoverColorPicker({ value, onChange }: Props) {
                          *  default `react-colorful` class; we override
                          *  the inner saturation/hue widths through
                          *  the wrapper width above. */}
-                        <HexColorPicker color={value} onChange={onChange} />
+                        <HexColorPicker color={value} onChange={applyCustom} />
                         <div className="mt-3 flex items-center gap-2">
                             <span className="text-xs text-ink-soft">HEX</span>
                             <input

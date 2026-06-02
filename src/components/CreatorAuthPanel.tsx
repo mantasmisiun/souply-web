@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import {
-    ArrowLeft, BookOpen, CalendarDays, Loader2, Smartphone, Stethoscope, Wrench,
+    ArrowLeft, AtSign, BarChart3, Loader2, Share2, Wrench,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AppleMark } from './BrandMarks';
@@ -28,17 +28,16 @@ interface Props {
  *      now that the persona blocks below carry the explanation).
  *   2. OAuth: Google + Apple. Same backend handler; analytics decides
  *      which funnel by provider.
- *   3. Four persona blocks — one per role we explicitly target. Each
- *      block shows an icon + role name + a one-sentence "this is what
- *      it does for YOU". Spaced out enough to be scannable, not a wall.
+ *   3. Three benefit bullets — "what you get" as a creator. The
+ *      persona "who it's for" blocks now live on the visitor screen,
+ *      so here we reassure the visitor right before they sign in.
  */
 export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onBack, pending = null }: Props) {
     const { t } = useTranslation();
-    const personas: { icon: LucideIcon; nameKey: string; bodyKey: string }[] = [
-        { icon: CalendarDays, nameKey: 'cta.creatorPersona1', bodyKey: 'cta.creatorBenefit1' },
-        { icon: Stethoscope,  nameKey: 'cta.creatorPersona2', bodyKey: 'cta.creatorBenefit2' },
-        { icon: BookOpen,     nameKey: 'cta.creatorPersona3', bodyKey: 'cta.creatorBenefit3' },
-        { icon: Smartphone,   nameKey: 'cta.creatorPersona4', bodyKey: 'cta.creatorBenefit4' },
+    const benefits: { icon: LucideIcon; titleKey: string; bodyKey: string }[] = [
+        { icon: Share2,    titleKey: 'cta.creatorIntroBullet1', bodyKey: 'cta.creatorIntroBulletBody1' },
+        { icon: AtSign,    titleKey: 'cta.creatorIntroBullet2', bodyKey: 'cta.creatorIntroBulletBody2' },
+        { icon: BarChart3, titleKey: 'cta.creatorIntroBullet3', bodyKey: 'cta.creatorIntroBulletBody3' },
     ];
     const busy = pending !== null;
 
@@ -55,7 +54,31 @@ export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onBack, pending
 
             <h3 className="text-base font-semibold text-ink">{t('cta.creatorLogin')}</h3>
 
-            <div className="flex flex-col gap-2 items-stretch">
+            {/* Benefit bullets — "what you get". Bigger type than the old
+                checkmark list (icon tile + text-sm title + text-[13px]
+                body). Shown above the sign-in buttons so the visitor
+                reads the value props before committing. */}
+            <ul className="flex flex-col gap-3.5">
+                {benefits.map(({ icon: Icon, titleKey, bodyKey }) => (
+                    <li key={titleKey} className="flex gap-3">
+                        <span className="grid place-items-center size-9 shrink-0 rounded-xl bg-beetTint text-souply-beetDeep">
+                            <Icon size={16} strokeWidth={2} />
+                        </span>
+                        <div className="flex-1 min-w-0 pt-0.5">
+                            <div className="text-sm font-semibold text-ink leading-tight">
+                                {t(titleKey)}
+                            </div>
+                            <p className="text-[13px] text-ink-soft leading-snug mt-1">
+                                {t(bodyKey)}
+                            </p>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+
+            {/* Sign-in buttons — placed under the benefits. Soft divider
+                above so they read as the action that follows the pitch. */}
+            <div className="mt-1 pt-4 border-t border-edge/60 flex flex-col gap-2 items-stretch">
                 {/* Real Google sign-in (GIS renders Google's own button).
                     Renders nothing if VITE_GOOGLE_CLIENT_ID is unset — the
                     dev bypass below still covers sign-in then. */}
@@ -93,33 +116,6 @@ export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onBack, pending
                         <Wrench size={13} /> Dev sign-in (skip auth → 000…)
                     </button>
                 )}
-            </div>
-
-            {/* Persona blocks — spaced for breathing room, body type
-                bumped to text-sm so the value props don't read as fine
-                print. Soft divider above so they feel like a section,
-                not a footer. */}
-            <div className="mt-3 pt-4 border-t border-edge/60 flex flex-col gap-4">
-                <h4 className="text-xs font-bold tracking-wider uppercase text-ink-soft">
-                    {t('cta.creatorBenefitsHeading')}
-                </h4>
-                <ul className="flex flex-col gap-3.5">
-                    {personas.map(({ icon: Icon, nameKey, bodyKey }) => (
-                        <li key={nameKey} className="flex gap-3">
-                            <span className="grid place-items-center size-9 shrink-0 rounded-xl bg-beetTint text-souply-beetDeep">
-                                <Icon size={16} strokeWidth={2} />
-                            </span>
-                            <div className="flex-1 min-w-0 pt-0.5">
-                                <div className="text-sm font-semibold text-ink leading-tight">
-                                    {t(nameKey)}
-                                </div>
-                                <p className="text-[13px] text-ink-soft leading-snug mt-1">
-                                    {t(bodyKey)}
-                                </p>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
             </div>
         </div>
     );

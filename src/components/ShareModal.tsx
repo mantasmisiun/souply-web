@@ -4,6 +4,7 @@ import { Check, Copy as CopyIcon, Download, X } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import type { SampleTemplate } from '@/data/sampleTemplates';
+import { shareTemplate } from '@/lib/templates';
 import { ease } from '@/lib/motion';
 
 interface Props {
@@ -36,12 +37,27 @@ export function ShareModal({ template, onClose }: Props) {
     const [copied, setCopied] = useState(false);
     const canvasRef = useRef<HTMLDivElement | null>(null);
 
+    // The real resolvable link uses the server-minted slug (not the numeric
+    // id — /t/:slug resolves by slug). Mint it when the modal opens for a
+    // shareable (non-private) template. Built off the dashboard's own origin
+    // so it's environment-correct (localhost / test / souply.lt).
+    const [slug, setSlug] = useState<string | null>(null);
+    const [minting, setMinting] = useState(false);
     const shareUrl = useMemo(() => {
-        if (!template) return '';
-        // TODO(api): swap to template.shareSlug once souply-api ships
-        // the mint endpoint; until then numeric id keeps the QR
-        // resolvable for the dev environment.
-        return `https://souply.lt/t/${template.id}`;
+        if (!template || !slug) return '';
+        const origin = typeof window !== 'undefined' ? window.location.origin : 'https://souply.lt';
+        return `${origin}/t/${slug}`;
+    }, [template, slug]);
+
+    useEffect(() => {
+        if (!template || template.visibility === 'private') { setSlug(null); return; }
+        let cancelled = false;
+        setMinting(true);
+        shareTemplate(template.id)
+            .then((res) => { if (!cancelled) setSlug(res.slug); })
+            .catch(() => { if (!cancelled) setSlug(null); })
+            .finally(() => { if (!cancelled) setMinting(false); });
+        return () => { cancelled = true; };
     }, [template]);
 
     // Reset the "Copied!" pill the next time the modal re-opens for
@@ -192,11 +208,11 @@ export function ShareModal({ template, onClose }: Props) {
                                 ref={canvasRef}
                                 className={
                                     'self-center p-3 rounded-2xl bg-white ring-1 ring-edge ' +
-                                    (template.visibility === 'private' ? 'opacity-40 grayscale' : '')
+                                    (template.visibility === 'private' || !shareUrl ? 'opacity-40 grayscale' : '')
                                 }
                             >
                                 <QRCodeCanvas
-                                    value={shareUrl}
+                                    value={shareUrl || 'https://souply.lt'}
                                     size={ON_SCREEN_QR_PX}
                                     bgColor="#ffffff"
                                     fgColor="#1F1B1D"
@@ -212,16 +228,16 @@ export function ShareModal({ template, onClose }: Props) {
                                     <input
                                         type="text"
                                         readOnly
-                                        value={template.visibility === 'private' ? '' : shareUrl}
-                                        placeholder={template.visibility === 'private' ? '—' : undefined}
+                                        value={shareUrl}
+                                        placeholder={template.visibility === 'private' ? '—' : (minting ? '…' : '—')}
                                         onFocus={(e) => e.target.select()}
-                                        disabled={template.visibility === 'private'}
+                                        disabled={!shareUrl}
                                         className="flex-1 min-w-0 px-3 py-2 text-sm rounded-xl bg-surface-muted text-ink placeholder:text-ink-faint ring-1 ring-edge focus:ring-2 focus:ring-souply-beet/60 outline-none transition disabled:cursor-not-allowed"
                                     />
                                     <button
                                         type="button"
                                         onClick={onCopy}
-                                        disabled={template.visibility === 'private'}
+                                        disabled={!shareUrl}
                                         className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold bg-souply-beet text-white hover:brightness-95 disabled:opacity-40 disabled:cursor-not-allowed transition"
                                     >
                                         {copied
@@ -234,7 +250,7 @@ export function ShareModal({ template, onClose }: Props) {
                             <button
                                 type="button"
                                 onClick={onDownload}
-                                disabled={template.visibility === 'private'}
+                                disabled={!shareUrl}
                                 className="inline-flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-ink text-surface hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition"
                             >
                                 <Download size={15} />

@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronRight } from 'lucide-react';
+import { BookOpen, CalendarDays, ChevronRight, Smartphone, Stethoscope } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
 import { BetaSignup } from './BetaSignup';
@@ -95,11 +97,11 @@ export function SideBand({
 
                         <footer className="text-[11px] text-ink-soft/80 leading-relaxed">
                             <div className="flex items-center gap-3 mb-2">
-                                <a href="#" className="hover:text-ink transition">{t('footer.privacy')}</a>
+                                <Link to="/legal/privacy" className="hover:text-ink transition">{t('footer.privacy')}</Link>
                                 <span className="opacity-30">·</span>
-                                <a href="#" className="hover:text-ink transition">{t('footer.terms')}</a>
+                                <Link to="/legal/terms" className="hover:text-ink transition">{t('footer.terms')}</Link>
                                 <span className="opacity-30">·</span>
-                                <a href="#" className="hover:text-ink transition">{t('footer.contact')}</a>
+                                <a href="mailto:support@souply.lt" className="hover:text-ink transition">{t('footer.contact')}</a>
                             </div>
                             <div>{t('footer.rights', { year })}</div>
                         </footer>
@@ -127,10 +129,15 @@ function BrandMark() {
 
 function VisitorBody({ onOpenCreatorAuth }: { onOpenCreatorAuth: () => void }) {
     const { t } = useTranslation();
-    const bullets = [
-        t('cta.creatorIntroBullet1'),
-        t('cta.creatorIntroBullet2'),
-        t('cta.creatorIntroBullet3'),
+    // "Who it's for" persona blocks — moved here from the creator-auth
+    // panel so a visitor can self-identify BEFORE deciding to log in.
+    // Content unchanged; the auth panel now carries the "what you get"
+    // benefit bullets instead.
+    const personas: { icon: LucideIcon; nameKey: string; bodyKey: string }[] = [
+        { icon: CalendarDays, nameKey: 'cta.creatorPersona1', bodyKey: 'cta.creatorBenefit1' },
+        { icon: Stethoscope,  nameKey: 'cta.creatorPersona2', bodyKey: 'cta.creatorBenefit2' },
+        { icon: BookOpen,     nameKey: 'cta.creatorPersona3', bodyKey: 'cta.creatorBenefit3' },
+        { icon: Smartphone,   nameKey: 'cta.creatorPersona4', bodyKey: 'cta.creatorBenefit4' },
     ];
     return (
         <div className="flex flex-col gap-7">
@@ -138,9 +145,8 @@ function VisitorBody({ onOpenCreatorAuth }: { onOpenCreatorAuth: () => void }) {
 
             {/* Creator explainer + CTA. Lives under the divider so the
                 beta-tester (top) and would-be creator (bottom) paths are
-                visually separated. The explainer copy is shared with the
-                mobile app's Šablonas → Statistika tab so creators see the
-                same framing on both surfaces. */}
+                visually separated. The persona blocks let a visitor see
+                "is this me?" before tapping through to log in. */}
             <div className="pt-5 border-t border-edge/60 flex flex-col gap-3">
                 <h4 className="text-sm font-semibold text-ink">
                     {t('cta.creatorIntroTitle')}
@@ -148,11 +154,24 @@ function VisitorBody({ onOpenCreatorAuth }: { onOpenCreatorAuth: () => void }) {
                 <p className="text-xs text-ink-soft leading-relaxed">
                     {t('cta.creatorIntroBody')}
                 </p>
-                <ul className="flex flex-col gap-1.5">
-                    {bullets.map((line) => (
-                        <li key={line} className="flex items-start gap-2 text-xs text-ink-soft leading-snug">
-                            <Check size={12} className="mt-[3px] shrink-0 text-souply-beet" />
-                            <span>{line}</span>
+
+                <h5 className="mt-1 text-xs font-bold tracking-wider uppercase text-ink-soft">
+                    {t('cta.creatorBenefitsHeading')}
+                </h5>
+                <ul className="flex flex-col gap-3.5">
+                    {personas.map(({ icon: Icon, nameKey, bodyKey }) => (
+                        <li key={nameKey} className="flex gap-3">
+                            <span className="grid place-items-center size-9 shrink-0 rounded-xl bg-beetTint text-souply-beetDeep">
+                                <Icon size={16} strokeWidth={2} />
+                            </span>
+                            <div className="flex-1 min-w-0 pt-0.5">
+                                <div className="text-sm font-semibold text-ink leading-tight">
+                                    {t(nameKey)}
+                                </div>
+                                <p className="text-[13px] text-ink-soft leading-snug mt-1">
+                                    {t(bodyKey)}
+                                </p>
+                            </div>
                         </li>
                     ))}
                 </ul>

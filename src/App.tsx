@@ -16,6 +16,7 @@ import { TemplateOpenSurface } from './components/TemplateOpenSurface';
 import { TemplateViewRail } from './components/TemplateViewRail';
 import { CoverColorPicker } from './components/CoverColorPicker';
 import { ConfirmDialog } from './components/ConfirmDialog';
+import { CreateUsernameModal } from './components/CreateUsernameModal';
 import { userFeatures, creatorFeatures } from './data/features';
 import { useAuth } from './state/auth';
 import { useCreateTemplate } from './state/createTemplate';
@@ -86,7 +87,7 @@ function LandingOrDashboard() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { pathname } = useLocation();
-    const { isAuthed, restoring, login, logout } = useAuth();
+    const { user, isAuthed, restoring, login, logout } = useAuth();
     const { active: creating, coverColor, setCoverColor } = useCreateTemplate();
     const { viewing: viewingTemplate, tab: viewingTab } = useTemplateView();
     const { ready: templatesReady } = useTemplates();
@@ -95,6 +96,8 @@ function LandingOrDashboard() {
     const [phase, setPhase] = useState<Phase>(isAuthed ? 'dashboard' : 'idle');
     const [pendingAuthMode, setPendingAuthMode] = useState<'login' | 'signup' | null>(null);
     const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+    // First sign-in with no @handle yet → require the username modal.
+    const [usernameNeeded, setUsernameNeeded] = useState(false);
 
     // Bridge the open-surface state (?t=:id / ?tab=edit / ?create=1) to the
     // URL so the back button closes surfaces and ?t=:id deep-links work.
@@ -150,6 +153,9 @@ function LandingOrDashboard() {
         try {
             const { user } = await oauthSignIn({ provider: 'google', idToken });
             login(toAppUser(user));
+            // First sign-in (no username yet) → require a @handle. The modal
+            // overlays the dashboard; it's not dismissible until one is set.
+            if (!user.username) setUsernameNeeded(true);
         } catch {
             setPendingAuthMode(null);
             setPhase('idle');
@@ -164,8 +170,12 @@ function LandingOrDashboard() {
     useEffect(() => {
         if (!restoring && isAuthed && phase === 'idle') {
             setPhase('dashboard');
+            // Safety net: a creator who signed in but never set a @handle
+            // (e.g. closed the tab during the modal) gets re-prompted on the
+            // next visit, so the "must pick a username" rule always holds.
+            if (user && !user.handle) setUsernameNeeded(true);
         }
-    }, [restoring, isAuthed, phase]);
+    }, [restoring, isAuthed, phase, user]);
 
     /**
      * Gate 1: auth-pending → merging once templates are loaded.
@@ -542,6 +552,14 @@ function LandingOrDashboard() {
                 noLabel={t('dashboard.logoutConfirm.no')}
                 onConfirm={confirmLogout}
                 onCancel={() => setLogoutConfirmOpen(false)}
+            />
+
+            <CreateUsernameModal
+                open={usernameNeeded}
+                onDone={(username) => {
+                    if (user) login({ ...user, handle: username });
+                    setUsernameNeeded(false);
+                }}
             />
         </motion.main>
     );

@@ -23,11 +23,13 @@ export interface SampleTemplate {
     visitCount: number;
     /** EUR, decimal string keeps server parity (mysql2 returns DECIMAL as string). */
     collectiveSavingsEur: string;
-    /** ISO timestamps. The card shows "Sukurta" when these match
-     *  and switches the label to "Atnaujinta" once the row has been
-     *  edited (updatedAt > createdAt). */
+    /** ISO timestamps. createdAt is the "Sukurta" date; updatedAt auto-bumps
+     *  on every write so it's NOT used for the edited stat. */
     createdAt: string;
     updatedAt: string;
+    /** Set only on content edits (name / cover / items); null = never edited.
+     *  Drives the "Sukurta → Redaguota" stat + its date. */
+    editedAt: string | null;
     /** Solid cover colour — also drives the basket's left edge and
      *  bookmark icon in the consumer app, so a creator picks it once
      *  in the create-template flow and the identity carries through. */
@@ -49,37 +51,37 @@ export const sampleTemplates: SampleTemplate[] = [
     {
         id: 1, name: 'Sveiki pusryčiai savaitei', visibility: 'public', autoUpdate: true,
         itemCount: 14, useCount: 1284, visitCount: 4815, collectiveSavingsEur: '732.50',
-        createdAt: days(20), updatedAt: days(2), coverColor: '#EB6784',
+        createdAt: days(20), updatedAt: days(2), editedAt: days(2), coverColor: '#EB6784',
         coverImage: { kind: 'preset', iconKey: 'apple' }, emoji: '🥣',
     },
     {
         id: 2, name: 'Vegetariška savaitė', visibility: 'public', autoUpdate: false,
         itemCount: 22, useCount: 643, visitCount: 2104, collectiveSavingsEur: '418.10',
-        createdAt: days(5), updatedAt: days(5), coverColor: '#4FAE52',
+        createdAt: days(5), updatedAt: days(5), editedAt: null, coverColor: '#4FAE52',
         coverImage: { kind: 'preset', iconKey: 'salad' }, emoji: '🥗',
     },
     {
         id: 3, name: 'Šventinis stalas dviem', visibility: 'unlisted', autoUpdate: false,
         itemCount: 31, useCount: 198, visitCount: 612, collectiveSavingsEur: '294.00',
-        createdAt: days(30), updatedAt: days(11), coverColor: '#F0AE3F',
+        createdAt: days(30), updatedAt: days(11), editedAt: days(11), coverColor: '#F0AE3F',
         coverImage: { kind: 'preset', iconKey: 'avocado' }, emoji: '🥂',
     },
     {
         id: 4, name: 'Sporto savaitė — 4 treniruotės', visibility: 'public', autoUpdate: true,
         itemCount: 18, useCount: 421, visitCount: 1487, collectiveSavingsEur: '187.40',
-        createdAt: days(8), updatedAt: days(1), coverColor: '#5571E1',
+        createdAt: days(8), updatedAt: days(1), editedAt: days(1), coverColor: '#5571E1',
         coverImage: { kind: 'preset', iconKey: 'protein' }, emoji: '🏋️',
     },
     {
         id: 5, name: 'Krepšelis studentui', visibility: 'public', autoUpdate: false,
         itemCount: 12, useCount: 902, visitCount: 3104, collectiveSavingsEur: '512.80',
-        createdAt: days(7), updatedAt: days(7), coverColor: '#A65EE0',
+        createdAt: days(7), updatedAt: days(7), editedAt: null, coverColor: '#A65EE0',
         coverImage: { kind: 'preset', iconKey: 'smoothie' }, emoji: '🎓',
     },
     {
         id: 6, name: 'Vakaras prie ekrano', visibility: 'private', autoUpdate: false,
         itemCount: 9,  useCount: 0,   visitCount: 0,    collectiveSavingsEur: '0.00',
-        createdAt: days(0), updatedAt: days(0), coverColor: '#1F1B1D',
+        createdAt: days(0), updatedAt: days(0), editedAt: null, coverColor: '#1F1B1D',
         coverImage: { kind: 'preset', iconKey: 'apple' }, emoji: '🍿',
     },
 ];

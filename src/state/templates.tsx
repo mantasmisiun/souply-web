@@ -82,6 +82,26 @@ export function TemplatesProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => { refresh(); }, [refresh]);
 
+    // Live-ish savings: refetch when the creator returns to the tab and on a
+    // gentle interval while it's visible. The savings number is accrued
+    // server-side when followers shop, so a focus + slow poll picks up new
+    // value without websockets. Skipped while the tab is hidden to avoid
+    // pointless background requests.
+    useEffect(() => {
+        if (!userId) return;
+        const onFocus = () => { if (document.visibilityState === 'visible') refresh(); };
+        document.addEventListener('visibilitychange', onFocus);
+        window.addEventListener('focus', onFocus);
+        const id = window.setInterval(() => {
+            if (document.visibilityState === 'visible') refresh();
+        }, 60_000);
+        return () => {
+            document.removeEventListener('visibilitychange', onFocus);
+            window.removeEventListener('focus', onFocus);
+            window.clearInterval(id);
+        };
+    }, [userId, refresh]);
+
     const remove = useCallback(async (id: number) => {
         // Optimistic; revert via refetch on failure.
         setTemplates((prev) => prev.filter((p) => p.id !== id));

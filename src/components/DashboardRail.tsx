@@ -7,6 +7,8 @@ import { sampleProfile } from '@/data/sampleTemplates';
 import { ltPluralSuffix } from '@/lib/ltPlural';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
+import { AnimatedNumber } from './AnimatedNumber';
+import type { ReactNode } from 'react';
 
 interface Props {
     /** Asks the parent (App) to open the logout-confirm dialog. App
@@ -91,7 +93,11 @@ export function DashboardRail({ onLogoutRequest }: Props = {}) {
             <section className="grid grid-cols-3 gap-2 nums">
                 <StatTile label={labelFor('templates', totals.templates)} value={String(totals.templates)} />
                 <StatTile label={labelFor('uses', totals.uses)}           value={fmt(totals.uses)} />
-                <StatTile label={t('dashboard.stats.savings')}            value={`${fmt(totals.savings)} €`} accent />
+                <StatTile
+                    label={t('dashboard.stats.savings')}
+                    value={<AnimatedNumber value={totals.savings} format={(n) => `${fmt(n)} €`} />}
+                    accent
+                />
             </section>
 
             <div className="flex-1" />
@@ -107,7 +113,7 @@ export function DashboardRail({ onLogoutRequest }: Props = {}) {
     );
 }
 
-function StatTile({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
+function StatTile({ label, value, accent = false }: { label: string; value: ReactNode; accent?: boolean }) {
     return (
         <div className="p-3 rounded-2xl bg-surface-muted ring-1 ring-white/5">
             <div className={accent ? 'text-beetTint-strong font-bold text-lg leading-none' : 'text-ink font-bold text-lg leading-none'}>

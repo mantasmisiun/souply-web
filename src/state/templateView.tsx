@@ -48,6 +48,9 @@ export function TemplateViewProvider({ children }: { children: ReactNode }) {
             coverImage: t.coverImage,
             items: [],
             visibility: startVis,
+            // Carry the real 3-state visibility so save() can preserve
+            // `unlisted` (shared-by-link) rather than coercing it to private.
+            originalVisibility: t.visibility,
             editingId: t.id,
         });
         if (t.id <= 0) {
