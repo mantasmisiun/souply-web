@@ -24,9 +24,6 @@ jobs:
         run: npm run typecheck
       - name: Lint
         run: npm run lint
-        # Non-blocking until the existing lint debt (~28 errors) is cleared;
-        # then drop this line to make lint a hard gate.
-        continue-on-error: true
       - name: Test
         run: npm test
       - name: Build

@@ -123,7 +123,7 @@ export function ShareModal({ template, onClose }: Props) {
             a.href = url;
             // Filename uses the template name, sanitised. Keeps the
             // download recognisable in the creator's gallery.
-            const safe = template.name.replace(/[^\w\-]+/g, '_').slice(0, 60) || `template-${template.id}`;
+            const safe = template.name.replace(/[^\w-]+/g, '_').slice(0, 60) || `template-${template.id}`;
             a.download = `${safe}-qr.png`;
             document.body.appendChild(a);
             a.click();
