@@ -39,6 +39,7 @@ describe('BetaSignup', () => {
             name: 'Mantas Misiūnas',
             email: 'tu@email.lt',
             platform: 'android',
+            lang: 'lt',
         });
         expect(await screen.findByText(i18n.t('cta.thanks'))).toBeInTheDocument();
     });
