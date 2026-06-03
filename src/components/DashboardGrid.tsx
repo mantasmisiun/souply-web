@@ -11,7 +11,6 @@ import { useTemplates } from '@/state/templates';
 import { useCreateTemplate, type CoverImage } from '@/state/createTemplate';
 import { useTemplateView } from '@/state/templateView';
 import { useThemeMode } from '@/state/theme';
-import { sampleTemplates } from '@/data/sampleTemplates';
 import { toCardData } from '@/lib/templateCard';
 import type { SampleTemplate } from '@/data/sampleTemplates';
 import { ease, dur } from '@/lib/motion';

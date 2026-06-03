@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { fetchMe, logoutSession, toAppUser } from '@/lib/auth';
+import { fetchMe, logoutSession, toAppUser, type AppUser } from '@/lib/auth';
 
 /**
  * Auth state. Real sessions are an httpOnly cookie set by
@@ -10,29 +10,24 @@ import { fetchMe, logoutSession, toAppUser } from '@/lib/auth';
  * server-side. The gated dev-auth bypass also calls `login()` directly
  * (no cookie — client-only, doesn't survive reload, which is fine).
  */
-interface User {
-    /** Server-side UUID, used as the `userId` URL segment for every
-     *  templates / baskets endpoint. */
-    id: string;
-    name: string;
-    handle: string;
-}
-
+// The session user is the AppUser shape (id + name/first/last + handle +
+// avatarUrl) produced by toAppUser(). Defined once in lib/auth so the
+// dashboard, profile editor, and this context all agree on the fields.
 interface AuthState {
-    user: User | null;
+    user: AppUser | null;
     isAuthed: boolean;
     /** True until the initial session-restore (`/api/auth/me`) settles —
      *  lets the app avoid flashing the landing page for a returning,
      *  cookie-authed creator. */
     restoring: boolean;
-    login: (user: User) => void;
+    login: (user: AppUser) => void;
     logout: () => void;
 }
 
 const AuthCtx = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<AppUser | null>(null);
     const [restoring, setRestoring] = useState(true);
 
     // Restore a cookie session on load. A 401 (anonymous visitor / dev
@@ -46,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return () => { cancelled = true; };
     }, []);
 
-    const login = useCallback((u: User) => setUser(u), []);
+    const login = useCallback((u: AppUser) => setUser(u), []);
     const logout = useCallback(() => {
         setUser(null);
         // Fire-and-forget cookie clear; a network blip shouldn't block
