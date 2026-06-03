@@ -25,7 +25,7 @@ export const privacyPolicy: Record<'lt' | 'en', LegalDoc> = {
     en: {
         title: 'Privacy Policy',
         updatedLabel: 'Last updated',
-        updated: '1 June 2026',
+        updated: '3 June 2026',
         intro:
             'This Privacy Policy explains how Souply ("Souply", "we", "us") collects, uses, and protects your personal data when you use the Souply mobile app and the website at souply.lt (together, the "Service"). It applies to users in the European Union and complies with the EU General Data Protection Regulation (GDPR).',
         sections: [
@@ -45,6 +45,7 @@ export const privacyPolicy: Record<'lt' | 'en', LegalDoc> = {
                     'Location data: with your permission, the app uses your device location (and any "Home"/"Work" places you save) to find the nearest and cheapest stores. Saved places and visit history are stored only on your device; when you calculate a basket, your coordinates are sent to our server solely to compute store prices for that request and are not stored against your account.',
                     'Communications: if you sign up for the beta on our website, we collect your name, email, and chosen platform (iOS/Android) to send you an invite.',
                     'Technical data: standard server logs such as IP address, device/browser type, and timestamps, used to operate and secure the Service.',
+                    'Crash and diagnostic data: when the app crashes or hits an error, we collect diagnostic information (device model, operating-system version, and the error or stack trace) so we can find and fix bugs.',
                 ],
             },
             {
@@ -54,6 +55,7 @@ export const privacyPolicy: Record<'lt' | 'en', LegalDoc> = {
                     'Compare prices and find nearby and cheapest stores — performance of a contract, and for location, your consent.',
                     'Send beta invites and service emails — your consent and our legitimate interests.',
                     'Keep the Service secure and prevent abuse — our legitimate interests.',
+                    'Diagnose crashes and improve app stability — our legitimate interests.',
                     'Comply with legal obligations — legal obligation.',
                 ],
                 p: ['Where we rely on consent (e.g. location, beta emails), you can withdraw it at any time.'],
@@ -71,6 +73,7 @@ export const privacyPolicy: Record<'lt' | 'en', LegalDoc> = {
                     'Google and Apple — to authenticate your sign-in.',
                     'Resend — to send our emails.',
                     'Cloudflare — DNS, security, and email routing.',
+                    'Sentry — to collect crash and error diagnostics so we can fix bugs (data processed in the EU region).',
                     'OpenStreetMap / Nominatim — to convert addresses to map coordinates when you search a location.',
                     'Apple App Store and Google Play — when you install or are invited to the app.',
                 ],
@@ -141,7 +144,7 @@ export const privacyPolicy: Record<'lt' | 'en', LegalDoc> = {
     lt: {
         title: 'Privatumo politika',
         updatedLabel: 'Paskutinį kartą atnaujinta',
-        updated: '2026 m. birželio 1 d.',
+        updated: '2026 m. birželio 3 d.',
         intro:
             'Ši privatumo politika paaiškina, kaip „Souply" („Souply", „mes") renka, naudoja ir saugo jūsų asmens duomenis, kai naudojatės „Souply" mobiliąja programėle ir svetaine souply.lt (kartu – „Paslauga"). Ji taikoma Europos Sąjungos naudotojams ir atitinka ES Bendrąjį duomenų apsaugos reglamentą (BDAR).',
         sections: [
@@ -161,6 +164,7 @@ export const privacyPolicy: Record<'lt' | 'en', LegalDoc> = {
                     'Vietos duomenys: gavę jūsų leidimą, programėlė naudoja įrenginio vietą (ir bet kurias jūsų išsaugotas „Namų"/„Darbo" vietas), kad surastų artimiausias ir pigiausias parduotuves. Išsaugotos vietos ir lankymosi istorija saugomos tik jūsų įrenginyje; skaičiuojant krepšelį, jūsų koordinatės siunčiamos į mūsų serverį tik tam, kad tai užklausai būtų apskaičiuotos parduotuvių kainos, ir nesaugomos jūsų paskyroje.',
                     'Susirašinėjimas: jei mūsų svetainėje užsiregistruojate beta versijai, renkame jūsų vardą, el. paštą ir pasirinktą platformą (iOS/Android), kad atsiųstume kvietimą.',
                     'Techniniai duomenys: standartiniai serverio žurnalai, pvz., IP adresas, įrenginio/naršyklės tipas ir laiko žymos, naudojami Paslaugai teikti ir apsaugoti.',
+                    'Gedimų ir diagnostikos duomenys: programėlei nulūžus ar įvykus klaidai, renkame diagnostinę informaciją (įrenginio modelį, operacinės sistemos versiją ir klaidos pranešimą arba steką), kad galėtume rasti ir ištaisyti klaidas.',
                 ],
             },
             {
@@ -170,6 +174,7 @@ export const privacyPolicy: Record<'lt' | 'en', LegalDoc> = {
                     'Lyginti kainas ir rasti artimiausias bei pigiausias parduotuves – sutarties vykdymas, o vietos atveju – jūsų sutikimas.',
                     'Siųsti beta kvietimus ir paslaugos el. laiškus – jūsų sutikimas ir teisėtas interesas.',
                     'Užtikrinti Paslaugos saugumą ir užkirsti kelią piktnaudžiavimui – teisėtas interesas.',
+                    'Nustatyti gedimus ir gerinti programėlės stabilumą – teisėtas interesas.',
                     'Vykdyti teisines prievoles – teisinė prievolė.',
                 ],
                 p: ['Kai remiamės sutikimu (pvz., vieta, beta el. laiškai), galite jį bet kada atšaukti.'],
@@ -187,6 +192,7 @@ export const privacyPolicy: Record<'lt' | 'en', LegalDoc> = {
                     '„Google" ir „Apple" – jūsų prisijungimui patvirtinti.',
                     '„Resend" – mūsų el. laiškams siųsti.',
                     '„Cloudflare" – DNS, saugumui ir el. pašto nukreipimui.',
+                    '„Sentry" – gedimų ir klaidų diagnostikai rinkti, kad galėtume taisyti klaidas (duomenys tvarkomi ES regione).',
                     '„OpenStreetMap" / „Nominatim" – adresams paversti žemėlapio koordinatėmis, kai ieškote vietos.',
                     '„Apple App Store" ir „Google Play" – kai įsidiegiate ar esate pakviečiami į programėlę.',
                 ],
