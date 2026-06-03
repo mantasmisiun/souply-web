@@ -4,6 +4,7 @@
 #
 #   cd /opt/souply/souply-web          # main checkout
 #   docker compose -f docker-compose.prod.yml up -d --build
+name: souply-prod
 services:
   souply-web:
     build:
@@ -15,7 +16,7 @@ services:
         VITE_APP_ENV: prod
         # NO dev-auth args — prod must not ship the bypass (tree-shaken away).
     image: souply-web:prod
-    container_name: souply-web
+    container_name: souply-web-prod
     restart: unless-stopped
     ports:
       - "8085:80"

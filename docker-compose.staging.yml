@@ -7,6 +7,7 @@
 #
 #   cd /opt/souply-staging/souply-web  # staging worktree
 #   docker compose -f docker-compose.staging.yml up -d --build
+name: souply-staging
 services:
   souply-web-staging:
     build:
