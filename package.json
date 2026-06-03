@@ -17,6 +17,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@sentry/react": "^10.56.0",
     "clsx": "^2.1.1",
     "compression": "^1.7.5",
     "express": "^4.21.2",
