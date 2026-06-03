@@ -31,6 +31,7 @@ interface TemplatesContextValue {
      *  itself; precomputed once per templates update. */
     totals: {
         templates: number;
+        visits: number;
         uses: number;
         /** EUR as a Number — only used for display; precision-safe
          *  enough because individual rows are bounded ≤ 1M EUR. */
@@ -63,7 +64,9 @@ export function TemplatesProvider({ children }: { children: ReactNode }) {
         setError(null);
         try {
             const rows = await listTemplatesForUser(userId);
-            setTemplates(rows);
+            // The auto "Smart template" (isDefault) is a phone-only personal
+            // tool — never surface it (or count it) on the web dashboard.
+            setTemplates(rows.filter((r) => r.isDefault !== 1));
         } catch (err) {
             const message = err instanceof ApiError
                 ? `API ${err.status}: ${err.message}`
@@ -114,6 +117,7 @@ export function TemplatesProvider({ children }: { children: ReactNode }) {
 
     const totals = useMemo(() => ({
         templates: templates.length,
+        visits:    templates.reduce((s, t) => s + (t.visitCount ?? 0), 0),
         uses:      templates.reduce((s, t) => s + (t.useCount ?? 0), 0),
         savings:   templates.reduce((s, t) => s + Number(t.collectiveSavingsEur ?? 0), 0),
     }), [templates]);

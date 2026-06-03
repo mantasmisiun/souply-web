@@ -26,7 +26,7 @@ import { useThemeMode } from './state/theme';
 import { useSyncDashboardUrl } from './hooks/useSyncDashboardUrl';
 import { COVER_GRADIENT_OVERLAY } from './lib/coverGradient';
 import { DEV_AUTH_ENABLED, DEV_USER } from './lib/devAuth';
-import { oauthSignIn, toAppUser } from './lib/auth';
+import { oauthSignIn, toAppUser, fetchUserIdentity } from './lib/auth';
 import { ease, dur } from './lib/motion';
 
 /**
@@ -137,6 +137,15 @@ function LandingOrDashboard() {
         setPendingAuthMode(mode);
         setPhase('auth-pending');
         login({ id: DEV_USER.id, name: DEV_USER.name, handle: DEV_USER.handle });
+        // Hydrate avatar + name from server state so anything set on the app
+        // (for the same user id) shows here too.
+        fetchUserIdentity(DEV_USER.id)
+            .then((f) => {
+                const fn = f.firstName ?? '', ln = f.lastName ?? '';
+                const nm = [fn, ln].filter(Boolean).join(' ') || DEV_USER.name;
+                login({ id: DEV_USER.id, name: nm, firstName: fn, lastName: ln, handle: f.username ?? DEV_USER.handle, avatarUrl: f.avatarUrl });
+            })
+            .catch(() => { /* keep the local DEV_USER */ });
     };
 
     /**

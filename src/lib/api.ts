@@ -13,6 +13,8 @@
  *    error body so screens don't all reinvent the same try/catch.
  */
 
+import { DEV_AUTH_ENABLED, DEV_USER } from './devAuth';
+
 const BASE_URL =
     import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
@@ -40,6 +42,13 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
     const headers = new Headers(opts.headers);
     if (opts.body !== undefined && !headers.has('Content-Type')) {
         headers.set('Content-Type', 'application/json');
+    }
+    // DEV-auth bypass has no server session cookie, so ownership-checked
+    // endpoints can't identify the caller. Send X-User-Id (which the API's
+    // `callerId` accepts as a fallback) so the dev user resolves. Dead-code-
+    // eliminated from prod builds — DEV_AUTH_ENABLED is a constant false there.
+    if (DEV_AUTH_ENABLED && DEV_USER.id && !headers.has('X-User-Id')) {
+        headers.set('X-User-Id', DEV_USER.id);
     }
 
     const res = await fetch(url, {

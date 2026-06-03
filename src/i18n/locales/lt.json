@@ -101,6 +101,7 @@
     "username": "@{{handle}}",
     "stats": {
       "savings": "Sutaupyta",
+      "visits": "Vizitai",
       "templates_one": "Šablonas",
       "templates_few": "Šablonai",
       "templates_other": "Šablonų",
@@ -190,6 +191,15 @@
       }
     },
     "logout": "Atsijungti",
+    "editProfile": {
+      "title": "Redaguoti profilį",
+      "firstNameLabel": "Vardas",
+      "lastNameLabel": "Pavardė",
+      "save": "Išsaugoti",
+      "saving": "Saugoma…",
+      "cancel": "Atšaukti",
+      "failed": "Nepavyko išsaugoti. Bandykite vėliau."
+    },
     "logoutConfirm": {
       "title": "Atsijungti?",
       "body": "Tavo kūrėjo darbalaukis užsidarys ir grįši į pradžios puslapį.",

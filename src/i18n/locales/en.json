@@ -101,6 +101,7 @@
     "username": "@{{handle}}",
     "stats": {
       "savings": "Saved",
+      "visits": "Visits",
       "templates_one": "Template",
       "templates_few": "Templates",
       "templates_other": "Templates",
@@ -190,6 +191,15 @@
       }
     },
     "logout": "Sign out",
+    "editProfile": {
+      "title": "Edit profile",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "failed": "Couldn't save. Try again later."
+    },
     "logoutConfirm": {
       "title": "Sign out?",
       "body": "Your creator dashboard will close and you'll go back to the landing page.",

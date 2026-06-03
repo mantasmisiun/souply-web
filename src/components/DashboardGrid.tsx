@@ -37,14 +37,6 @@ export function DashboardGrid({ reverse = false }: Props = {}) {
     const { effective } = useThemeMode();
     const cards = useMemo(() => templates.map(toCardData), [templates]);
 
-    /** One sample template appended after the live cards as a visual
-     *  reference while we iterate on the creator-panel card design.
-     *  Tagged with id < 0 so it can't collide with a real DB id. */
-    const sample = useMemo<SampleTemplate>(
-        () => ({ ...sampleTemplates[0], id: -1 }),
-        [],
-    );
-
     const { open: openCreate, openWithDraft } = useCreateTemplate();
     const { open: openTemplateView } = useTemplateView();
     const onCreate = openCreate;
@@ -207,30 +199,6 @@ export function DashboardGrid({ reverse = false }: Props = {}) {
                                 />
                             </motion.div>
                         ))}
-
-                        {/* Placeholder sample card for the creator-panel
-                            design review. Removed once we've decided
-                            what to keep / change. id = -1 keeps it from
-                            ever colliding with a real DB row. */}
-                        <motion.div
-                            key="__sample"
-                            layout
-                            initial={{ opacity: 0, x: 64 }}
-                            animate={reverse ? { opacity: 0, x: 64 } : { opacity: 1, x: 0 }}
-                            transition={{
-                                delay: (cards.length) * 0.04,
-                                duration: Math.max(0.5, dur.band - cards.length * 0.04),
-                                ease: ease.soft,
-                            }}
-                        >
-                            <TemplateCard
-                                template={sample}
-                                onOpen={openTemplateView}
-                                onShare={setShareTemplate}
-                                onDuplicate={setDuplicateTemplate}
-                                onDelete={setDeleteTemplate}
-                            />
-                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
