@@ -14,7 +14,7 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
-    "prepare": "husky"
+    "prepare": "node .husky/install.mjs"
   },
   "dependencies": {
     "@sentry/react": "^10.56.0",
