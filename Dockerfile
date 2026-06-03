@@ -33,6 +33,11 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ARG VITE_GOOGLE_CLIENT_ID=
 ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 
+# Environment marker (drives the EnvBanner + [ENV] title + noindex).
+# Defaults to prod (no banner) so an un-parametrised build is safe.
+ARG VITE_APP_ENV=prod
+ENV VITE_APP_ENV=$VITE_APP_ENV
+
 # TEST-ONLY dev-auth bypass (no real OAuth until Phase 5). ALL empty by
 # default so a prod build can NEVER bake the bypass — only the test
 # compose passes these. `VITE_ENABLE_DEV_AUTH` is the gate: when unset,

@@ -53,14 +53,19 @@ export function TemplatesProvider({ children }: { children: ReactNode }) {
      *  hold the animation. */
     const [settledForUserId, setSettledForUserId] = useState<string | null>(null);
 
-    const refresh = useCallback(async () => {
+    const refresh = useCallback(async (opts?: { background?: boolean }) => {
         if (!userId) {
             setTemplates([]);
             setSettledForUserId(null);
             setLoading(false);
             return;
         }
-        setLoading(true);
+        // Background refreshes (focus + the interval poll) update silently.
+        // Toggling the first-load `loading` flag here would flash the
+        // dashboard/create surface every minute — so only show loading for
+        // the initial/manual fetch (stale-while-revalidate).
+        const background = opts?.background === true;
+        if (!background) setLoading(true);
         setError(null);
         try {
             const rows = await listTemplatesForUser(userId);
@@ -72,9 +77,11 @@ export function TemplatesProvider({ children }: { children: ReactNode }) {
                 ? `API ${err.status}: ${err.message}`
                 : (err as Error).message ?? 'Unknown error';
             setError(message);
-            setTemplates([]);
+            // Don't wipe the displayed list on a transient *background*
+            // failure — that would flash an empty dashboard.
+            if (!background) setTemplates([]);
         } finally {
-            setLoading(false);
+            if (!background) setLoading(false);
             // Record settlement in `finally` so transient errors still
             // free the App's gating effect — the dashboard renders with
             // an error banner instead of stalling on a permanent
@@ -92,11 +99,11 @@ export function TemplatesProvider({ children }: { children: ReactNode }) {
     // pointless background requests.
     useEffect(() => {
         if (!userId) return;
-        const onFocus = () => { if (document.visibilityState === 'visible') refresh(); };
+        const onFocus = () => { if (document.visibilityState === 'visible') refresh({ background: true }); };
         document.addEventListener('visibilitychange', onFocus);
         window.addEventListener('focus', onFocus);
         const id = window.setInterval(() => {
-            if (document.visibilityState === 'visible') refresh();
+            if (document.visibilityState === 'visible') refresh({ background: true });
         }, 60_000);
         return () => {
             document.removeEventListener('visibilitychange', onFocus);
