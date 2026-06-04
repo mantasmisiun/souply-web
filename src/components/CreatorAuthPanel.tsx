@@ -1,11 +1,11 @@
 import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    ArrowLeft, AtSign, BarChart3, Loader2, Share2, Wrench,
+    ArrowLeft, AtSign, BarChart3, Share2, Wrench,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { AppleMark } from './BrandMarks';
 import { GoogleSignInButton } from './GoogleSignInButton';
+import { AppleSignInButton } from './AppleSignInButton';
 import { DEV_AUTH_ENABLED } from '@/lib/devAuth';
 
 interface Props {
@@ -14,6 +14,8 @@ interface Props {
     onSubmit: (mode: 'login' | 'signup') => void;
     /** Real Google sign-in: GIS hands up the ID-token credential. */
     onGoogleCredential: (idToken: string) => void;
+    /** Real Apple sign-in: Apple JS popup hands up the id_token. */
+    onAppleCredential?: (idToken: string) => void;
     onBack: () => void;
     /** Which CTA, if any, is currently waiting on the auth + templates
      *  fetch round-trip. The clicked button swaps its brand mark for
@@ -37,7 +39,7 @@ interface Props {
  *      persona "who it's for" blocks now live on the visitor screen,
  *      so here we reassure the visitor right before they sign in.
  */
-export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onBack, pending = null, authSlot }: Props) {
+export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onAppleCredential, onBack, pending = null, authSlot }: Props) {
     const { t } = useTranslation();
     const benefits: { icon: LucideIcon; titleKey: string; bodyKey: string }[] = [
         { icon: Share2,    titleKey: 'cta.creatorIntroBullet1', bodyKey: 'cta.creatorIntroBulletBody1' },
@@ -92,20 +94,9 @@ export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onBack, pending
                 <div className="min-h-[44px]">
                     <GoogleSignInButton onCredential={onGoogleCredential} disabled={busy} />
                 </div>
-                <button
-                    type="button"
-                    onClick={() => onSubmit('signup')}
-                    disabled={busy}
-                    /* Apple HIG: black button + white text in light,
-                     * white button + black text in dark. The inverse
-                     * `bg-ink text-surface` pair flips both with theme. */
-                    className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-ink text-surface text-sm font-semibold shadow-card hover:opacity-90 transition disabled:cursor-not-allowed disabled:hover:opacity-100"
-                >
-                    {pending === 'signup'
-                        ? <Loader2 size={16} className="animate-spin" />
-                        : <AppleMark size={16} />}
-                    {t('cta.loginApple')}
-                </button>
+                {/* Real Sign in with Apple (web). Renders nothing until the
+                    Services ID env is set, so local/dev just shows Google. */}
+                <AppleSignInButton onCredential={onAppleCredential ?? (() => {})} disabled={busy} />
 
                 {/* DEV-ONLY bypass — rendered only when the dev-auth gate
                     is on (test/dev builds). Tree-shaken out of production

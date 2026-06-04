@@ -173,6 +173,22 @@ function LandingOrDashboard() {
         }
     };
 
+    /** Real Sign in with Apple (web) — same exchange + phase machine as
+     *  Google; the Apple JS popup hands up the id_token. */
+    const onAppleCredential = async (idToken: string) => {
+        if (phase !== 'idle') return;
+        setPendingAuthMode('signup');
+        setPhase('auth-pending');
+        try {
+            const { user } = await oauthSignIn({ provider: 'apple', idToken });
+            login(toAppUser(user));
+            if (!user.username) setUsernameNeeded(true);
+        } catch {
+            setPendingAuthMode(null);
+            setPhase('idle');
+        }
+    };
+
     /**
      * Restore: once /api/auth/me settles with a cookie-authed creator,
      * jump straight to the dashboard (no merge replay — a reload
@@ -481,6 +497,7 @@ function LandingOrDashboard() {
                         onBackToVisitor={() => setBandView('visitor')}
                         onAuthenticated={onAuthenticated}
                         onGoogleCredential={onGoogleCredential}
+                        onAppleCredential={onAppleCredential}
                     />
                 )}
             </motion.div>
