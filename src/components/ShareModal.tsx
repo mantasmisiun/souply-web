@@ -34,7 +34,7 @@ const DOWNLOAD_QR_PX = 1024;
 // Centre logo: clear a quiet zone slightly larger than the logo (so no data
 // dots touch it) and float the real Souply mark in it — no white box/border.
 const QR_CLEAR_PX = 52;
-const QR_LOGO_PX = 34;
+const QR_LOGO_PX = 44;
 const SOUPLY_LOGO = '/souply-logo.png';
 // 1×1 transparent PNG — handed to qrcode.react purely so its `excavate` clears
 // the centre modules; the visible logo is overlaid separately at a smaller size.
