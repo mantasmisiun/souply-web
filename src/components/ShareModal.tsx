@@ -31,6 +31,15 @@ interface Props {
  */
 const ON_SCREEN_QR_PX = 192;
 const DOWNLOAD_QR_PX = 1024;
+// Centre logo: clear a quiet zone slightly larger than the logo (so no data
+// dots touch it) and float the real Souply mark in it — no white box/border.
+const QR_CLEAR_PX = 52;
+const QR_LOGO_PX = 34;
+const SOUPLY_LOGO = '/souply-logo.png';
+// 1×1 transparent PNG — handed to qrcode.react purely so its `excavate` clears
+// the centre modules; the visible logo is overlaid separately at a smaller size.
+const TRANSPARENT_PX =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 export function ShareModal({ template, onClose }: Props) {
     const { t } = useTranslation();
@@ -134,30 +143,20 @@ export function ShareModal({ template, onClose }: Props) {
             }, 'image/png');
         };
 
-        // Redraw the branded centre mark crisply at hi-res — a white rounded
-        // badge with the Souply logo — instead of upscaling the small on-screen
-        // logo (which would be blocky). The QR uses level="H" (30% error
-        // correction), so the covered modules still scan.
+        // The cleared centre zone is already baked into the on-screen canvas
+        // (excavate removed those modules), so we only redraw the logo crisply
+        // at hi-res — no white badge/border. Sized to match the on-screen ratio
+        // so the breathing room around it scales identically.
         const logo = new Image();
         logo.onload = () => {
-            const badge = Math.round(DOWNLOAD_QR_PX * 0.22);
-            const logoSz = Math.round(DOWNLOAD_QR_PX * 0.15);
+            const logoSz = Math.round(DOWNLOAD_QR_PX * (QR_LOGO_PX / ON_SCREEN_QR_PX));
             const c = DOWNLOAD_QR_PX / 2;
-            const radius = Math.round(badge * 0.26);
-            ctx.fillStyle = '#ffffff';
-            if (typeof ctx.roundRect === 'function') {
-                ctx.beginPath();
-                ctx.roundRect(c - badge / 2, c - badge / 2, badge, badge, radius);
-                ctx.fill();
-            } else {
-                ctx.fillRect(c - badge / 2, c - badge / 2, badge, badge);
-            }
             ctx.imageSmoothingEnabled = true;
             ctx.drawImage(logo, c - logoSz / 2, c - logoSz / 2, logoSz, logoSz);
             exportBlob();
         };
         logo.onerror = exportBlob; // logo failed to load → export the plain QR
-        logo.src = '/favicon.svg';
+        logo.src = SOUPLY_LOGO;
     };
 
     return (
@@ -245,16 +244,23 @@ export function ShareModal({ template, onClose }: Props) {
                                     bgColor="#ffffff"
                                     fgColor="#1F1B1D"
                                     level="H"
+                                    // Excavate a clean quiet zone in the centre
+                                    // (modules removed, not covered) so the logo
+                                    // never sits on top of data dots.
+                                    imageSettings={{
+                                        src: TRANSPARENT_PX,
+                                        width: QR_CLEAR_PX,
+                                        height: QR_CLEAR_PX,
+                                        excavate: true,
+                                    }}
                                 />
-                                {/* Branded centre mark. Overlaid (not drawn into
-                                    the QR) so the white padding around the logo
-                                    is fully controlled; the download canvas
-                                    redraws it crisply at hi-res. level="H" keeps
-                                    the code scannable under the badge. */}
+                                {/* The real Souply logo, centred in the cleared
+                                    zone — smaller than the cleared square, so it
+                                    has breathing room and no box/border. The
+                                    download canvas redraws it crisply at hi-res;
+                                    level="H" keeps the code scannable. */}
                                 <span aria-hidden className="absolute inset-0 grid place-items-center pointer-events-none">
-                                    <span className="grid place-items-center bg-white rounded-xl shadow-sm ring-1 ring-edge/60" style={{ width: 46, height: 46 }}>
-                                        <img src="/favicon.svg" alt="" width={30} height={30} />
-                                    </span>
+                                    <img src={SOUPLY_LOGO} alt="" width={QR_LOGO_PX} height={QR_LOGO_PX} />
                                 </span>
                             </div>
 

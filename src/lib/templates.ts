@@ -167,6 +167,9 @@ export interface SharedTemplate {
         quantity: number;
         unit: string | null;
         imageUrls: (string | null)[] | null;
+        /** Representative SP pack size (e.g. 1 l, 500 g); null when unknown. */
+        packAmount: number | null;
+        packUnit: string | null;
     }>;
 }
 

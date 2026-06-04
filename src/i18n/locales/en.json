@@ -22,11 +22,13 @@
       "notFound": "Template not found or is private.",
       "items": "{{count}} items",
       "by": "List by {{handle}}",
-      "saveUpTo": "Up to €{{amount}} less at the cheapest store",
-      "saveUpToHelp": "We compared this basket across every store. The number shows how much you'd save by buying the selected items at the cheapest store instead of the most expensive. The amount saved depends on which store you choose. It was calculated when the link was shared and doesn't update automatically — prices change over time, so the real difference may vary.",
+      "saveUpTo": "Save up to €{{amount}}",
+      "saveUpToHelp": "The gap between the priciest and cheapest store for this basket, measured when the link was shared. Prices change, so the real difference may vary.",
+      "moreItems": "+{{count}} items",
       "privateTitle": "This template is private",
       "privateBody": "The creator made this template private, so it can't be viewed.",
-      "openInApp": "Open in the app"
+      "openInApp": "Open in the app",
+      "getSouply": "Get Souply"
     }
   },
   "lang": {
@@ -185,7 +187,7 @@
       "viewNoChanges": "No changes",
       "share": {
         "title": "Share this template",
-        "body": "Anyone with the link will land in the cheapest store carrying these items.",
+        "body": "Anyone with the link will get these products to their basket.",
         "link": "Link",
         "copyLink": "Copy link",
         "copied": "Copied!",

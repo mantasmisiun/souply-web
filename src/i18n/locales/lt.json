@@ -22,11 +22,13 @@
       "notFound": "Šablonas nerastas arba yra privatus.",
       "items": "{{count}} prekės",
       "by": "Sąrašas nuo {{handle}}",
-      "saveUpTo": "Pigiausioje parduotuvėje – iki {{amount}} € pigiau",
-      "saveUpToHelp": "Šį krepšelį palyginome visose parduotuvėse. Skaičius rodo, kiek sutaupytum pasirinktas prekes pirkdamas pigiausioje parduotuvėje, o ne brangiausioje. Sutaupyta suma priklauso nuo to, kurią parduotuvę pasirenki. Suma apskaičiuota nuorodos dalijimosi metu ir automatiškai neatsinaujina — kainos nuolat keičiasi, todėl realus skirtumas gali būti kitoks.",
+      "saveUpTo": "Sutaupyk iki {{amount}} €",
+      "saveUpToHelp": "Skirtumas tarp brangiausios ir pigiausios parduotuvės šiam krepšeliui, apskaičiuotas dalijimosi metu. Kainos keičiasi, todėl realus skirtumas gali būti kitoks.",
+      "moreItems": "+{{count}} prekių",
       "privateTitle": "Šis šablonas privatus",
       "privateBody": "Kūrėjas padarė šį šabloną privatų, todėl jo peržiūrėti negalima.",
-      "openInApp": "Atidaryti programėlėje"
+      "openInApp": "Atidaryti programėlėje",
+      "getSouply": "Atsisiųsk Souply"
     }
   },
   "lang": {
@@ -185,7 +187,7 @@
       "viewNoChanges": "Pakeitimų nėra",
       "share": {
         "title": "Pasidalink šablonu",
-        "body": "Bet kas su nuoroda gaus tą patį krepšelį pigiausioje parduotuvėje.",
+        "body": "Bet kas su nuoroda gaus šias prekes į savo krepšelį.",
         "link": "Nuoroda",
         "copyLink": "Kopijuoti nuorodą",
         "copied": "Nukopijuota!",
