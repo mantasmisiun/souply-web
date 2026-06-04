@@ -27,12 +27,13 @@ describe('BetaSignup', () => {
         expect(screen.queryByText(i18n.t('cta.thanks'))).not.toBeInTheDocument();
     });
 
-    it('submits name + email + platform on a valid submit and shows thanks', async () => {
+    it('submits name + email + platform on a valid submit and shows the sent confirmation', async () => {
         const user = userEvent.setup();
         renderWith(<BetaSignup />);
         await user.click(screen.getByRole('tab', { name: /android/i }));
         await user.type(screen.getByPlaceholderText(i18n.t('cta.namePlaceholder')), 'Mantas Misiūnas');
         await user.type(screen.getByPlaceholderText(i18n.t('cta.emailPlaceholder')), 'tu@email.lt');
+        await user.click(screen.getByRole('checkbox'));
         await user.click(screen.getByRole('button', { name: i18n.t('cta.send') }));
 
         expect(submitBetaSignup).toHaveBeenCalledWith({
@@ -41,7 +42,9 @@ describe('BetaSignup', () => {
             platform: 'android',
             lang: 'lt',
         });
-        expect(await screen.findByText(i18n.t('cta.thanks'))).toBeInTheDocument();
+        expect(await screen.findByText(i18n.t('cta.invitationSent'))).toBeInTheDocument();
+        // The form is replaced by the confirmation — nothing left to resubmit.
+        expect(screen.queryByRole('button', { name: i18n.t('cta.send') })).not.toBeInTheDocument();
     });
 
     it('shows an error when the submit fails', async () => {
@@ -50,9 +53,26 @@ describe('BetaSignup', () => {
         renderWith(<BetaSignup />);
         await user.type(screen.getByPlaceholderText(i18n.t('cta.namePlaceholder')), 'Mantas Misiūnas');
         await user.type(screen.getByPlaceholderText(i18n.t('cta.emailPlaceholder')), 'tu@email.lt');
+        await user.click(screen.getByRole('checkbox'));
         await user.click(screen.getByRole('button', { name: i18n.t('cta.send') }));
         expect(await screen.findByText(i18n.t('cta.sendError'))).toBeInTheDocument();
-        expect(screen.queryByText(i18n.t('cta.thanks'))).not.toBeInTheDocument();
+        expect(screen.queryByText(i18n.t('cta.invitationSent'))).not.toBeInTheDocument();
+    });
+
+    it('keeps the submit disabled until name (2 words) + email + terms are valid', async () => {
+        const user = userEvent.setup();
+        renderWith(<BetaSignup />);
+        const button = screen.getByRole('button', { name: i18n.t('cta.send') });
+        // Single-word name + valid email + terms → still disabled.
+        await user.type(screen.getByPlaceholderText(i18n.t('cta.namePlaceholder')), 'Mantas');
+        await user.type(screen.getByPlaceholderText(i18n.t('cta.emailPlaceholder')), 'tu@email.lt');
+        await user.click(screen.getByRole('checkbox'));
+        expect(button).toBeDisabled();
+        await user.click(button);
+        expect(submitBetaSignup).not.toHaveBeenCalled();
+        // Add the surname → all three conditions met → enabled.
+        await user.type(screen.getByPlaceholderText(i18n.t('cta.namePlaceholder')), ' Misiūnas');
+        expect(button).toBeEnabled();
     });
 
     it('uses the "Gauti kvietimą" CTA text', () => {
