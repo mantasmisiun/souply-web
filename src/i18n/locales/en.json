@@ -106,7 +106,7 @@
     "welcome": "Welcome, {{name}}",
     "username": "@{{handle}}",
     "stats": {
-      "savings": "Saved",
+      "savings": "Follower savings",
       "visits": "Visits",
       "templates_one": "Template",
       "templates_few": "Templates",

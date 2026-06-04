@@ -106,14 +106,14 @@
     "welcome": "Sveika(s), {{name}}",
     "username": "@{{handle}}",
     "stats": {
-      "savings": "Sutaupyta",
+      "savings": "Sekėjai sutaupė",
       "visits": "Vizitai",
       "templates_one": "Šablonas",
       "templates_few": "Šablonai",
       "templates_other": "Šablonų",
-      "uses_one": "Pasinaudojimas",
-      "uses_few": "Pasinaudojimai",
-      "uses_other": "Pasinaudojimų",
+      "uses_one": "Panaudojimas",
+      "uses_few": "Panaudojimai",
+      "uses_other": "Panaudojimų",
       "followers_one": "Sekėjas",
       "followers_few": "Sekėjai",
       "followers_other": "Sekėjų"

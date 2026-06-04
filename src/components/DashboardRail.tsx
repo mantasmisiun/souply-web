@@ -20,6 +20,9 @@ interface Props {
 }
 
 const fmt = (n: number) => new Intl.NumberFormat('lt-LT', { maximumFractionDigits: 0 }).format(n);
+// Savings is a euro amount — show 2 decimals so it matches the app (which
+// shows e.g. "1,52 €"); the integer `fmt` above would round it to "2 €".
+const fmtEur = (n: number) => new Intl.NumberFormat('lt-LT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
 /**
  * Dashboard left rail. Carries everything the visitor expects after the
@@ -107,7 +110,7 @@ export function DashboardRail({ onLogoutRequest }: Props = {}) {
                 <StatTile label={labelFor('uses', totals.uses)}           value={fmt(totals.uses)} />
                 <StatTile
                     label={t('dashboard.stats.savings')}
-                    value={<AnimatedNumber value={totals.savings} format={(n) => `${fmt(n)} €`} />}
+                    value={<AnimatedNumber value={totals.savings} format={(n) => `${fmtEur(n)} €`} />}
                     accent
                 />
             </section>
