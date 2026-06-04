@@ -2,17 +2,18 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { privacyPolicy, type LegalDoc } from '@/content/privacy';
 import { termsOfService } from '@/content/terms';
+import { deleteAccount } from '@/content/deleteAccount';
 
 /**
- * Renders the full GDPR privacy policy or the terms of service from
- * `content/privacy.ts` / `content/terms.ts` (LT/EN, picked by the active
- * UI language). The mobile app links here rather than duplicating the
- * text, so these pages are the single source of truth.
+ * Renders the privacy policy, terms of service, or account-deletion page from
+ * `content/*.ts` (LT/EN, picked by the active UI language). The mobile app +
+ * the Play Data Safety form link here rather than duplicating the text, so
+ * these pages are the single source of truth.
  */
-export function LegalPage({ kind }: { kind: 'privacy' | 'terms' }) {
+export function LegalPage({ kind }: { kind: 'privacy' | 'terms' | 'delete' }) {
     const { t, i18n } = useTranslation();
     const en = i18n.language?.startsWith('en');
-    const source = kind === 'privacy' ? privacyPolicy : termsOfService;
+    const source = kind === 'privacy' ? privacyPolicy : kind === 'terms' ? termsOfService : deleteAccount;
     const doc: LegalDoc = en ? source.en : source.lt;
 
     return (
