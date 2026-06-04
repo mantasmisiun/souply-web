@@ -115,21 +115,49 @@ export function ShareModal({ template, onClose }: Props) {
         ctx.fillRect(0, 0, DOWNLOAD_QR_PX, DOWNLOAD_QR_PX);
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(onScreen, 0, 0, DOWNLOAD_QR_PX, DOWNLOAD_QR_PX);
-        big.toBlob((blob) => {
-            document.body.removeChild(exportRoot);
-            if (!blob) return;
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            // Filename uses the template name, sanitised. Keeps the
-            // download recognisable in the creator's gallery.
-            const safe = template.name.replace(/[^\w-]+/g, '_').slice(0, 60) || `template-${template.id}`;
-            a.download = `${safe}-qr.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-        }, 'image/png');
+
+        const exportBlob = () => {
+            big.toBlob((blob) => {
+                document.body.removeChild(exportRoot);
+                if (!blob) return;
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                // Filename uses the template name, sanitised. Keeps the
+                // download recognisable in the creator's gallery.
+                const safe = template.name.replace(/[^\w-]+/g, '_').slice(0, 60) || `template-${template.id}`;
+                a.download = `${safe}-qr.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }, 'image/png');
+        };
+
+        // Redraw the branded centre mark crisply at hi-res — a white rounded
+        // badge with the Souply logo — instead of upscaling the small on-screen
+        // logo (which would be blocky). The QR uses level="H" (30% error
+        // correction), so the covered modules still scan.
+        const logo = new Image();
+        logo.onload = () => {
+            const badge = Math.round(DOWNLOAD_QR_PX * 0.22);
+            const logoSz = Math.round(DOWNLOAD_QR_PX * 0.15);
+            const c = DOWNLOAD_QR_PX / 2;
+            const radius = Math.round(badge * 0.26);
+            ctx.fillStyle = '#ffffff';
+            if (typeof ctx.roundRect === 'function') {
+                ctx.beginPath();
+                ctx.roundRect(c - badge / 2, c - badge / 2, badge, badge, radius);
+                ctx.fill();
+            } else {
+                ctx.fillRect(c - badge / 2, c - badge / 2, badge, badge);
+            }
+            ctx.imageSmoothingEnabled = true;
+            ctx.drawImage(logo, c - logoSz / 2, c - logoSz / 2, logoSz, logoSz);
+            exportBlob();
+        };
+        logo.onerror = exportBlob; // logo failed to load → export the plain QR
+        logo.src = '/favicon.svg';
     };
 
     return (
@@ -207,7 +235,7 @@ export function ShareModal({ template, onClose }: Props) {
                             <div
                                 ref={canvasRef}
                                 className={
-                                    'self-center p-3 rounded-2xl bg-white ring-1 ring-edge ' +
+                                    'relative self-center p-3 rounded-2xl bg-white ring-1 ring-edge ' +
                                     (template.visibility === 'private' || !shareUrl ? 'opacity-40 grayscale' : '')
                                 }
                             >
@@ -216,8 +244,18 @@ export function ShareModal({ template, onClose }: Props) {
                                     size={ON_SCREEN_QR_PX}
                                     bgColor="#ffffff"
                                     fgColor="#1F1B1D"
-                                    level="M"
+                                    level="H"
                                 />
+                                {/* Branded centre mark. Overlaid (not drawn into
+                                    the QR) so the white padding around the logo
+                                    is fully controlled; the download canvas
+                                    redraws it crisply at hi-res. level="H" keeps
+                                    the code scannable under the badge. */}
+                                <span aria-hidden className="absolute inset-0 grid place-items-center pointer-events-none">
+                                    <span className="grid place-items-center bg-white rounded-xl shadow-sm ring-1 ring-edge/60" style={{ width: 46, height: 46 }}>
+                                        <img src="/favicon.svg" alt="" width={30} height={30} />
+                                    </span>
+                                </span>
                             </div>
 
                             <div>
