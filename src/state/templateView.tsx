@@ -60,15 +60,21 @@ export function TemplateViewProvider({ children }: { children: ReactNode }) {
         setItemsLoading(true);
         listTemplateItems(t.id)
             .then((rows) => {
-                const draftItems: DraftItem[] = rows.map((it) => ({
-                    productId: it.productId,
-                    name: it.name,
-                    imageUrl: extractImage(it.imageUrls),
-                    quantity: typeof it.quantity === 'string' ? Number(it.quantity) || 1 : it.quantity,
-                    unit: it.unit,
-                    step: it.unit === 'kg' || it.unit === 'l' ? 0.1 : 1,
-                    itemId: it.id,
-                }));
+                const draftItems: DraftItem[] = rows.map((it) => {
+                    // The stored `unit` column is usually null, so derive the
+                    // display unit + stepper from the server-derived isWeighable
+                    // (matching the app: kg / 0.1 step vs vnt. / 1 step).
+                    const weighable = !!it.isWeighable;
+                    return {
+                        productId: it.productId,
+                        name: it.name,
+                        imageUrl: extractImage(it.imageUrls),
+                        quantity: typeof it.quantity === 'string' ? Number(it.quantity) || 1 : it.quantity,
+                        unit: it.unit ?? (weighable ? 'kg' : 'vnt.'),
+                        step: weighable || it.unit === 'kg' || it.unit === 'l' ? 0.1 : 1,
+                        itemId: it.id,
+                    };
+                });
                 setItems(draftItems);
             })
             .catch(() => { /* swallow — empty-state surfaces the failure */ })

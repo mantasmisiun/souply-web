@@ -109,6 +109,10 @@ export interface TemplateItem {
     name: string;
     quantity: string | number;
     unit: string | null;
+    /** Derived server-side from the matched StoreProducts (1 if any chain sells
+     *  this product by weight). The stored `unit` column is usually null, so the
+     *  display unit is derived from this — matching the app (kg vs vnt.). */
+    isWeighable?: number | boolean | null;
     imageUrls?: string | (string | null)[] | null;
     sortOrder: number;
 }
