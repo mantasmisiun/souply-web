@@ -32,7 +32,7 @@ export const privacyPolicy: Record<'lt' | 'en', LegalDoc> = {
             {
                 h: '1. Who we are (Data Controller)',
                 p: [
-                    'The data controller responsible for your personal data is Mantas Misiūnas, Gytarių g. 15-4, Šiauliai, LT-78362, Lithuania. Email: support@souply.lt.',
+                    'The data controller responsible for your personal data is Mantas Misiūnas (Lithuania). Email: support@souply.lt.',
                     'For any questions about this policy or your data, contact us at support@souply.lt.',
                 ],
             },
@@ -151,7 +151,7 @@ export const privacyPolicy: Record<'lt' | 'en', LegalDoc> = {
             {
                 h: '1. Kas mes esame (duomenų valdytojas)',
                 p: [
-                    'Už jūsų asmens duomenis atsakingas duomenų valdytojas yra Mantas Misiūnas, Gytarių g. 15-4, Šiauliai, LT-78362, Lietuva. El. paštas: support@souply.lt.',
+                    'Už jūsų asmens duomenis atsakingas duomenų valdytojas yra Mantas Misiūnas (Lietuva). El. paštas: support@souply.lt.',
                     'Visais klausimais dėl šios politikos ar savo duomenų rašykite support@souply.lt.',
                 ],
             },
