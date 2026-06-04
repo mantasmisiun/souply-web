@@ -127,7 +127,7 @@ function BrandMark() {
     );
 }
 
-function VisitorBody({ onOpenCreatorAuth }: { onOpenCreatorAuth: () => void }) {
+export function VisitorBody({ onOpenCreatorAuth }: { onOpenCreatorAuth: () => void }) {
     const { t } = useTranslation();
     // "Who it's for" persona blocks — moved here from the creator-auth
     // panel so a visitor can self-identify BEFORE deciding to log in.

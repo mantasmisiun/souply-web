@@ -7,6 +7,7 @@ import { AuthCallback } from './pages/AuthCallback';
 import { LegalPage } from './pages/LegalPage';
 import { NotFound } from './pages/NotFound';
 import { SideBand } from './components/SideBand';
+import { MobileLandingSheet } from './components/MobileLandingSheet';
 import { FeatureCarousel } from './components/FeatureCarousel';
 import { DashboardRail } from './components/DashboardRail';
 import { DashboardGrid } from './components/DashboardGrid';
@@ -386,7 +387,9 @@ function LandingOrDashboard() {
                 className={
                     bandAtLeft
                         ? 'absolute top-0 bottom-0 left-0 w-[88vw] sm:w-[420px] bg-surface shadow-band md:rounded-r-[40px] overflow-hidden'
-                        : 'absolute top-4 bottom-4 right-4 md:top-6 md:bottom-6 md:right-6 w-[88vw] sm:w-[380px] md:w-[400px] bg-surface shadow-band rounded-l-[40px] md:rounded-[40px] overflow-hidden'
+                        // Landing band is desktop-only; on mobile it's replaced
+                        // by the slide-in MobileLandingSheet (rendered below).
+                        : 'hidden sm:block absolute top-4 bottom-4 right-4 md:top-6 md:bottom-6 md:right-6 w-[88vw] sm:w-[380px] md:w-[400px] bg-surface shadow-band rounded-l-[40px] md:rounded-[40px] overflow-hidden'
                 }
                 style={{ zIndex: 10 }}
             >
@@ -472,6 +475,18 @@ function LandingOrDashboard() {
                     />
                 )}
             </motion.div>
+
+            {/* Mobile-only landing sheet (`sm:hidden` inside). On phones the
+                desktop band above is hidden; this gives a pink pull-tab + a
+                slide-in sheet with the sign-up form and a no-login creator
+                info view. */}
+            {phase === 'idle' && (
+                <MobileLandingSheet
+                    bandView={bandView}
+                    onOpenCreatorAuth={() => setBandView('creator-auth')}
+                    onBackToVisitor={() => setBandView('visitor')}
+                />
+            )}
 
             {/* Atverti surface — hosts BOTH tabs internally. The
                 page-level coloured bar paints the top across rail +

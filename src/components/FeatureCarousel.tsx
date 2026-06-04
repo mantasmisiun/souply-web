@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { AnimatePresence, motion, type PanInfo } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { FeatureCard } from '@/data/features';
@@ -49,6 +49,23 @@ export function FeatureCarousel({ cards, audienceKey, autoplayMs = 6000 }: Props
 
     // Reset on audience change so the new card set starts at zero.
     useEffect(() => { dispatch({ type: 'goto', index: 0 }); }, [audienceKey]);
+
+    // Touch-swipe (mobile only): drag the card horizontally to paginate.
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 639px)');
+        const sync = () => setIsMobile(mq.matches);
+        sync();
+        mq.addEventListener('change', sync);
+        return () => mq.removeEventListener('change', sync);
+    }, []);
+
+    const onDragEnd = useCallback((_e: unknown, info: PanInfo) => {
+        pausedRef.current = false;
+        const SWIPE = 50;
+        if (info.offset.x < -SWIPE || info.velocity.x < -400) dispatch({ type: 'next' });
+        else if (info.offset.x > SWIPE || info.velocity.x > 400) dispatch({ type: 'prev' });
+    }, []);
 
     useEffect(() => {
         if (cardCount <= 1) return;
@@ -101,7 +118,15 @@ export function FeatureCarousel({ cards, audienceKey, autoplayMs = 6000 }: Props
                         animate="center"
                         exit="exit"
                         transition={{ duration: 0.55, ease: ease.soft }}
-                        className="w-full"
+                        // Mobile-only horizontal swipe; vertical stays free for
+                        // page scroll. Snaps back to centre, paginates on release.
+                        drag={isMobile ? 'x' : false}
+                        dragSnapToOrigin
+                        dragElastic={0.18}
+                        dragConstraints={{ left: 0, right: 0 }}
+                        onDragStart={() => { pausedRef.current = true; }}
+                        onDragEnd={onDragEnd}
+                        className={cx('w-full', isMobile && 'touch-pan-y cursor-grab active:cursor-grabbing')}
                     >
                         <FeatureCardMockup
                             icon={current.icon}
