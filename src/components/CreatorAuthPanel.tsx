@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     ArrowLeft, AtSign, BarChart3, Loader2, Share2, Wrench,
@@ -19,6 +20,10 @@ interface Props {
      *  a spinner and disables both buttons so a user can't double-fire
      *  while the network is still in flight. */
     pending?: 'login' | 'signup' | null;
+    /** When provided, replaces the Google/Apple sign-in block (everything
+     *  else — back link, title, benefit bullets — stays identical). Used by
+     *  the mobile landing sheet, where web login isn't offered. */
+    authSlot?: ReactNode;
 }
 
 /**
@@ -32,7 +37,7 @@ interface Props {
  *      persona "who it's for" blocks now live on the visitor screen,
  *      so here we reassure the visitor right before they sign in.
  */
-export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onBack, pending = null }: Props) {
+export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onBack, pending = null, authSlot }: Props) {
     const { t } = useTranslation();
     const benefits: { icon: LucideIcon; titleKey: string; bodyKey: string }[] = [
         { icon: Share2,    titleKey: 'cta.creatorIntroBullet1', bodyKey: 'cta.creatorIntroBulletBody1' },
@@ -77,7 +82,9 @@ export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onBack, pending
             </ul>
 
             {/* Sign-in buttons — placed under the benefits. Soft divider
-                above so they read as the action that follows the pitch. */}
+                above so they read as the action that follows the pitch.
+                On mobile `authSlot` replaces this whole block (no web login). */}
+            {authSlot ?? (
             <div className="mt-1 pt-4 border-t border-edge/60 flex flex-col gap-2 items-stretch">
                 {/* Real Google sign-in (GIS renders Google's own button).
                     Renders nothing if VITE_GOOGLE_CLIENT_ID is unset — the
@@ -117,6 +124,7 @@ export function CreatorAuthPanel({ onSubmit, onGoogleCredential, onBack, pending
                     </button>
                 )}
             </div>
+            )}
         </div>
     );
 }

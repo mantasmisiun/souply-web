@@ -7,6 +7,7 @@ import { AuthCallback } from './pages/AuthCallback';
 import { LegalPage } from './pages/LegalPage';
 import { NotFound } from './pages/NotFound';
 import { SideBand } from './components/SideBand';
+import { MobileLandingSheet } from './components/MobileLandingSheet';
 import { FeatureCarousel } from './components/FeatureCarousel';
 import { DashboardRail } from './components/DashboardRail';
 import { DashboardGrid } from './components/DashboardGrid';
@@ -26,7 +27,7 @@ import { useThemeMode } from './state/theme';
 import { useSyncDashboardUrl } from './hooks/useSyncDashboardUrl';
 import { COVER_GRADIENT_OVERLAY } from './lib/coverGradient';
 import { DEV_AUTH_ENABLED, DEV_USER } from './lib/devAuth';
-import { oauthSignIn, toAppUser } from './lib/auth';
+import { oauthSignIn, toAppUser, fetchUserIdentity } from './lib/auth';
 import { ease, dur } from './lib/motion';
 
 /**
@@ -137,6 +138,15 @@ function LandingOrDashboard() {
         setPendingAuthMode(mode);
         setPhase('auth-pending');
         login({ id: DEV_USER.id, name: DEV_USER.name, handle: DEV_USER.handle });
+        // Hydrate avatar + name from server state so anything set on the app
+        // (for the same user id) shows here too.
+        fetchUserIdentity(DEV_USER.id)
+            .then((f) => {
+                const fn = f.firstName ?? '', ln = f.lastName ?? '';
+                const nm = [fn, ln].filter(Boolean).join(' ') || DEV_USER.name;
+                login({ id: DEV_USER.id, name: nm, firstName: fn, lastName: ln, handle: f.username ?? DEV_USER.handle, avatarUrl: f.avatarUrl });
+            })
+            .catch(() => { /* keep the local DEV_USER */ });
     };
 
     /**
@@ -250,12 +260,19 @@ function LandingOrDashboard() {
      * type/position), so the band + layoutId morphs are never torn down.
      */
     useEffect(() => {
+        // While auth is still restoring we don't yet know the terminal phase.
+        // `phase` is transiently 'idle' during a reload of an authed session,
+        // so syncing now would navigate('/') and DROP the query string
+        // (?create=1 / ?t=) before the surface can be restored. Wait for the
+        // restore to settle — by then pathname already matches the phase, so
+        // no navigate fires and the params survive.
+        if (restoring) return;
         if (phase === 'dashboard' && pathname !== '/dashboard') {
             navigate('/dashboard', { replace: true });
         } else if (phase === 'idle' && pathname !== '/') {
             navigate('/', { replace: true });
         }
-    }, [phase, pathname, navigate]);
+    }, [phase, pathname, navigate, restoring]);
 
     /**
      * Auth guard. A logged-out visit to /dashboard (direct nav, refresh
@@ -266,10 +283,11 @@ function LandingOrDashboard() {
      * / and /dashboard and unmount the morphing band.
      */
     useEffect(() => {
+        if (restoring) return; // don't bounce before auth is known (drops the query)
         if (!isAuthed && pathname === '/dashboard') {
             navigate('/', { replace: true });
         }
-    }, [isAuthed, pathname, navigate]);
+    }, [isAuthed, pathname, navigate, restoring]);
 
     const features = audience === 'user' ? userFeatures : creatorFeatures;
     // Carousel rides the whole landing/morph window — mounted from
@@ -377,7 +395,9 @@ function LandingOrDashboard() {
                 className={
                     bandAtLeft
                         ? 'absolute top-0 bottom-0 left-0 w-[88vw] sm:w-[420px] bg-surface shadow-band md:rounded-r-[40px] overflow-hidden'
-                        : 'absolute top-4 bottom-4 right-4 md:top-6 md:bottom-6 md:right-6 w-[88vw] sm:w-[380px] md:w-[400px] bg-surface shadow-band rounded-l-[40px] md:rounded-[40px] overflow-hidden'
+                        // Landing band is desktop-only; on mobile it's replaced
+                        // by the slide-in MobileLandingSheet (rendered below).
+                        : 'hidden sm:block absolute top-4 bottom-4 right-4 md:top-6 md:bottom-6 md:right-6 w-[88vw] sm:w-[380px] md:w-[400px] bg-surface shadow-band rounded-l-[40px] md:rounded-[40px] overflow-hidden'
                 }
                 style={{ zIndex: 10 }}
             >
@@ -463,6 +483,18 @@ function LandingOrDashboard() {
                     />
                 )}
             </motion.div>
+
+            {/* Mobile-only landing sheet (`sm:hidden` inside). On phones the
+                desktop band above is hidden; this gives a pink pull-tab + a
+                slide-in sheet with the sign-up form and a no-login creator
+                info view. */}
+            {phase === 'idle' && (
+                <MobileLandingSheet
+                    bandView={bandView}
+                    onOpenCreatorAuth={() => setBandView('creator-auth')}
+                    onBackToVisitor={() => setBandView('visitor')}
+                />
+            )}
 
             {/* Atverti surface — hosts BOTH tabs internally. The
                 page-level coloured bar paints the top across rail +

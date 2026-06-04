@@ -22,11 +22,13 @@
       "notFound": "Šablonas nerastas arba yra privatus.",
       "items": "{{count}} prekės",
       "by": "Sąrašas nuo {{handle}}",
-      "saveUpTo": "Pigiausioje parduotuvėje – iki {{amount}} € pigiau",
-      "saveUpToHelp": "Šį krepšelį palyginome visose parduotuvėse. Skaičius rodo, kiek sutaupytum pasirinktas prekes pirkdamas pigiausioje parduotuvėje, o ne brangiausioje. Sutaupyta suma priklauso nuo to, kurią parduotuvę pasirenki. Suma apskaičiuota nuorodos dalijimosi metu ir automatiškai neatsinaujina — kainos nuolat keičiasi, todėl realus skirtumas gali būti kitoks.",
+      "saveUpTo": "Sutaupyk iki {{amount}} €",
+      "saveUpToHelp": "Skirtumas tarp brangiausios ir pigiausios parduotuvės šiam krepšeliui, apskaičiuotas dalijimosi metu. Kainos keičiasi, todėl realus skirtumas gali būti kitoks.",
+      "moreItems": "+{{count}} prekių",
       "privateTitle": "Šis šablonas privatus",
       "privateBody": "Kūrėjas padarė šį šabloną privatų, todėl jo peržiūrėti negalima.",
-      "openInApp": "Atidaryti programėlėje"
+      "openInApp": "Atidaryti programėlėje",
+      "getSouply": "Atsisiųsk Souply"
     }
   },
   "lang": {
@@ -48,9 +50,19 @@
     "namePlaceholder": "Vardas Pavardė",
     "emailPlaceholder": "tu@email.lt",
     "send": "Gauti kvietimą",
+    "nameError": "Įveskite vardą ir pavardę.",
+    "emailError": "Įveskite teisingą el. pašto adresą.",
+    "acceptTermsPrefix": "Sutinku su ",
+    "acceptTermsLink": "naudojimosi sąlygomis",
     "thanks": "Ačiū! Kvietimas atkeliaus per parą.",
+    "invitationSent": "Kvietimas išsiųstas",
+    "invitationSentSub": "Patikrink savo el. paštą (ir šlamšto aplanką).",
     "sendError": "Kažkas nepavyko — bandyk dar kartą.",
     "creatorLogin": "Kūrėjo prisijungimas",
+    "mobileOpenPanel": "Atidaryti",
+    "mobileClose": "Uždaryti",
+    "mobileLoginBody": "Kūrėjo paskyrą galima valdyti kompiuteryje arba programėlėje. Užsiregistruok beta versijai čia arba atsidaryk souply.lt kompiuteryje.",
+    "mobileSignUpApp": "Registruotis beta versijai",
     "createCreator": "Sukurti kūrėjo paskyrą",
     "creatorIntroTitle": "Kūrėjams",
     "creatorIntroBody": "Paskyra reikalinga tik norint dalintis šablonais viešai.",
@@ -100,13 +112,14 @@
     "welcome": "Sveika(s), {{name}}",
     "username": "@{{handle}}",
     "stats": {
-      "savings": "Sutaupyta",
+      "savings": "Sekėjai sutaupė",
+      "visits": "Vizitai",
       "templates_one": "Šablonas",
       "templates_few": "Šablonai",
       "templates_other": "Šablonų",
-      "uses_one": "Pasinaudojimas",
-      "uses_few": "Pasinaudojimai",
-      "uses_other": "Pasinaudojimų",
+      "uses_one": "Panaudojimas",
+      "uses_few": "Panaudojimai",
+      "uses_other": "Panaudojimų",
       "followers_one": "Sekėjas",
       "followers_few": "Sekėjai",
       "followers_other": "Sekėjų"
@@ -174,7 +187,7 @@
       "viewNoChanges": "Pakeitimų nėra",
       "share": {
         "title": "Pasidalink šablonu",
-        "body": "Bet kas su nuoroda gaus tą patį krepšelį pigiausioje parduotuvėje.",
+        "body": "Bet kas su nuoroda gaus šias prekes į savo krepšelį.",
         "link": "Nuoroda",
         "copyLink": "Kopijuoti nuorodą",
         "copied": "Nukopijuota!",
@@ -190,6 +203,15 @@
       }
     },
     "logout": "Atsijungti",
+    "editProfile": {
+      "title": "Redaguoti profilį",
+      "firstNameLabel": "Vardas",
+      "lastNameLabel": "Pavardė",
+      "save": "Išsaugoti",
+      "saving": "Saugoma…",
+      "cancel": "Atšaukti",
+      "failed": "Nepavyko išsaugoti. Bandykite vėliau."
+    },
     "logoutConfirm": {
       "title": "Atsijungti?",
       "body": "Tavo kūrėjo darbalaukis užsidarys ir grįši į pradžios puslapį.",

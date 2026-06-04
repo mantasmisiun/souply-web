@@ -155,7 +155,7 @@ export function TemplateBrowsePanel({ onItemAdded }: Props = {}) {
 
             {/* Body — two columns. Left categories stay put; the right
                 column renders search results or the L3+products pair. */}
-            <div className="flex-1 min-h-0 grid gap-5 md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[290px_minmax(0,1fr)] px-7 md:px-10 pt-5 pb-0">
+            <div className="flex-1 min-h-0 grid grid-rows-[minmax(0,1fr)] gap-5 md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[290px_minmax(0,1fr)] px-7 md:px-10 pt-5 pb-0">
                 <CategoriesPanel
                     selectedL2Id={selectedL2?.id ?? null}
                     onSelectL2={(l2) => setSelectedL2(l2)}

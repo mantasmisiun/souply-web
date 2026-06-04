@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { LogOut } from 'lucide-react';
+import { LogOut, Pencil } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
 import { useAuth } from '@/state/auth';
 import { useTemplates } from '@/state/templates';
 import { sampleProfile } from '@/data/sampleTemplates';
@@ -8,7 +9,8 @@ import { ltPluralSuffix } from '@/lib/ltPlural';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
 import { AnimatedNumber } from './AnimatedNumber';
-import type { ReactNode } from 'react';
+import { ProfileEditDialog } from './ProfileEditDialog';
+import { formatEur, formatCount } from '@/lib/formatNumber';
 
 interface Props {
     /** Asks the parent (App) to open the logout-confirm dialog. App
@@ -18,7 +20,6 @@ interface Props {
     onLogoutRequest?: () => void;
 }
 
-const fmt = (n: number) => new Intl.NumberFormat('lt-LT', { maximumFractionDigits: 0 }).format(n);
 
 /**
  * Dashboard left rail. Carries everything the visitor expects after the
@@ -34,11 +35,21 @@ const fmt = (n: number) => new Intl.NumberFormat('lt-LT', { maximumFractionDigit
  */
 export function DashboardRail({ onLogoutRequest }: Props = {}) {
     const { t, i18n } = useTranslation();
-    const { user, logout } = useAuth();
+    const { user, logout, login } = useAuth();
     const { totals } = useTemplates();
     const profile = sampleProfile;
     const name = user?.name ?? profile.name;
     const handle = user?.handle ?? profile.handle;
+    const avatarUrl = user?.avatarUrl ?? null;
+    const initials = name.split(' ').map((s) => s[0]).slice(0, 2).join('');
+    const [editOpen, setEditOpen] = useState(false);
+    // Apply the saved values straight to the session user — no /me round-trip
+    // (which 401s on the dev bypass).
+    const onProfileSaved = ({ firstName, lastName, avatarUrl: newAvatar }: { firstName: string; lastName: string; avatarUrl: string | null }) => {
+        if (!user) return;
+        const newName = [firstName, lastName].filter(Boolean).join(' ') || user.name;
+        login({ ...user, firstName, lastName, name: newName, avatarUrl: newAvatar });
+    };
     // Fallback to a direct logout (no animation) when App hasn't wired
     // the confirm flow — defensive, never expected in production.
     const handleLogout = onLogoutRequest ?? logout;
@@ -71,31 +82,32 @@ export function DashboardRail({ onLogoutRequest }: Props = {}) {
                 </div>
             </header>
 
-            {/* Identity block */}
+            {/* Identity block — tap to edit name + photo */}
             <section>
-                <div className="flex items-center gap-3">
-                    <div className="size-14 rounded-full bg-gradient-to-br from-beetTint to-souply-beet ring-1 ring-white/15 shadow-card grid place-items-center">
-                        <span className="font-display text-xl font-bold text-white">
-                            {name.split(' ').map((s) => s[0]).slice(0, 2).join('')}
-                        </span>
+                <button type="button" onClick={() => setEditOpen(true)} className="flex items-center gap-3 text-left group">
+                    <div className="size-14 rounded-full overflow-hidden bg-gradient-to-br from-beetTint to-souply-beet ring-1 ring-white/15 shadow-card grid place-items-center">
+                        {avatarUrl
+                            ? <img src={avatarUrl} alt="" className="size-full object-cover" />
+                            : <span className="font-display text-xl font-bold text-white">{initials}</span>}
                     </div>
                     <div className="leading-tight">
-                        <div className="text-sm font-semibold text-ink">{name}</div>
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-semibold text-ink group-hover:underline">{name}</span>
+                            <Pencil size={13} className="text-ink-soft opacity-0 group-hover:opacity-100 transition shrink-0" />
+                        </div>
                         <div className="text-xs text-ink-soft">{t('dashboard.username', { handle })}</div>
                     </div>
-                </div>
+                </button>
             </section>
 
-            {/* Stats — three tiles read from the live templates
-                provider. Followers tile parked until the creator
-                profile aggregator endpoint lands and there's something
-                real to count. */}
-            <section className="grid grid-cols-3 gap-2 nums">
-                <StatTile label={labelFor('templates', totals.templates)} value={String(totals.templates)} />
-                <StatTile label={labelFor('uses', totals.uses)}           value={fmt(totals.uses)} />
+            {/* Stats — four tiles read from the live templates provider. */}
+            <section className="grid grid-cols-2 gap-2 nums">
+                <StatTile label={labelFor('templates', totals.templates)} value={formatCount(totals.templates, i18n.language)} />
+                <StatTile label={t('dashboard.stats.visits')}            value={formatCount(totals.visits, i18n.language)} />
+                <StatTile label={labelFor('uses', totals.uses)}           value={formatCount(totals.uses, i18n.language)} />
                 <StatTile
                     label={t('dashboard.stats.savings')}
-                    value={<AnimatedNumber value={totals.savings} format={(n) => `${fmt(n)} €`} />}
+                    value={<AnimatedNumber value={totals.savings} format={(n) => `${formatEur(n, i18n.language)} €`} />}
                     accent
                 />
             </section>
@@ -109,6 +121,17 @@ export function DashboardRail({ onLogoutRequest }: Props = {}) {
             >
                 <LogOut size={14} /> {t('dashboard.logout')}
             </button>
+
+            <ProfileEditDialog
+                open={editOpen}
+                onClose={() => setEditOpen(false)}
+                currentFirstName={user?.firstName ?? ''}
+                currentLastName={user?.lastName ?? ''}
+                currentName={name}
+                currentAvatarUrl={avatarUrl}
+                initials={initials}
+                onSaved={onProfileSaved}
+            />
         </motion.div>
     );
 }

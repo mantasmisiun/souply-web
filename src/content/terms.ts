@@ -12,7 +12,7 @@ export const termsOfService: Record<'lt' | 'en', LegalDoc> = {
         updatedLabel: 'Last updated',
         updated: '1 June 2026',
         intro:
-            'These Terms of Service ("Terms") govern your use of the Souply mobile app and the website at souply.lt (together, the "Service"), provided by Mantas Misiūnas, Gytarių g. 15-4, Šiauliai, LT-78362, Lithuania ("Souply", "we", "us"). By using the Service, you agree to these Terms. If you do not agree, please do not use the Service.',
+            'These Terms of Service ("Terms") govern your use of the Souply mobile app and the website at souply.lt (together, the "Service"), provided by Mantas Misiūnas (Lithuania) ("Souply", "we", "us"). By using the Service, you agree to these Terms. If you do not agree, please do not use the Service.',
         sections: [
             {
                 h: '1. The Service',
@@ -130,7 +130,7 @@ export const termsOfService: Record<'lt' | 'en', LegalDoc> = {
         updatedLabel: 'Paskutinį kartą atnaujinta',
         updated: '2026 m. birželio 1 d.',
         intro:
-            'Šios naudojimosi sąlygos („Sąlygos") reglamentuoja jūsų naudojimąsi „Souply" mobiliąja programėle ir svetaine souply.lt (kartu – „Paslauga"), kurią teikia Mantas Misiūnas, Gytarių g. 15-4, Šiauliai, LT-78362, Lietuva („Souply", „mes"). Naudodamiesi Paslauga, sutinkate su šiomis Sąlygomis. Jei nesutinkate, Paslauga nesinaudokite.',
+            'Šios naudojimosi sąlygos („Sąlygos") reglamentuoja jūsų naudojimąsi „Souply" mobiliąja programėle ir svetaine souply.lt (kartu – „Paslauga"), kurią teikia Mantas Misiūnas (Lietuva) („Souply", „mes"). Naudodamiesi Paslauga, sutinkate su šiomis Sąlygomis. Jei nesutinkate, Paslauga nesinaudokite.',
         sections: [
             {
                 h: '1. Paslauga',

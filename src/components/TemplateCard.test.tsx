@@ -17,6 +17,7 @@ const tpl: SampleTemplate = {
     collectiveSavingsEur: '34.00',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    editedAt: new Date().toISOString(),
     coverColor: '#EB6784',
     coverImage: { kind: 'preset' as const, iconKey: 'basket' },
     emoji: '🧪',

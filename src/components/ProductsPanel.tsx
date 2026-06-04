@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useCreateTemplate } from '@/state/createTemplate';
@@ -45,6 +45,14 @@ export function ProductsPanel({ l2, onAddRequest }: Props) {
      *  loading flip into the post-fetch render and the skeleton
      *  barely flashes (or doesn't show at all on cached fetches). */
     const [trackedL2Id, setTrackedL2Id] = useState<number | null | undefined>(undefined);
+    /* Progressive render window — how many rows are currently mounted.
+     * The Nuolaidos list (and big L2s) can run to thousands of rows;
+     * mounting them all at once froze the tab and left the whole page
+     * janky (huge DOM + a card-enter animation per card). We render PAGE
+     * rows and grow the window by PAGE each time a sentinel near the
+     * bottom scrolls into view — "load more as you near the end". */
+    const PAGE = 48;
+    const [visibleCount, setVisibleCount] = useState(PAGE);
 
     if ((l2?.id ?? null) !== trackedL2Id) {
         // React 18's officially-supported "set state during render"
@@ -55,6 +63,7 @@ export function ProductsPanel({ l2, onAddRequest }: Props) {
         setProducts([]);
         setL3([]);
         setProductsLoading(l2 != null);
+        setVisibleCount(PAGE);
     }
 
     useEffect(() => {
@@ -102,6 +111,33 @@ export function ProductsPanel({ l2, onAddRequest }: Props) {
         return products.filter((p) => p.categoryId === selectedL3);
     }, [products, selectedL3]);
 
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const sentinelRef = useRef<HTMLDivElement>(null);
+    const visible = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
+    const hasMore = visibleCount < filtered.length;
+
+    // Switching category (L2 swap or L3 chip) should show results from the
+    // top — otherwise the scroll position carries over from the previous
+    // list and the new category opens mid-way down.
+    useEffect(() => {
+        scrollRef.current?.scrollTo({ top: 0 });
+    }, [l2?.id, selectedL3]);
+
+    useEffect(() => {
+        if (!hasMore) return;
+        const root = scrollRef.current;
+        const target = sentinelRef.current;
+        if (!root || !target) return;
+        // rootMargin pre-loads the next batch ~one viewport early so the
+        // grid never visibly runs out of cards while scrolling.
+        const io = new IntersectionObserver(
+            (entries) => { if (entries[0]?.isIntersecting) setVisibleCount((c) => c + PAGE); },
+            { root, rootMargin: '800px 0px' },
+        );
+        io.observe(target);
+        return () => io.disconnect();
+    }, [hasMore, filtered.length]);
+
     if (!l2) {
         return (
             <div className="h-full flex items-center justify-center text-center px-8">
@@ -127,7 +163,7 @@ export function ProductsPanel({ l2, onAddRequest }: Props) {
                 <div className="flex flex-wrap gap-2 pb-3 border-b border-edge">
                     <ChipBtn
                         active={selectedL3 === null}
-                        onClick={() => setSelectedL3(null)}
+                        onClick={() => { setSelectedL3(null); setVisibleCount(PAGE); }}
                     >
                         Visos
                     </ChipBtn>
@@ -135,7 +171,7 @@ export function ProductsPanel({ l2, onAddRequest }: Props) {
                         <ChipBtn
                             key={c.id}
                             active={selectedL3 === c.id}
-                            onClick={() => setSelectedL3(c.id)}
+                            onClick={() => { setSelectedL3(c.id); setVisibleCount(PAGE); }}
                         >
                             {c.name}
                         </ChipBtn>
@@ -148,7 +184,7 @@ export function ProductsPanel({ l2, onAddRequest }: Props) {
                 container itself extends to the viewport bottom (the
                 parent body's pb is zero on the create surface), so
                 the bottom clip line is the screen edge. */}
-            <div className="flex-1 overflow-y-auto pr-1 -mr-1 pt-3 pb-10">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto pr-1 -mr-1 pt-3 pb-10">
                 <AnimatePresence mode="wait">
                     {productsLoading ? (
                         <motion.div
@@ -188,15 +224,18 @@ export function ProductsPanel({ l2, onAddRequest }: Props) {
                             transition={{ duration: 0.2 }}
                         >
                             <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                {filtered.map((p, i) => (
+                                {visible.map((p, i) => (
                                     <li
                                         key={p.id}
                                         className="card-enter"
                                         /* CSS stagger via index var — no
-                                         * per-item JS, so the entry of
-                                         * 200 cards costs effectively
-                                         * zero main-thread time. */
-                                        style={{ ['--i' as string]: i }}
+                                         * per-item JS, so the entry of a
+                                         * batch costs effectively zero
+                                         * main-thread time. `% PAGE` keeps
+                                         * each appended batch's stagger
+                                         * short instead of compounding the
+                                         * delay across the whole window. */
+                                        style={{ ['--i' as string]: i % PAGE }}
                                     >
                                         <ProductRow
                                             product={p}
@@ -211,6 +250,10 @@ export function ProductsPanel({ l2, onAddRequest }: Props) {
                         </motion.div>
                     )}
                 </AnimatePresence>
+                {/* Infinite-scroll trigger — only present while there are
+                    more rows to reveal; the observer above grows the window
+                    when this scrolls within ~one viewport of the bottom. */}
+                {hasMore && <div ref={sentinelRef} aria-hidden className="h-px" />}
             </div>
         </div>
     );

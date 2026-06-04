@@ -31,6 +31,15 @@ interface Props {
  */
 const ON_SCREEN_QR_PX = 192;
 const DOWNLOAD_QR_PX = 1024;
+// Centre logo: clear a quiet zone slightly larger than the logo (so no data
+// dots touch it) and float the real Souply mark in it — no white box/border.
+const QR_CLEAR_PX = 52;
+const QR_LOGO_PX = 44;
+const SOUPLY_LOGO = '/souply-logo.png';
+// 1×1 transparent PNG — handed to qrcode.react purely so its `excavate` clears
+// the centre modules; the visible logo is overlaid separately at a smaller size.
+const TRANSPARENT_PX =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 export function ShareModal({ template, onClose }: Props) {
     const { t } = useTranslation();
@@ -115,21 +124,39 @@ export function ShareModal({ template, onClose }: Props) {
         ctx.fillRect(0, 0, DOWNLOAD_QR_PX, DOWNLOAD_QR_PX);
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(onScreen, 0, 0, DOWNLOAD_QR_PX, DOWNLOAD_QR_PX);
-        big.toBlob((blob) => {
-            document.body.removeChild(exportRoot);
-            if (!blob) return;
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            // Filename uses the template name, sanitised. Keeps the
-            // download recognisable in the creator's gallery.
-            const safe = template.name.replace(/[^\w\-]+/g, '_').slice(0, 60) || `template-${template.id}`;
-            a.download = `${safe}-qr.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-        }, 'image/png');
+
+        const exportBlob = () => {
+            big.toBlob((blob) => {
+                document.body.removeChild(exportRoot);
+                if (!blob) return;
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                // Filename uses the template name, sanitised. Keeps the
+                // download recognisable in the creator's gallery.
+                const safe = template.name.replace(/[^\w-]+/g, '_').slice(0, 60) || `template-${template.id}`;
+                a.download = `${safe}-qr.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }, 'image/png');
+        };
+
+        // The cleared centre zone is already baked into the on-screen canvas
+        // (excavate removed those modules), so we only redraw the logo crisply
+        // at hi-res — no white badge/border. Sized to match the on-screen ratio
+        // so the breathing room around it scales identically.
+        const logo = new Image();
+        logo.onload = () => {
+            const logoSz = Math.round(DOWNLOAD_QR_PX * (QR_LOGO_PX / ON_SCREEN_QR_PX));
+            const c = DOWNLOAD_QR_PX / 2;
+            ctx.imageSmoothingEnabled = true;
+            ctx.drawImage(logo, c - logoSz / 2, c - logoSz / 2, logoSz, logoSz);
+            exportBlob();
+        };
+        logo.onerror = exportBlob; // logo failed to load → export the plain QR
+        logo.src = SOUPLY_LOGO;
     };
 
     return (
@@ -207,7 +234,7 @@ export function ShareModal({ template, onClose }: Props) {
                             <div
                                 ref={canvasRef}
                                 className={
-                                    'self-center p-3 rounded-2xl bg-white ring-1 ring-edge ' +
+                                    'relative self-center p-3 rounded-2xl bg-white ring-1 ring-edge ' +
                                     (template.visibility === 'private' || !shareUrl ? 'opacity-40 grayscale' : '')
                                 }
                             >
@@ -216,8 +243,25 @@ export function ShareModal({ template, onClose }: Props) {
                                     size={ON_SCREEN_QR_PX}
                                     bgColor="#ffffff"
                                     fgColor="#1F1B1D"
-                                    level="M"
+                                    level="H"
+                                    // Excavate a clean quiet zone in the centre
+                                    // (modules removed, not covered) so the logo
+                                    // never sits on top of data dots.
+                                    imageSettings={{
+                                        src: TRANSPARENT_PX,
+                                        width: QR_CLEAR_PX,
+                                        height: QR_CLEAR_PX,
+                                        excavate: true,
+                                    }}
                                 />
+                                {/* The real Souply logo, centred in the cleared
+                                    zone — smaller than the cleared square, so it
+                                    has breathing room and no box/border. The
+                                    download canvas redraws it crisply at hi-res;
+                                    level="H" keeps the code scannable. */}
+                                <span aria-hidden className="absolute inset-0 grid place-items-center pointer-events-none">
+                                    <img src={SOUPLY_LOGO} alt="" width={QR_LOGO_PX} height={QR_LOGO_PX} />
+                                </span>
                             </div>
 
                             <div>

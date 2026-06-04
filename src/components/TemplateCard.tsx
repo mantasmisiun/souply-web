@@ -10,6 +10,7 @@ import { findPreset } from '@/data/coverPresets';
 import { cx } from '@/lib/cx';
 import { ease } from '@/lib/motion';
 import { COVER_GRADIENT_OVERLAY } from '@/lib/coverGradient';
+import { formatEur, formatCount } from '@/lib/formatNumber';
 import { StatsHelpDialog } from './StatsHelpDialog';
 
 /** True when the row has been edited since creation (updatedAt is
@@ -28,9 +29,6 @@ interface Props {
     onDuplicate: (t: SampleTemplate) => void;
     onDelete: (t: SampleTemplate) => void;
 }
-
-const fmtEur = (n: number) =>
-    new Intl.NumberFormat('lt-LT', { maximumFractionDigits: 0 }).format(n);
 
 /** Short numeric date used in the dashboard stat row. We want
  *  "2025-05-23" / locale-equivalent — NOT a "2 val." relative
@@ -130,9 +128,9 @@ export function TemplateCard({ template, onOpen, onShare, onDuplicate, onDelete 
                 </div>
 
                 <dl className="grid grid-cols-2 gap-3 py-3 border-y border-edge nums">
-                    <Stat label={t('dashboard.templates.statsVisits')}      value={new Intl.NumberFormat('lt-LT').format(template.visitCount)} />
-                    <Stat label={t('dashboard.templates.statsUses')}        value={new Intl.NumberFormat('lt-LT').format(template.useCount)} />
-                    <Stat label={t('dashboard.templates.statsHelpedSave')}  value={`${fmtEur(Number(template.collectiveSavingsEur))} €`} accent />
+                    <Stat label={t('dashboard.templates.statsVisits')}      value={formatCount(template.visitCount, i18n.language)} />
+                    <Stat label={t('dashboard.templates.statsUses')}        value={formatCount(template.useCount, i18n.language)} />
+                    <Stat label={t('dashboard.templates.statsHelpedSave')}  value={`${formatEur(template.collectiveSavingsEur, i18n.language)} €`} accent />
                     <Stat label={dateLabel}                                  value={dateValue} />
                 </dl>
 

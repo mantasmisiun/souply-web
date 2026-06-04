@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2, HelpCircle } from 'lucide-react';
 import { getSharedTemplate, type SharedTemplate } from '@/lib/templates';
+import { formatEur } from '@/lib/formatNumber';
 import { findPreset } from '@/data/coverPresets';
 import type { CoverImage } from '@/state/createTemplate';
 
@@ -28,9 +29,16 @@ function firstImage(urls: (string | null)[] | null): string | null {
     return urls.find((u): u is string => typeof u === 'string' && u.length > 0) ?? null;
 }
 
+/** The app only exists on phones, so the deep-link CTA only makes sense on a
+ *  mobile browser. On desktop we offer "Get Souply" → the marketing site. */
+function isMobileDevice(): boolean {
+    return typeof navigator !== 'undefined'
+        && /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
 export function PublicTemplateView() {
     const { slug } = useParams<{ slug: string }>();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [data, setData] = useState<SharedTemplate | null>(null);
     const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
     const [showHelp, setShowHelp] = useState(false);
@@ -96,6 +104,13 @@ export function PublicTemplateView() {
             ? Math.max(0, snapshot.mostExpensiveTotalEur - snapshot.cheapestTotalEur)
             : null;
 
+    // Show a short preview of the basket — first few items, then a "+N items"
+    // summary so a long list doesn't dominate the landing.
+    const MAX_ITEMS = 3;
+    const shownItems = items.slice(0, MAX_ITEMS);
+    const overflow = items.length - shownItems.length;
+    const mobile = isMobileDevice();
+
     return (
         <div className="min-h-screen bg-createWash text-ink">
             <div className="max-w-2xl mx-auto px-6 py-10">
@@ -103,44 +118,46 @@ export function PublicTemplateView() {
                     {t('brand.name')}
                 </Link>
 
-                {/* Cover band — same colour + emoji the creator chose, now
-                    server-owned so it matches the dashboard + the app. */}
-                <div
-                    className="mt-5 h-28 rounded-2xl grid place-items-center shadow-card overflow-hidden"
-                    style={{ backgroundColor: template.coverColor ?? '#EB6784' }}
-                >
-                    {emoji && <span className="text-5xl" aria-hidden>{emoji}</span>}
-                </div>
-
-                <header className="mt-5 mb-6">
-                    <h1 className="text-2xl font-bold">{template.name}</h1>
-                    <p className="text-sm text-ink-soft mt-1">
-                        {t('pages.publicTemplate.items', { count: items.length })} · {t('pages.publicTemplate.by', { handle })}
-                    </p>
-                    {saveUpTo != null && saveUpTo > 0 && (
-                        <div className="mt-3">
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-souply-beet/10 text-souply-beet text-sm font-bold px-3 py-1.5">
-                                {t('pages.publicTemplate.saveUpTo', { amount: saveUpTo.toFixed(2) })}
-                                <button
-                                    type="button"
-                                    onClick={() => setShowHelp((v) => !v)}
-                                    aria-label={t('pages.publicTemplate.saveUpToHelp')}
-                                    className="inline-grid place-items-center rounded-full hover:bg-souply-beet/15 transition"
-                                >
-                                    <HelpCircle size={15} />
-                                </button>
-                            </span>
-                            {showHelp && (
-                                <p className="mt-2 max-w-prose text-xs text-ink-soft leading-relaxed">
-                                    {t('pages.publicTemplate.saveUpToHelp')}
-                                </p>
-                            )}
-                        </div>
-                    )}
+                {/* Compact header: themed emoji circle on the left, template
+                    name on the right with item count + creator handle under it. */}
+                <header className="mt-6 flex items-center gap-4">
+                    <div
+                        className="size-16 rounded-2xl grid place-items-center shadow-card shrink-0"
+                        style={{ backgroundColor: template.coverColor ?? '#EB6784' }}
+                    >
+                        {emoji && <span className="text-3xl" aria-hidden>{emoji}</span>}
+                    </div>
+                    <div className="min-w-0">
+                        <h1 className="text-xl font-bold leading-tight">{template.name}</h1>
+                        <p className="text-sm text-ink-soft mt-0.5">
+                            {t('pages.publicTemplate.items', { count: items.length })} · {t('pages.publicTemplate.by', { handle })}
+                        </p>
+                    </div>
                 </header>
 
-                <ul className="space-y-2">
-                    {items.map((it) => {
+                {saveUpTo != null && saveUpTo > 0 && (
+                    <div className="mt-4">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-souply-beet/10 text-souply-beet text-sm font-bold pl-4 pr-3 py-2">
+                            {t('pages.publicTemplate.saveUpTo', { amount: formatEur(saveUpTo, i18n.language) })}
+                            <button
+                                type="button"
+                                onClick={() => setShowHelp((v) => !v)}
+                                aria-label={t('pages.publicTemplate.saveUpToHelp')}
+                                className="inline-grid place-items-center rounded-full hover:bg-souply-beet/15 transition"
+                            >
+                                <HelpCircle size={15} />
+                            </button>
+                        </span>
+                        {showHelp && (
+                            <p className="mt-2 max-w-prose text-xs text-ink-soft leading-relaxed">
+                                {t('pages.publicTemplate.saveUpToHelp')}
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                <ul className="mt-6 space-y-2">
+                    {shownItems.map((it) => {
                         const img = firstImage(it.imageUrls);
                         return (
                             <li
@@ -152,22 +169,45 @@ export function PublicTemplateView() {
                                         ? <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
                                         : <span className="text-lg opacity-50">🫜</span>}
                                 </div>
-                                <span className="flex-1 text-sm font-semibold leading-tight">{it.productName}</span>
+                                <div className="flex-1 min-w-0">
+                                    <div className="text-sm font-semibold leading-tight">{it.productName}</div>
+                                    {/* SP pack size (not the creator's quantity) — muted, only when known. */}
+                                    {it.packAmount != null && it.packUnit && (
+                                        <div className="text-xs text-ink-soft mt-0.5">{Number(it.packAmount)} {it.packUnit}</div>
+                                    )}
+                                </div>
                                 <span className="text-xs font-bold text-souply-beet nums shrink-0">
                                     {Number(it.quantity)}{it.unit ? ` ${it.unit}` : ''}
                                 </span>
                             </li>
                         );
                     })}
+                    {overflow > 0 && (
+                        <li className="text-center text-sm font-semibold text-ink-soft py-2">
+                            {t('pages.publicTemplate.moreItems', { count: overflow })}
+                        </li>
+                    )}
                 </ul>
 
                 <div className="mt-8 grid place-items-center">
-                    <button
-                        type="button"
-                        className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-souply-beet text-white text-sm font-semibold shadow-card hover:brightness-95 transition"
-                    >
-                        {t('pages.publicTemplate.openInApp')}
-                    </button>
+                    {/* On a phone: custom-scheme deep link → opens the app to
+                        this template. On desktop the app can't open, so offer
+                        the marketing site instead. */}
+                    {mobile ? (
+                        <a
+                            href={`souply://t/${slug}`}
+                            className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-souply-beet text-white text-sm font-semibold shadow-card hover:brightness-95 transition"
+                        >
+                            {t('pages.publicTemplate.openInApp')}
+                        </a>
+                    ) : (
+                        <a
+                            href="https://souply.lt"
+                            className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-souply-beet text-white text-sm font-semibold shadow-card hover:brightness-95 transition"
+                        >
+                            {t('pages.publicTemplate.getSouply')}
+                        </a>
+                    )}
                 </div>
             </div>
         </div>

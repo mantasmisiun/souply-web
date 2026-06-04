@@ -22,11 +22,13 @@
       "notFound": "Template not found or is private.",
       "items": "{{count}} items",
       "by": "List by {{handle}}",
-      "saveUpTo": "Up to €{{amount}} less at the cheapest store",
-      "saveUpToHelp": "We compared this basket across every store. The number shows how much you'd save by buying the selected items at the cheapest store instead of the most expensive. The amount saved depends on which store you choose. It was calculated when the link was shared and doesn't update automatically — prices change over time, so the real difference may vary.",
+      "saveUpTo": "Save up to €{{amount}}",
+      "saveUpToHelp": "The gap between the priciest and cheapest store for this basket, measured when the link was shared. Prices change, so the real difference may vary.",
+      "moreItems": "+{{count}} items",
       "privateTitle": "This template is private",
       "privateBody": "The creator made this template private, so it can't be viewed.",
-      "openInApp": "Open in the app"
+      "openInApp": "Open in the app",
+      "getSouply": "Get Souply"
     }
   },
   "lang": {
@@ -48,9 +50,19 @@
     "namePlaceholder": "Full name",
     "emailPlaceholder": "you@email.com",
     "send": "Get my invite",
+    "nameError": "Enter your first and last name.",
+    "emailError": "Enter a valid email address.",
+    "acceptTermsPrefix": "I accept the ",
+    "acceptTermsLink": "terms and conditions",
     "thanks": "Thanks! Your invite lands within a day.",
+    "invitationSent": "Invitation sent",
+    "invitationSentSub": "Check your inbox (and the spam folder).",
     "sendError": "Something went wrong — please try again.",
     "creatorLogin": "Creator login",
+    "mobileOpenPanel": "Open",
+    "mobileClose": "Close",
+    "mobileLoginBody": "Creator accounts can be managed on the desktop or via the app. Sign up for the beta here or open souply.lt on the desktop PC.",
+    "mobileSignUpApp": "Sign up for the beta",
     "createCreator": "Create creator account",
     "creatorIntroTitle": "For creators",
     "creatorIntroBody": "An account is only needed to share your templates publicly.",
@@ -100,7 +112,8 @@
     "welcome": "Welcome, {{name}}",
     "username": "@{{handle}}",
     "stats": {
-      "savings": "Saved",
+      "savings": "Follower savings",
+      "visits": "Visits",
       "templates_one": "Template",
       "templates_few": "Templates",
       "templates_other": "Templates",
@@ -174,7 +187,7 @@
       "viewNoChanges": "No changes",
       "share": {
         "title": "Share this template",
-        "body": "Anyone with the link will land in the cheapest store carrying these items.",
+        "body": "Anyone with the link will get these products to their basket.",
         "link": "Link",
         "copyLink": "Copy link",
         "copied": "Copied!",
@@ -190,6 +203,15 @@
       }
     },
     "logout": "Sign out",
+    "editProfile": {
+      "title": "Edit profile",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "failed": "Couldn't save. Try again later."
+    },
     "logoutConfirm": {
       "title": "Sign out?",
       "body": "Your creator dashboard will close and you'll go back to the landing page.",

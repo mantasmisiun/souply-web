@@ -31,6 +31,7 @@ interface TemplatesContextValue {
      *  itself; precomputed once per templates update. */
     totals: {
         templates: number;
+        visits: number;
         uses: number;
         /** EUR as a Number — only used for display; precision-safe
          *  enough because individual rows are bounded ≤ 1M EUR. */
@@ -52,26 +53,35 @@ export function TemplatesProvider({ children }: { children: ReactNode }) {
      *  hold the animation. */
     const [settledForUserId, setSettledForUserId] = useState<string | null>(null);
 
-    const refresh = useCallback(async () => {
+    const refresh = useCallback(async (opts?: { background?: boolean }) => {
         if (!userId) {
             setTemplates([]);
             setSettledForUserId(null);
             setLoading(false);
             return;
         }
-        setLoading(true);
+        // Background refreshes (focus + the interval poll) update silently.
+        // Toggling the first-load `loading` flag here would flash the
+        // dashboard/create surface every minute — so only show loading for
+        // the initial/manual fetch (stale-while-revalidate).
+        const background = opts?.background === true;
+        if (!background) setLoading(true);
         setError(null);
         try {
             const rows = await listTemplatesForUser(userId);
-            setTemplates(rows);
+            // The auto "Smart template" (isDefault) is a phone-only personal
+            // tool — never surface it (or count it) on the web dashboard.
+            setTemplates(rows.filter((r) => r.isDefault !== 1));
         } catch (err) {
             const message = err instanceof ApiError
                 ? `API ${err.status}: ${err.message}`
                 : (err as Error).message ?? 'Unknown error';
             setError(message);
-            setTemplates([]);
+            // Don't wipe the displayed list on a transient *background*
+            // failure — that would flash an empty dashboard.
+            if (!background) setTemplates([]);
         } finally {
-            setLoading(false);
+            if (!background) setLoading(false);
             // Record settlement in `finally` so transient errors still
             // free the App's gating effect — the dashboard renders with
             // an error banner instead of stalling on a permanent
@@ -89,11 +99,11 @@ export function TemplatesProvider({ children }: { children: ReactNode }) {
     // pointless background requests.
     useEffect(() => {
         if (!userId) return;
-        const onFocus = () => { if (document.visibilityState === 'visible') refresh(); };
+        const onFocus = () => { if (document.visibilityState === 'visible') refresh({ background: true }); };
         document.addEventListener('visibilitychange', onFocus);
         window.addEventListener('focus', onFocus);
         const id = window.setInterval(() => {
-            if (document.visibilityState === 'visible') refresh();
+            if (document.visibilityState === 'visible') refresh({ background: true });
         }, 60_000);
         return () => {
             document.removeEventListener('visibilitychange', onFocus);
@@ -114,6 +124,7 @@ export function TemplatesProvider({ children }: { children: ReactNode }) {
 
     const totals = useMemo(() => ({
         templates: templates.length,
+        visits:    templates.reduce((s, t) => s + (t.visitCount ?? 0), 0),
         uses:      templates.reduce((s, t) => s + (t.useCount ?? 0), 0),
         savings:   templates.reduce((s, t) => s + Number(t.collectiveSavingsEur ?? 0), 0),
     }), [templates]);
