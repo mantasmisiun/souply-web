@@ -94,8 +94,11 @@ export function CoverColorPicker({ value, onChange }: Props) {
                         onClick={() => onChange(hex)}
                         className={cx(
                             'size-7 rounded-full grid place-items-center transition-transform',
-                            'ring-1 ring-white/20 hover:scale-110',
-                            active && 'scale-110 ring-2 ring-white',
+                            // Dark hairline keeps every swatch delineated on a
+                            // light cover colour; the active state adds a dark
+                            // halo so it reads on light AND dark bars.
+                            'ring-1 ring-black/15 hover:scale-110',
+                            active && 'scale-110 ring-2 ring-white shadow-[0_0_0_4px_rgba(0,0,0,0.16)]',
                         )}
                         style={{ backgroundColor: hex }}
                     >
@@ -118,9 +121,9 @@ export function CoverColorPicker({ value, onChange }: Props) {
                 }}
                 className={cx(
                     'size-7 rounded-full grid place-items-center transition-transform',
-                    'ring-1 ring-white/40 hover:scale-110 text-white',
-                    !chip && 'bg-white/20 hover:bg-white/30',
-                    (open || !isPreset) && 'scale-110 ring-2 ring-white',
+                    'ring-1 ring-black/15 hover:scale-110 text-white',
+                    !chip && 'bg-black/10 hover:bg-black/20',
+                    (open || !isPreset) && 'scale-110 ring-2 ring-white shadow-[0_0_0_4px_rgba(0,0,0,0.16)]',
                 )}
                 style={chip ? { backgroundColor: chip } : undefined}
             >

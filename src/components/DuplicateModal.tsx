@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { SampleTemplate } from '@/data/sampleTemplates';
 import type { CoverImage } from '@/state/createTemplate';
@@ -83,14 +82,6 @@ export function DuplicateModal({ template, onCancel, onConfirm }: Props) {
                             transition={{ duration: 0.25 }}
                             className="relative px-5 py-4 flex items-center gap-4 shadow-card"
                         >
-                            <button
-                                type="button"
-                                onClick={onCancel}
-                                aria-label="Close"
-                                className="absolute right-3 top-3 size-8 grid place-items-center rounded-full bg-white/20 hover:bg-white/30 text-white transition"
-                            >
-                                <X size={16} />
-                            </button>
                             <CoverPicturePicker
                                 value={coverImage}
                                 onChange={setCoverImage}
