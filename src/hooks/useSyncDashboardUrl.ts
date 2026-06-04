@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTemplates } from '@/state/templates';
 import { useTemplateView } from '@/state/templateView';
@@ -71,7 +71,16 @@ export function useSyncDashboardUrl() {
     }, [tParam, tabParam, createParam, templates]);
 
     // ── context → URL ───────────────────────────────────────────────
+    // Skip the FIRST run. On a reload with ?t=/?create= in the URL, context
+    // starts empty (in-memory state is gone), so writing now would DELETE
+    // those params before the URL→context effect above has adopted them —
+    // which then re-triggers URL→context with "param gone but context set"
+    // and cancels the surface: an open/cancel oscillation that lands on the
+    // bare dashboard. Letting the first hydration happen first means every
+    // later run reflects a real UI action, not the empty mount state.
+    const hydratedRef = useRef(false);
     useEffect(() => {
+        if (!hydratedRef.current) { hydratedRef.current = true; return; }
         const next = new URLSearchParams(searchParams);
         // viewing wins over creating (templateView seeds createTemplate,
         // so `creating` is also true while a template is open).

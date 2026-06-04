@@ -260,12 +260,19 @@ function LandingOrDashboard() {
      * type/position), so the band + layoutId morphs are never torn down.
      */
     useEffect(() => {
+        // While auth is still restoring we don't yet know the terminal phase.
+        // `phase` is transiently 'idle' during a reload of an authed session,
+        // so syncing now would navigate('/') and DROP the query string
+        // (?create=1 / ?t=) before the surface can be restored. Wait for the
+        // restore to settle — by then pathname already matches the phase, so
+        // no navigate fires and the params survive.
+        if (restoring) return;
         if (phase === 'dashboard' && pathname !== '/dashboard') {
             navigate('/dashboard', { replace: true });
         } else if (phase === 'idle' && pathname !== '/') {
             navigate('/', { replace: true });
         }
-    }, [phase, pathname, navigate]);
+    }, [phase, pathname, navigate, restoring]);
 
     /**
      * Auth guard. A logged-out visit to /dashboard (direct nav, refresh
@@ -276,10 +283,11 @@ function LandingOrDashboard() {
      * / and /dashboard and unmount the morphing band.
      */
     useEffect(() => {
+        if (restoring) return; // don't bounce before auth is known (drops the query)
         if (!isAuthed && pathname === '/dashboard') {
             navigate('/', { replace: true });
         }
-    }, [isAuthed, pathname, navigate]);
+    }, [isAuthed, pathname, navigate, restoring]);
 
     const features = audience === 'user' ? userFeatures : creatorFeatures;
     // Carousel rides the whole landing/morph window — mounted from
