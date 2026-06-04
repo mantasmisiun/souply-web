@@ -33,6 +33,13 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ARG VITE_GOOGLE_CLIENT_ID=
 ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 
+# Sign in with Apple (web): the Services ID + return URL. Public, safe to bake.
+# Unset → the Apple button renders nothing (e.g. staging/dev).
+ARG VITE_APPLE_SERVICES_ID=
+ENV VITE_APPLE_SERVICES_ID=$VITE_APPLE_SERVICES_ID
+ARG VITE_APPLE_REDIRECT_URI=
+ENV VITE_APPLE_REDIRECT_URI=$VITE_APPLE_REDIRECT_URI
+
 # Environment marker (drives the EnvBanner + [ENV] title + noindex).
 # Defaults to prod (no banner) so an un-parametrised build is safe.
 ARG VITE_APP_ENV=prod
