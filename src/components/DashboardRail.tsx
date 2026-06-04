@@ -10,6 +10,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
 import { AnimatedNumber } from './AnimatedNumber';
 import { ProfileEditDialog } from './ProfileEditDialog';
+import { formatEur, formatCount } from '@/lib/formatNumber';
 
 interface Props {
     /** Asks the parent (App) to open the logout-confirm dialog. App
@@ -19,10 +20,6 @@ interface Props {
     onLogoutRequest?: () => void;
 }
 
-const fmt = (n: number) => new Intl.NumberFormat('lt-LT', { maximumFractionDigits: 0 }).format(n);
-// Savings is a euro amount — show 2 decimals so it matches the app (which
-// shows e.g. "1,52 €"); the integer `fmt` above would round it to "2 €".
-const fmtEur = (n: number) => new Intl.NumberFormat('lt-LT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
 /**
  * Dashboard left rail. Carries everything the visitor expects after the
@@ -105,12 +102,12 @@ export function DashboardRail({ onLogoutRequest }: Props = {}) {
 
             {/* Stats — four tiles read from the live templates provider. */}
             <section className="grid grid-cols-2 gap-2 nums">
-                <StatTile label={labelFor('templates', totals.templates)} value={String(totals.templates)} />
-                <StatTile label={t('dashboard.stats.visits')}            value={fmt(totals.visits)} />
-                <StatTile label={labelFor('uses', totals.uses)}           value={fmt(totals.uses)} />
+                <StatTile label={labelFor('templates', totals.templates)} value={formatCount(totals.templates, i18n.language)} />
+                <StatTile label={t('dashboard.stats.visits')}            value={formatCount(totals.visits, i18n.language)} />
+                <StatTile label={labelFor('uses', totals.uses)}           value={formatCount(totals.uses, i18n.language)} />
                 <StatTile
                     label={t('dashboard.stats.savings')}
-                    value={<AnimatedNumber value={totals.savings} format={(n) => `${fmtEur(n)} €`} />}
+                    value={<AnimatedNumber value={totals.savings} format={(n) => `${formatEur(n, i18n.language)} €`} />}
                     accent
                 />
             </section>

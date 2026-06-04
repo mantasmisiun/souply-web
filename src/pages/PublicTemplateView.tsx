@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2, HelpCircle } from 'lucide-react';
 import { getSharedTemplate, type SharedTemplate } from '@/lib/templates';
+import { formatEur } from '@/lib/formatNumber';
 import { findPreset } from '@/data/coverPresets';
 import type { CoverImage } from '@/state/createTemplate';
 
@@ -30,7 +31,7 @@ function firstImage(urls: (string | null)[] | null): string | null {
 
 export function PublicTemplateView() {
     const { slug } = useParams<{ slug: string }>();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [data, setData] = useState<SharedTemplate | null>(null);
     const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
     const [showHelp, setShowHelp] = useState(false);
@@ -120,7 +121,7 @@ export function PublicTemplateView() {
                     {saveUpTo != null && saveUpTo > 0 && (
                         <div className="mt-3">
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-souply-beet/10 text-souply-beet text-sm font-bold px-3 py-1.5">
-                                {t('pages.publicTemplate.saveUpTo', { amount: saveUpTo.toFixed(2) })}
+                                {t('pages.publicTemplate.saveUpTo', { amount: formatEur(saveUpTo, i18n.language) })}
                                 <button
                                     type="button"
                                     onClick={() => setShowHelp((v) => !v)}
