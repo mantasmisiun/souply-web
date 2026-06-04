@@ -79,6 +79,7 @@ export default function App() {
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/legal/privacy" element={<LegalPage kind="privacy" />} />
             <Route path="/legal/terms" element={<LegalPage kind="terms" />} />
+            <Route path="/legal/delete-account" element={<LegalPage kind="delete" />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     );
