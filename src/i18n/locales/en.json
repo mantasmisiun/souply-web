@@ -57,6 +57,8 @@
     "thanks": "Thanks! Your invite lands within a day.",
     "invitationSent": "Invitation sent",
     "invitationSentSub": "Check your inbox (and the spam folder).",
+    "alreadyOnList": "You're already on the list",
+    "alreadyOnListSub": "Your invite was already sent — check your inbox (and the spam folder).",
     "sendError": "Something went wrong — please try again.",
     "creatorLogin": "Creator login",
     "mobileOpenPanel": "Open",

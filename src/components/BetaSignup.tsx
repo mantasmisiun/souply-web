@@ -21,6 +21,7 @@ export function BetaSignup() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [done, setDone] = useState(false);
+    const [alreadyInvited, setAlreadyInvited] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(false);
     const [accepted, setAccepted] = useState(false);
@@ -49,7 +50,8 @@ export function BetaSignup() {
             const lang = i18n.language?.startsWith('en') ? 'en' : 'lt';
             // Resolves only once the invite email has actually been sent (the
             // API awaits it); rejects on send failure → error state below.
-            await submitBetaSignup({ name: trimmedName, email: trimmedEmail, platform, lang });
+            const res = await submitBetaSignup({ name: trimmedName, email: trimmedEmail, platform, lang });
+            setAlreadyInvited(res?.alreadyInvited === true);
             setDone(true);
         } catch {
             setError(true);
@@ -69,8 +71,12 @@ export function BetaSignup() {
                 <div className="flex items-start gap-2.5 rounded-2xl bg-beetTint/30 ring-1 ring-edge px-4 py-3.5">
                     <Check size={18} className="mt-0.5 text-beetTint-strong shrink-0" />
                     <div>
-                        <div className="text-sm font-semibold text-ink">{t('cta.invitationSent')}</div>
-                        <div className="text-xs text-ink-soft mt-0.5">{t('cta.invitationSentSub')}</div>
+                        <div className="text-sm font-semibold text-ink">
+                            {t(alreadyInvited ? 'cta.alreadyOnList' : 'cta.invitationSent')}
+                        </div>
+                        <div className="text-xs text-ink-soft mt-0.5">
+                            {t(alreadyInvited ? 'cta.alreadyOnListSub' : 'cta.invitationSentSub')}
+                        </div>
                     </div>
                 </div>
             ) : (
@@ -113,7 +119,7 @@ export function BetaSignup() {
                         autoComplete="name"
                         placeholder={t('cta.namePlaceholder')}
                         value={name}
-                        onChange={(e) => { setName(e.target.value); setDone(false); setError(false); }}
+                        onChange={(e) => { setName(e.target.value); setDone(false); setAlreadyInvited(false); setError(false); }}
                         onBlur={() => setTouched((s) => ({ ...s, name: true }))}
                         aria-invalid={nameError || undefined}
                         className={cx(
@@ -130,7 +136,7 @@ export function BetaSignup() {
                         autoComplete="email"
                         placeholder={t('cta.emailPlaceholder')}
                         value={email}
-                        onChange={(e) => { setEmail(e.target.value); setDone(false); setError(false); }}
+                        onChange={(e) => { setEmail(e.target.value); setDone(false); setAlreadyInvited(false); setError(false); }}
                         onBlur={() => setTouched((s) => ({ ...s, email: true }))}
                         aria-invalid={emailError || undefined}
                         className={cx(
