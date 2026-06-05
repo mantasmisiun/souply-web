@@ -57,6 +57,8 @@
     "thanks": "Ačiū! Kvietimas atkeliaus per parą.",
     "invitationSent": "Kvietimas išsiųstas",
     "invitationSentSub": "Patikrink savo el. paštą (ir šlamšto aplanką).",
+    "alreadyOnList": "Tu jau esi sąraše",
+    "alreadyOnListSub": "Kvietimas jau buvo išsiųstas — patikrink el. paštą (ir šlamšto aplanką).",
     "sendError": "Kažkas nepavyko — bandyk dar kartą.",
     "creatorLogin": "Kūrėjo prisijungimas",
     "mobileOpenPanel": "Atidaryti",
