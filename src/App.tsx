@@ -352,10 +352,18 @@ function LandingOrDashboard() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, transition: { duration: 0.2 } }}
                         transition={{ duration: dur.base, ease: ease.soft }}
-                        className="absolute inset-y-0 left-0 right-0 md:right-[420px] flex items-center justify-center px-6 md:pl-20 md:pr-12 pt-16 pb-16"
+                        // Scrollable: at large device display-zoom / text size the
+                        // card grows past the viewport. Centring it (items-center)
+                        // inside an overflow-hidden page clipped the title (top) and
+                        // the arrows + dots (bottom). The min-h-full inner wrapper
+                        // keeps the normal fits-in-viewport case perfectly centred,
+                        // and lets it scroll only when it can't fit.
+                        className="absolute inset-y-0 left-0 right-0 md:right-[420px] overflow-x-hidden overflow-y-auto px-8 md:pl-20 md:pr-12"
                         style={{ zIndex: 1 }}
                     >
-                        <FeatureCarousel cards={features} audienceKey={audience} />
+                        <div className="min-h-full flex items-center justify-center py-6 md:py-16">
+                            <FeatureCarousel cards={features} audienceKey={audience} />
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
