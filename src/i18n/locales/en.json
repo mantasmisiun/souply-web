@@ -47,6 +47,8 @@
     "joinBetaSub": "Pick your phone — we'll send the invite.",
     "iosLabel": "iOS",
     "androidLabel": "Android",
+    "iosPendingTitle": "iOS coming soon",
+    "iosPendingBody": "The app is submitted to the App Store and awaiting Apple's approval. Please try again later.",
     "namePlaceholder": "Full name",
     "emailPlaceholder": "you@email.com",
     "send": "Get my invite",

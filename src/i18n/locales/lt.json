@@ -47,6 +47,8 @@
     "joinBetaSub": "Pasirink telefoną — atsiųsime kvietimą.",
     "iosLabel": "iOS",
     "androidLabel": "Android",
+    "iosPendingTitle": "iOS netrukus",
+    "iosPendingBody": "Programėlė pateikta „App Store“ ir laukia „Apple“ patvirtinimo. Bandykite vėliau.",
     "namePlaceholder": "Vardas Pavardė",
     "emailPlaceholder": "tu@email.lt",
     "send": "Gauti kvietimą",
