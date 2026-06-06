@@ -16,6 +16,11 @@ services:
       args:
         VITE_API_BASE_URL: https://api.souply.manofoto.dpdns.org
         VITE_GOOGLE_CLIENT_ID: 554949767682-oqvvbc2a3klc1tedqvbdotmg4uqkj5s3.apps.googleusercontent.com
+        # Apple Sign In (web): same Services ID as prod, staging return URL. The
+        # Services ID lt.souply.web must list this return URL + domain in the
+        # Apple Developer portal or the popup errors.
+        VITE_APPLE_SERVICES_ID: lt.souply.web
+        VITE_APPLE_REDIRECT_URI: https://souply.manofoto.dpdns.org/auth/callback
         VITE_APP_ENV: staging
         # NO VITE_ENABLE_DEV_AUTH / dev-user — staging now mirrors prod auth.
     image: souply-web:staging
