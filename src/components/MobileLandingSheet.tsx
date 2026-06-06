@@ -81,8 +81,14 @@ export function MobileLandingSheet({ bandView, onOpenCreatorAuth, onBackToVisito
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ duration: 0.32, ease: ease.soft }}
-                            className="fixed inset-y-0 right-0 z-50 w-[88vw] max-w-sm bg-surface shadow-band rounded-l-[32px] flex flex-col overflow-hidden"
+                            className="fixed inset-y-0 right-0 z-50 w-[88vw] max-w-sm flex"
                         >
+                            {/* Rounding + clip live on this inner wrapper, which carries
+                                NO transform. iOS Safari fails to clip border-radius +
+                                overflow-hidden on a transformed element (the aside
+                                animates `x`), so scrolling text bled past the rounded
+                                corners. Keeping the clip off the transformed node fixes it. */}
+                            <div className="relative flex-1 min-h-0 flex flex-col bg-surface shadow-band rounded-l-[32px] overflow-hidden">
                             <header className="flex items-center justify-between gap-2 px-6 pt-6 pb-2">
                                 <div className="flex items-center gap-1.5">
                                     <ThemeToggle />
@@ -139,6 +145,7 @@ export function MobileLandingSheet({ bandView, onOpenCreatorAuth, onBackToVisito
                                     </div>
                                     <div>{t('footer.rights', { year })}</div>
                                 </footer>
+                            </div>
                             </div>
                         </motion.aside>
                     </>
