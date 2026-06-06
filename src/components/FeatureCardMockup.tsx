@@ -26,7 +26,7 @@ export function FeatureCardMockup({ icon: Icon, title, body }: Props) {
                  *  surface tokens — white-ish text in light theme,
                  *  dark text in dark theme — so the words always
                  *  contrast against pink, not against the band. */}
-                <h2 className="font-display font-bold text-surface tracking-tight text-3xl md:text-4xl lg:text-5xl leading-[1.05] mb-4">
+                <h2 className="font-display font-bold text-surface tracking-tight text-3xl md:text-4xl lg:text-5xl leading-[1.05] mb-4 break-words hyphens-auto">
                     {title}
                 </h2>
                 <p className="text-surface/80 text-base md:text-lg leading-relaxed max-w-md">
@@ -42,17 +42,19 @@ export function FeatureCardMockup({ icon: Icon, title, body }: Props) {
             >
                 {/* Height is viewport-capped (and width follows the 1:2 phone
                     aspect) so at large display-zoom the mockup shrinks to fit
-                    instead of forcing the page to scroll. */}
-                <div className="relative aspect-[1/2] h-[min(420px,42vh)] rounded-[40px] mockup-grad shadow-pop ring-1 ring-white/40">
-                    {/* Faux notch + screen content */}
-                    <div className="absolute inset-x-0 top-2 h-6 flex justify-center">
-                        <span className="w-20 h-5 rounded-full bg-ink/40" />
+                    instead of forcing the page to scroll. Inner bits (island,
+                    icon, shadow) are sized in % of the frame so they scale with
+                    it instead of staying fixed-px and looking oversized. */}
+                <div className="relative aspect-[1/2] h-[min(400px,34vh)] rounded-[clamp(18px,5vh,40px)] mockup-grad shadow-pop ring-1 ring-white/40">
+                    {/* Dynamic-island pill */}
+                    <div className="absolute inset-x-0 top-[3.5%] flex justify-center">
+                        <span className="w-[34%] aspect-[4/1] rounded-full bg-ink/40" />
                     </div>
-                    <div className="absolute inset-3 top-10 rounded-[28px] bg-white/15 backdrop-blur-[2px] ring-1 ring-white/30 flex items-center justify-center">
-                        <Icon size={84} strokeWidth={1.4} className="text-white/90 drop-shadow-md" />
+                    <div className="absolute inset-[5%] top-[12%] rounded-[clamp(12px,3vh,28px)] bg-white/15 backdrop-blur-[2px] ring-1 ring-white/30 flex items-center justify-center">
+                        <Icon strokeWidth={1.4} className="w-1/2 h-auto text-white/90 drop-shadow-md" />
                     </div>
                 </div>
-                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 h-3 w-32 rounded-full bg-black/20 blur-md" />
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 h-3 w-[55%] rounded-full bg-black/20 blur-md" />
             </motion.div>
         </div>
     );

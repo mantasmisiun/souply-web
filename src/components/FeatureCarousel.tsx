@@ -108,7 +108,7 @@ export function FeatureCarousel({ cards, audienceKey, autoplayMs = 6000 }: Props
             className="relative w-full max-w-3xl outline-none focus-visible:ring-2 focus-visible:ring-beetTint-strong/40 rounded-[40px]"
             data-testid="feature-carousel"
         >
-            <div className="relative min-h-[440px] md:min-h-[480px] flex items-center">
+            <div className="relative min-h-[clamp(300px,52vh,440px)] md:min-h-[480px] flex items-center">
                 <AnimatePresence custom={dir} mode="popLayout" initial={false}>
                     <motion.div
                         key={`${audienceKey}-${safeIndex}`}
