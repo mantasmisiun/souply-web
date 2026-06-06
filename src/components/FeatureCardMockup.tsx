@@ -40,7 +40,10 @@ export function FeatureCardMockup({ icon: Icon, title, body }: Props) {
                 className="relative mx-auto md:mx-0"
                 style={{ perspective: 1000 }}
             >
-                <div className="relative w-[220px] h-[440px] rounded-[40px] mockup-grad shadow-pop ring-1 ring-white/40">
+                {/* Height is viewport-capped (and width follows the 1:2 phone
+                    aspect) so at large display-zoom the mockup shrinks to fit
+                    instead of forcing the page to scroll. */}
+                <div className="relative aspect-[1/2] h-[min(420px,42vh)] rounded-[40px] mockup-grad shadow-pop ring-1 ring-white/40">
                     {/* Faux notch + screen content */}
                     <div className="absolute inset-x-0 top-2 h-6 flex justify-center">
                         <span className="w-20 h-5 rounded-full bg-ink/40" />
