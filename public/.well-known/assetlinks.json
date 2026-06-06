@@ -4,7 +4,7 @@
     "target": {
       "namespace": "android_app",
       "package_name": "lt.souply.app",
-      "sha256_cert_fingerprints": ["REPLACE_WITH_PROD_SHA256_FINGERPRINT"]
+      "sha256_cert_fingerprints": ["C6:C8:31:C0:96:70:06:52:72:F6:96:F7:A5:0A:A6:F7:DC:FA:7E:03:37:71:D3:A5:3D:8C:F8:A3:9A:76:4A:2A"]
     }
   },
   {
@@ -12,7 +12,15 @@
     "target": {
       "namespace": "android_app",
       "package_name": "lt.souply.app.dev",
-      "sha256_cert_fingerprints": ["REPLACE_WITH_DEV_SHA256_FINGERPRINT"]
+      "sha256_cert_fingerprints": ["B4:A8:12:B6:EC:65:FF:96:C1:47:D2:AE:E8:64:E6:0A:71:BE:5F:29:33:19:9E:9C:24:9B:68:55:F9:B7:0B:3B"]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "lt.souply.app.staging",
+      "sha256_cert_fingerprints": ["0C:F7:3F:21:79:F7:FC:A6:64:55:3E:B8:6C:C3:92:71:F2:C3:92:8F:65:C0:C2:FD:F2:47:BF:82:C3:65:B3:21"]
     }
   }
 ]
