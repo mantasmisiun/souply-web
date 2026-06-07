@@ -78,10 +78,21 @@ export function useSyncDashboardUrl() {
     // and cancels the surface: an open/cancel oscillation that lands on the
     // bare dashboard. Letting the first hydration happen first means every
     // later run reflects a real UI action, not the empty mount state.
+    // Read the live params via a ref so this effect can compute `next` WITHOUT
+    // depending on `searchParams`/`setSearchParams`. Those were in the deps —
+    // so writing setSearchParams changed searchParams, which re-ran this effect,
+    // which wrote again: a self-sustaining navigation loop (browser "Throttling
+    // navigation" + an unbounded re-render storm) the moment the two sync
+    // effects diverged, e.g. on a visibility toggle. This direction must fire
+    // only on real UI-state changes; the URL→context effect owns URL changes.
+    const searchParamsRef = useRef(searchParams);
+    searchParamsRef.current = searchParams;
+
     const hydratedRef = useRef(false);
     useEffect(() => {
         if (!hydratedRef.current) { hydratedRef.current = true; return; }
-        const next = new URLSearchParams(searchParams);
+        const current = searchParamsRef.current;
+        const next = new URLSearchParams(current);
         // viewing wins over creating (templateView seeds createTemplate,
         // so `creating` is also true while a template is open).
         if (viewing) {
@@ -95,12 +106,13 @@ export function useSyncDashboardUrl() {
             next.delete('t'); next.delete('tab'); next.delete('create');
         }
 
-        if (next.toString() === searchParams.toString()) return;
+        if (next.toString() === current.toString()) return;
 
         // Push only when a surface first opens (no-surface → surface) so
         // back closes it; tab flips / closes replace to keep history flat.
-        const hadSurface = searchParams.has('t') || searchParams.get('create') === '1';
+        const hadSurface = current.has('t') || current.get('create') === '1';
         const willHaveSurface = next.has('t') || next.get('create') === '1';
         setSearchParams(next, { replace: !(!hadSurface && willHaveSurface) });
-    }, [viewing, tab, creating, searchParams, setSearchParams]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [viewing, tab, creating]);
 }
