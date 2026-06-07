@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Loader2, Minus, Plus, Save, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -78,13 +78,6 @@ export function TemplateViewRail() {
         JSON.stringify(coverImage) !== JSON.stringify(seededCoverImage);
     const dirty = name !== seededName || visibility !== seededVisibility || coverDirty;
     const canSave = dirty && !submitting && !saving;
-
-    // TEMP DEBUG: render-storm tracer for the "glitches like crazy" bug when
-    // switching a template to public. A spiking count = a re-render/layout loop.
-    const renderCount = useRef(0);
-    renderCount.current += 1;
-     
-    console.log(`[DBG-WEB] TVRail render #${renderCount.current} vis=${visibility} dirty=${dirty} tab=${tab} saving=${saving} submitting=${submitting}`);
 
     const onSubmit = useCallback(async () => {
         if (!user?.id || !viewing) return;
@@ -270,7 +263,7 @@ export function TemplateViewRail() {
                 </div>
             )}
 
-            <VisibilitySlider value={visibility} onChange={(v) => {   console.log('[DBG-WEB] setVisibility ->', v); setVisibility(v); }} />
+            <VisibilitySlider value={visibility} onChange={setVisibility} />
 
             <button
                 type="button"
