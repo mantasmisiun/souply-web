@@ -4,8 +4,8 @@
     "details": [
       {
         "appIDs": [
-          "REPLACE_WITH_APPLE_TEAM_ID.lt.souply.app",
-          "REPLACE_WITH_APPLE_TEAM_ID.lt.souply.app.dev"
+          "MPCNLCFS2R.lt.souply.app",
+          "MPCNLCFS2R.lt.souply.app.dev"
         ],
         "components": [
           { "/": "/t/*", "comment": "Shared template links" },

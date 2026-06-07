@@ -53,6 +53,20 @@ export function PublicTemplateView() {
         return () => { cancelled = true; };
     }, [slug]);
 
+    // On a phone, try to hand straight off to the app so the visitor doesn't
+    // have to tap "open in app" (one fewer step). `instantiate=1` tells the app
+    // they already reviewed the template here, so it skips its own preview and
+    // goes straight to the basket. Fires once, shortly after paint, so the page
+    // still renders as the fallback if the app isn't installed. (iOS Universal
+    // Links don't fire from a QR/Camera scan, which is why this web hop exists.)
+    useEffect(() => {
+        if (!slug || !isMobileDevice()) return;
+        const id = window.setTimeout(() => {
+            window.location.href = `souply://t/${slug}?instantiate=1`;
+        }, 350);
+        return () => window.clearTimeout(id);
+    }, [slug]);
+
     if (state === 'loading') {
         return (
             <div className="min-h-screen grid place-items-center bg-createWash text-souply-beet">
@@ -195,7 +209,7 @@ export function PublicTemplateView() {
                         the marketing site instead. */}
                     {mobile ? (
                         <a
-                            href={`souply://t/${slug}`}
+                            href={`souply://t/${slug}?instantiate=1`}
                             className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-souply-beet text-white text-sm font-semibold shadow-card hover:brightness-95 transition"
                         >
                             {t('pages.publicTemplate.openInApp')}
