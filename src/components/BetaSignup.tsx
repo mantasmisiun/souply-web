@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Loader2, Clock } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { AppleMark, AndroidMark } from './BrandMarks';
 import { submitBetaSignup } from '@/lib/beta';
 import { cx } from '@/lib/cx';
@@ -17,9 +17,11 @@ type Platform = 'ios' | 'android';
  */
 export function BetaSignup() {
     const { t, i18n } = useTranslation();
-    // iOS isn't released yet (in App Store review), so Android is the default
-    // and the picker is mainly to flip TO iOS, which shows a "coming soon" note.
-    const [platform, setPlatform] = useState<Platform>('android');
+    // iOS is now live (TestFlight + App Store), so default the picker to the
+    // visitor's actual device and let either platform sign up.
+    const [platform, setPlatform] = useState<Platform>(
+        typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent) ? 'ios' : 'android',
+    );
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [done, setDone] = useState(false);
@@ -114,17 +116,6 @@ export function BetaSignup() {
                 ))}
             </div>
 
-            {platform === 'ios' ? (
-                /* iOS not live yet (awaiting App Store review) — show a note
-                   instead of the signup form; switching back to Android restores it. */
-                <div className="flex items-start gap-2.5 rounded-2xl bg-surface-muted ring-1 ring-edge px-4 py-3.5">
-                    <Clock size={18} className="mt-0.5 text-ink-soft shrink-0" />
-                    <div>
-                        <div className="text-sm font-semibold text-ink">{t('cta.iosPendingTitle')}</div>
-                        <div className="text-xs text-ink-soft mt-0.5">{t('cta.iosPendingBody')}</div>
-                    </div>
-                </div>
-            ) : (
             <>
             <form onSubmit={onSubmit} className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
@@ -203,7 +194,6 @@ export function BetaSignup() {
                 )}
             </AnimatePresence>
             </>
-            )}
             </>
             )}
         </div>
