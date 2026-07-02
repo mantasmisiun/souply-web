@@ -54,6 +54,18 @@ const DEFAULT_OG = {
 // didn't run — fail fast rather than serve 404s for every route.
 const indexHtml = readFileSync(path.join(DIST, 'index.html'), 'utf-8');
 
+// Web version gate (Phase 4): the build id this deploy was built with, read once from the
+// bundle's version.json (emitted by the vite plugin). A running tab polls /version.json and
+// reloads when the served id differs from the one it was built with — the browser equivalent
+// of the native app's store gate, but cheap (a reload, no store trip).
+const BUILD_ID = (() => {
+    try {
+        return JSON.parse(readFileSync(path.join(DIST, 'version.json'), 'utf-8')).buildId ?? '';
+    } catch {
+        return process.env.BUILD_ID ?? '';
+    }
+})();
+
 const app = express();
 app.disable('x-powered-by');
 app.use(compression());
@@ -121,6 +133,15 @@ app.get('/t/:slug', async (req, res) => {
         // shell; the client renders its own loading / not-found state.
         res.type('html').send(indexHtml);
     }
+});
+
+// ── Web version gate ────────────────────────────────────────────────
+// MUST be no-cache (the static middleware would otherwise leave it uncached-but-heuristic).
+// Served explicitly so a running tab always reads the CURRENTLY-deployed build id.
+app.get('/version.json', (_req, res) => {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+        .type('application/json')
+        .send(JSON.stringify({ buildId: BUILD_ID }));
 });
 
 // ── Apple Universal Links association ───────────────────────────────
