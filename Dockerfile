@@ -26,7 +26,7 @@ RUN npm pkg delete scripts.prepare && npm ci
 COPY . .
 
 # Vite reads VITE_* from the environment at build time.
-ARG VITE_API_BASE_URL=https://api.souply.manofoto.dpdns.org
+ARG VITE_API_BASE_URL=https://souply-api.manofoto.dpdns.org
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # Google Identity Services Web client ID (public; safe to bake).

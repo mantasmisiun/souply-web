@@ -34,7 +34,10 @@
   "lang": {
     "lt": "Lithuanian",
     "en": "English",
-    "short": { "lt": "LT", "en": "EN" }
+    "short": {
+      "lt": "LT",
+      "en": "EN"
+    }
   },
   "audience": {
     "user": "For shoppers",
@@ -247,13 +250,13 @@
     "presetHint": "Pick a popular one or tap the last button to browse the full list.",
     "back": "Back",
     "emojiGroup": {
-      "fruit":   "Fruit",
-      "veg":     "Vegetables",
+      "fruit": "Fruit",
+      "veg": "Vegetables",
       "protein": "Protein",
-      "grain":   "Bread & grains",
-      "meal":    "Meals",
-      "sweet":   "Sweets",
-      "drink":   "Drinks"
+      "grain": "Bread & grains",
+      "meal": "Meals",
+      "sweet": "Sweets",
+      "drink": "Drinks"
     },
     "preset": {
       "salad": "Salad",
@@ -265,31 +268,105 @@
   },
   "features": {
     "user": {
-      "compare": { "title": "Every store, one search", "body": "Maxima, Rimi, IKI, Norfa, Lidl — one query, one price." },
-      "scan": { "title": "Scan the receipt — get the story", "body": "Lithuania's first receipt-to-insights mapping." },
-      "habits": { "title": "A template that builds itself", "body": "Upload 3 receipts from 2 stores — Souply drafts your weekly basket." },
-      "discounts": { "title": "All discounts in one feed", "body": "Every promo from every store in one continuously updated strip." },
-      "history": { "title": "Price history", "body": "See how every product's price changes over time." },
-      "bestStore": { "title": "The cheapest store for your basket", "body": "In seconds, find the store where your basket costs the least." },
-      "perKg": { "title": "Pay per kilo, not per pack", "body": "Enter how much you need and we'll work out which is cheaper — packaged or loose." },
-      "quickRepeat": { "title": "Repeat your shop in 5 seconds", "body": "One tap — template becomes a basket in the cheapest store." },
-      "multiStore": { "title": "A basket spread across stores", "body": "Norfa + Lidl + Rimi — we'll tell you what to buy where." },
-      "route": { "title": "Cheapest store on your route", "body": "Set home and work — Souply shows where to shop on the way." },
-      "monthly": { "title": "Savings report", "body": "Insights into your savings journey and monthly spending." },
-      "privacy": { "title": "Private and secure", "body": "No account needed, no personal data collected — just use it." },
-      "shared": { "title": "Shop twice as fast", "body": "Share your shopping list with your other half." },
-      "seasonal": { "title": "Seasonal peaks, surfaced", "body": "Raspberries in July, tangerines in December — see seasonal pricing." },
-      "noAccount": { "title": "Works only for you", "body": "Browse and compare instantly — an unbiased algorithm that works only for you." },
-      "lt": { "title": "Made in Lithuania", "body": "Real prices from real Lithuanian stores. Real time." }
+      "compare": {
+        "title": "Every store, one search",
+        "body": "Maxima, Rimi, IKI, Norfa, Lidl — one query, one price."
+      },
+      "scan": {
+        "title": "Scan the receipt — get the story",
+        "body": "Lithuania's first receipt-to-insights mapping."
+      },
+      "habits": {
+        "title": "A template that builds itself",
+        "body": "Upload 3 receipts from 2 stores — Souply drafts your weekly basket."
+      },
+      "discounts": {
+        "title": "All discounts in one feed",
+        "body": "Every promo from every store in one continuously updated strip."
+      },
+      "history": {
+        "title": "Price history",
+        "body": "See how every product's price changes over time."
+      },
+      "bestStore": {
+        "title": "The cheapest store for your basket",
+        "body": "In seconds, find the store where your basket costs the least."
+      },
+      "perKg": {
+        "title": "Pay per kilo, not per pack",
+        "body": "Enter how much you need and we'll work out which is cheaper — packaged or loose."
+      },
+      "quickRepeat": {
+        "title": "Repeat your shop in 5 seconds",
+        "body": "One tap — template becomes a basket in the cheapest store."
+      },
+      "multiStore": {
+        "title": "A basket spread across stores",
+        "body": "Norfa + Lidl + Rimi — we'll tell you what to buy where."
+      },
+      "route": {
+        "title": "Cheapest store on your route",
+        "body": "Set home and work — Souply shows where to shop on the way."
+      },
+      "monthly": {
+        "title": "Savings report",
+        "body": "Insights into your savings journey and monthly spending."
+      },
+      "privacy": {
+        "title": "Private and secure",
+        "body": "No account needed, no personal data collected — just use it."
+      },
+      "shared": {
+        "title": "Shop twice as fast",
+        "body": "Share your shopping list with your other half."
+      },
+      "seasonal": {
+        "title": "Seasonal peaks, surfaced",
+        "body": "Raspberries in July, tangerines in December — see seasonal pricing."
+      },
+      "noAccount": {
+        "title": "Works only for you",
+        "body": "Browse and compare instantly — an unbiased algorithm that works only for you."
+      },
+      "lt": {
+        "title": "Made in Lithuania",
+        "body": "Real prices from real Lithuanian stores. Real time."
+      }
     },
     "creator": {
-      "share": { "title": "Share your basket", "body": "Build a template, get a QR code and link — followers shop in one tap." },
-      "savings": { "title": "Track collective savings", "body": "See in real time how much your followers saved using your template." },
-      "recipe": { "title": "Recipe → basket → store", "body": "A recipe becomes a basket, and the basket a shopping list in the cheapest store." },
-      "publish": { "title": "Templates thousands shop", "body": "One template, many uses — grow your audience and your impact." },
-      "profile": { "title": "Public profile @yourname", "body": "All your templates on one page — share once, always working." },
-      "visibility": { "title": "You decide who sees it", "body": "Keep a template private, link-only, or fully public." },
-      "stats": { "title": "Stats and audience", "body": "See how many people use your templates and how much they saved." }
+      "share": {
+        "title": "Share your basket",
+        "body": "Build a template, get a QR code and link — followers shop in one tap."
+      },
+      "savings": {
+        "title": "Track collective savings",
+        "body": "See in real time how much your followers saved using your template."
+      },
+      "recipe": {
+        "title": "Recipe → basket → store",
+        "body": "A recipe becomes a basket, and the basket a shopping list in the cheapest store."
+      },
+      "publish": {
+        "title": "Templates thousands shop",
+        "body": "One template, many uses — grow your audience and your impact."
+      },
+      "profile": {
+        "title": "Public profile @yourname",
+        "body": "All your templates on one page — share once, always working."
+      },
+      "visibility": {
+        "title": "You decide who sees it",
+        "body": "Keep a template private, link-only, or fully public."
+      },
+      "stats": {
+        "title": "Stats and audience",
+        "body": "See how many people use your templates and how much they saved."
+      }
     }
+  },
+  "updateToast": {
+    "message": "A new version is available.",
+    "reload": "Reload",
+    "dismiss": "Dismiss"
   }
 }

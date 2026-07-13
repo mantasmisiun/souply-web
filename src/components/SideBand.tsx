@@ -84,7 +84,7 @@ export function SideBand({
                         animate={{ opacity: isMerging ? 0 : 1, y: 0 }}
                         exit={{ opacity: 0, y: -12 }}
                         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex-1 flex flex-col justify-between gap-8 mt-10"
+                        className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-8 mt-10"
                     >
                         {view === 'visitor' ? (
                             <VisitorBody onOpenCreatorAuth={onOpenCreatorAuth} />
@@ -98,7 +98,7 @@ export function SideBand({
                             />
                         )}
 
-                        <footer className="text-[11px] text-ink-soft/80 leading-relaxed">
+                        <footer className="text-[11px] text-ink-soft/80 leading-relaxed mt-auto">
                             <div className="flex items-center gap-3 mb-2">
                                 <Link to="/legal/privacy" className="hover:text-ink transition">{t('footer.privacy')}</Link>
                                 <span className="opacity-30">·</span>
