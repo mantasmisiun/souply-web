@@ -34,7 +34,10 @@
   "lang": {
     "lt": "Lietuvių",
     "en": "English",
-    "short": { "lt": "LT", "en": "EN" }
+    "short": {
+      "lt": "LT",
+      "en": "EN"
+    }
   },
   "audience": {
     "user": "Naudotojui",
@@ -247,13 +250,13 @@
     "presetHint": "Pasirink iš populiarių arba paspausk paskutinį mygtuką, kad atvertum visus.",
     "back": "Atgal",
     "emojiGroup": {
-      "fruit":   "Vaisiai",
-      "veg":     "Daržovės",
+      "fruit": "Vaisiai",
+      "veg": "Daržovės",
       "protein": "Baltymai",
-      "grain":   "Duona ir grūdai",
-      "meal":    "Patiekalai",
-      "sweet":   "Saldumynai",
-      "drink":   "Gėrimai"
+      "grain": "Duona ir grūdai",
+      "meal": "Patiekalai",
+      "sweet": "Saldumynai",
+      "drink": "Gėrimai"
     },
     "preset": {
       "salad": "Salotos",
@@ -265,31 +268,105 @@
   },
   "features": {
     "user": {
-      "compare": { "title": "Visos parduotuvės vienoje vietoje", "body": "Maxima, Rimi, IKI, Norfa, Lidl — viena paieška, viena kaina." },
-      "scan": { "title": "Skenuok kvitą — gauk įžvalgas", "body": "Pirmą kartą Lietuvoje — kvitas virsta įpročių žemėlapiu." },
-      "habits": { "title": "Šablonas, kuris kuriasi pats", "body": "Įkelk 3 kvitus iš 2 parduotuvių — Souply pasiūlys tavo savaitės krepšelį." },
-      "discounts": { "title": "Nuolaidos vienu žvilgsniu", "body": "Visos akcijos visose parduotuvėse vienoje juostoje, atnaujinama kasdien." },
-      "history": { "title": "Kainų istorija", "body": "Matyk, kaip keičiasi kiekvienos prekės kaina." },
-      "bestStore": { "title": "Pigiausia parduotuvė tavo krepšeliui", "body": "Per kelias sekundes rask parduotuvę, kurioje tavo krepšelis kainuos mažiausiai." },
-      "perKg": { "title": "Mokėk už kilogramą, ne už pakuotę", "body": "Įvesk, kiek tau reikia, o programėlė apskaičiuos, kas pigiau — supakuotas ar sveriamas produktas." },
-      "quickRepeat": { "title": "Pakartok pirkimą per 5 sekundes", "body": "Vienas mygtukas — šablonas tampa krepšeliu pigiausioje parduotuvėje." },
-      "multiStore": { "title": "Krepšelis kelioms parduotuvėms", "body": "Norfa + Lidl + Rimi — Souply parodys, kur ką pirkti." },
-      "route": { "title": "Pigiausia parduotuvė pakeliui", "body": "Nustatyk namus ir darbą — Souply parodys, kur apsipirkti pakeliui." },
-      "monthly": { "title": "Taupymo pranešimas", "body": "Įžvalgos apie tavo taupymo kelionę ir mėnesio išlaidas." },
-      "privacy": { "title": "Privatu ir saugu", "body": "Nereikia paskyros, nerenkami asmeniniai duomenys — tiesiog naudokis." },
-      "shared": { "title": "Apsipirk du kartus greičiau", "body": "Dalinkis pirkinių sąrašu su antra puse." },
-      "seasonal": { "title": "Sezoniniai pikai vienoje vietoje", "body": "Avietės liepą, mandarinai gruodį — kainos pagal sezoną." },
-      "noAccount": { "title": "Dirba tik tau", "body": "Naršyk ir palygink iškart — nešališkas algoritmas, kuris dirba tik tau." },
-      "lt": { "title": "Lietuviams, Lietuvoje", "body": "Kainos iš tikrų Lietuvos parduotuvių. Realiu laiku." }
+      "compare": {
+        "title": "Visos parduotuvės vienoje vietoje",
+        "body": "Maxima, Rimi, IKI, Norfa, Lidl — viena paieška, viena kaina."
+      },
+      "scan": {
+        "title": "Skenuok kvitą — gauk įžvalgas",
+        "body": "Pirmą kartą Lietuvoje — kvitas virsta įpročių žemėlapiu."
+      },
+      "habits": {
+        "title": "Šablonas, kuris kuriasi pats",
+        "body": "Įkelk 3 kvitus iš 2 parduotuvių — Souply pasiūlys tavo savaitės krepšelį."
+      },
+      "discounts": {
+        "title": "Nuolaidos vienu žvilgsniu",
+        "body": "Visos akcijos visose parduotuvėse vienoje juostoje, atnaujinama kasdien."
+      },
+      "history": {
+        "title": "Kainų istorija",
+        "body": "Matyk, kaip keičiasi kiekvienos prekės kaina."
+      },
+      "bestStore": {
+        "title": "Pigiausia parduotuvė tavo krepšeliui",
+        "body": "Per kelias sekundes rask parduotuvę, kurioje tavo krepšelis kainuos mažiausiai."
+      },
+      "perKg": {
+        "title": "Mokėk už kilogramą, ne už pakuotę",
+        "body": "Įvesk, kiek tau reikia, o programėlė apskaičiuos, kas pigiau — supakuotas ar sveriamas produktas."
+      },
+      "quickRepeat": {
+        "title": "Pakartok pirkimą per 5 sekundes",
+        "body": "Vienas mygtukas — šablonas tampa krepšeliu pigiausioje parduotuvėje."
+      },
+      "multiStore": {
+        "title": "Krepšelis kelioms parduotuvėms",
+        "body": "Norfa + Lidl + Rimi — Souply parodys, kur ką pirkti."
+      },
+      "route": {
+        "title": "Pigiausia parduotuvė pakeliui",
+        "body": "Nustatyk namus ir darbą — Souply parodys, kur apsipirkti pakeliui."
+      },
+      "monthly": {
+        "title": "Taupymo pranešimas",
+        "body": "Įžvalgos apie tavo taupymo kelionę ir mėnesio išlaidas."
+      },
+      "privacy": {
+        "title": "Privatu ir saugu",
+        "body": "Nereikia paskyros, nerenkami asmeniniai duomenys — tiesiog naudokis."
+      },
+      "shared": {
+        "title": "Apsipirk du kartus greičiau",
+        "body": "Dalinkis pirkinių sąrašu su antra puse."
+      },
+      "seasonal": {
+        "title": "Sezoniniai pikai vienoje vietoje",
+        "body": "Avietės liepą, mandarinai gruodį — kainos pagal sezoną."
+      },
+      "noAccount": {
+        "title": "Dirba tik tau",
+        "body": "Naršyk ir palygink iškart — nešališkas algoritmas, kuris dirba tik tau."
+      },
+      "lt": {
+        "title": "Lietuviams, Lietuvoje",
+        "body": "Kainos iš tikrų Lietuvos parduotuvių. Realiu laiku."
+      }
     },
     "creator": {
-      "share": { "title": "Pasidalink savo krepšeliu", "body": "Sukurk šabloną, gauk QR kodą ir nuorodą — sekėjai apsiperka vienu paspaudimu." },
-      "savings": { "title": "Sek bendrą sutaupymą", "body": "Realiu laiku stebėk, kiek tavo sekėjai sutaupė pagal tavo šabloną." },
-      "recipe": { "title": "Receptas → krepšelis → parduotuvė", "body": "Receptas virsta krepšeliu, o krepšelis — pirkinių sąrašu pigiausioje parduotuvėje." },
-      "publish": { "title": "Šablonai, kuriuos perka tūkstančiai", "body": "Vienas šablonas, daug pasinaudojimų — augink savo auditoriją ir poveikį." },
-      "profile": { "title": "Viešas profilis @tavovardas", "body": "Visi tavo šablonai vienoje puslapyje — pasidalink kartą, dirba visada." },
-      "visibility": { "title": "Tu sprendi, kas mato", "body": "Šablonas gali būti privatus, tik su nuoroda arba viešas." },
-      "stats": { "title": "Statistika ir auditorija", "body": "Matyk, kiek žmonių naudoja tavo šablonus ir kiek jie sutaupė." }
+      "share": {
+        "title": "Pasidalink savo krepšeliu",
+        "body": "Sukurk šabloną, gauk QR kodą ir nuorodą — sekėjai apsiperka vienu paspaudimu."
+      },
+      "savings": {
+        "title": "Sek bendrą sutaupymą",
+        "body": "Realiu laiku stebėk, kiek tavo sekėjai sutaupė pagal tavo šabloną."
+      },
+      "recipe": {
+        "title": "Receptas → krepšelis → parduotuvė",
+        "body": "Receptas virsta krepšeliu, o krepšelis — pirkinių sąrašu pigiausioje parduotuvėje."
+      },
+      "publish": {
+        "title": "Šablonai, kuriuos perka tūkstančiai",
+        "body": "Vienas šablonas, daug pasinaudojimų — augink savo auditoriją ir poveikį."
+      },
+      "profile": {
+        "title": "Viešas profilis @tavovardas",
+        "body": "Visi tavo šablonai vienoje puslapyje — pasidalink kartą, dirba visada."
+      },
+      "visibility": {
+        "title": "Tu sprendi, kas mato",
+        "body": "Šablonas gali būti privatus, tik su nuoroda arba viešas."
+      },
+      "stats": {
+        "title": "Statistika ir auditorija",
+        "body": "Matyk, kiek žmonių naudoja tavo šablonus ir kiek jie sutaupė."
+      }
     }
+  },
+  "updateToast": {
+    "message": "Yra naujesnė versija.",
+    "reload": "Atnaujinti",
+    "dismiss": "Uždaryti"
   }
 }
