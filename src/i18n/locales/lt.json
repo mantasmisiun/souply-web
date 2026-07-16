@@ -29,6 +29,20 @@
       "privateBody": "Kūrėjas padarė šį šabloną privatų, todėl jo peržiūrėti negalima.",
       "openInApp": "Atidaryti programėlėje",
       "getSouply": "Atsisiųsk Souply"
+    },
+    "joinInvite": {
+      "loading": "Kraunama…",
+      "invalidTitle": "Kvietimas nebegalioja",
+      "invalidBody": "Ši nuoroda neteisinga, atšaukta arba pasibaigė jos galiojimas. Paprašyk naujos nuorodos ar QR kodo.",
+      "householdTitle": "Tave kviečia prisijungti prie namų ūkio",
+      "householdTitleNamed": "Tave kviečia prisijungti prie „{{name}}“",
+      "tripTitle": "Tave kviečia į bendrą apsipirkimą",
+      "tripTitleNamed": "Tave kviečia į apsipirkimą „{{name}}“",
+      "members": "{{count}} nariai",
+      "openHint": "Atsidaryk kvietimą „Souply“ programėlėje — jei ji neatsidarė automatiškai, spausk mygtuką žemiau.",
+      "desktopHint": "Kvietimai priimami „Souply“ programėlėje telefone — atsidaryk šią nuorodą telefonu.",
+      "openInApp": "Atidaryti programėlėje",
+      "getSouply": "Gauti „Souply“"
     }
   },
   "lang": {
