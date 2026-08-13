@@ -1,67 +1,103 @@
 # souply-web
 
-Marketing landing + creator authentication + creator dashboard for [Souply](https://souply.lt) —
-the Lithuanian grocery price-comparison platform.
+Web client for [Souply](https://souply.lt) — a grocery price-comparison platform for the
+Lithuanian market. This repo covers the marketing landing page, creator authentication,
+the creator dashboard, and the public pages that shared links resolve to.
 
-The mobile experience lives in `souply-app`; the backend in `souply-api`.
+Souply is split across four repositories:
+
+| Repo | Role |
+|---|---|
+| `souply-app` | React Native / Expo mobile client — receipt scanning, basket building |
+| `souply-api` | Node / Express / MariaDB backend — pricing, matching, scrapers |
+| `souply-shared` | Receipt parsers and configuration shared between app and API |
+| **`souply-web`** | **This repo — web client** |
 
 ## Stack
 
-- **Vite + React 19 + TypeScript** (strict, with `@/*` path alias)
-- **Tailwind CSS 3** with the Souply palette mirroring the mobile app
-- **Framer Motion** for the band-slide transition and stagger animations
-- **React Router** for `/` ↔ `/dashboard` (driven by auth state)
-- **i18next** with Lithuanian (default) + English
-- **Vitest + React Testing Library + jsdom** for component + transition specs
+- **Vite 8 · React 19 · TypeScript 6** (strict, `@/*` path alias)
+- **Tailwind CSS 3** — palette mirrors the mobile app
+- **Framer Motion** — the side-band morph and staggered grid entrance
+- **React Router 7** — landing ↔ dashboard driven by auth state
+- **i18next** — Lithuanian default, English fallback
+- **Vitest · React Testing Library · jsdom**
+- **Express 4** — production static server (see *Serving* below)
+- **Sentry** for error reporting
 
-## Commands
+## Things worth a look
+
+A few decisions here were less obvious than they appear:
+
+**The production build refuses to ship the dev auth bypass.** Local development can skip
+sign-in via `VITE_ENABLE_DEV_AUTH`, which is exactly the kind of flag that escapes into a
+release. `npm run verify:prod-clean` builds with those variables blanked and then greps the
+emitted bundle for the dev user ID and bypass strings, failing the build if either survives.
+The guard checks the artefact rather than the source, so it holds even if the dead-code
+elimination changes.
+
+**Sessions are an httpOnly cookie, never localStorage.** Google and Apple sign-in hand an
+ID token to the API's `/api/auth/oauth`, which verifies it against the provider's JWKS and
+sets the session cookie itself. The browser never holds a readable token, so an XSS bug
+can't exfiltrate a session. Requests use `credentials: 'include'` against an explicit CORS
+origin allowlist on the API side.
+
+**The Express server exists for three things static hosting can't do.** It server-renders
+`/t/:slug` so shared template links produce real link previews; it serves
+`/.well-known/apple-app-site-association` with a JSON content type, which `express.static`
+would otherwise mislabel as `octet-stream` and break universal links; and it pins
+`/version.json` to no-cache so clients can detect a deploy. Everything else is static files
+with cache headers.
+
+**Lithuanian is the default locale, not English.** The product is Lithuania-first, so `lt`
+is the base and `en` is the fallback — the reverse of the usual setup.
+
+## Running locally
 
 ```bash
-npm run dev         # vite dev server at http://localhost:5173
-npm run build       # tsc -b && vite build → dist/
-npm run preview     # serve dist/ locally to verify the production build
-npm run test        # vitest run (CI mode, single pass)
-npm run test:watch  # vitest interactive
-npm run test:ui     # vitest browser UI
-npm run typecheck   # tsc --noEmit on tsconfig.app.json
+npm install
+npm run dev            # http://localhost:5173
+```
+
+The dev server expects `souply-api` reachable for anything beyond the landing page.
+Copy `.env.example` if present, or set `VITE_ENABLE_DEV_AUTH=1` to work on authenticated
+views without a backend session.
+
+```bash
+npm run build          # tsc -b && vite build → dist/
+npm run preview        # serve dist/ locally
+npm start              # run the production Express server against dist/
+npm test               # vitest, single pass
+npm run typecheck      # tsc --noEmit
+npm run lint           # eslint
+npm run verify:prod-clean   # build + assert no dev-auth in the bundle
 ```
 
 ## Layout
 
 ```
 src/
-├── App.tsx                  ← top-level layout choreography (band morph)
-├── main.tsx                 ← React root + AuthProvider + i18n bootstrap
-├── components/
-│   ├── SideBand.tsx         ← white 3D right-edge band (visitor + creator-auth views)
-│   ├── FeatureCarousel.tsx  ← auto-advancing card carousel (6s, arrows, dots, ←/→)
-│   ├── FeatureCardMockup.tsx← phone-shaped mockup card body
-│   ├── BetaSignup.tsx       ← name + email + iOS/Android picker
-│   ├── CreatorAuthPanel.tsx ← Google + Apple OAuth buttons
-│   ├── BrandMarks.tsx       ← inline Apple / Android / Google SVG marks
-│   ├── DashboardRail.tsx    ← left rail post-login (avatar, stats)
-│   ├── DashboardGrid.tsx    ← right side templates grid with stagger
-│   ├── TemplateCard.tsx     ← per-template card with 6 actions + inline delete confirm
-│   └── LanguageSwitcher.tsx ← LT/EN segmented control
-├── data/
-│   ├── features.ts          ← landing carousel card config (20 user + 7 creator)
-│   └── sampleTemplates.ts   ← dashboard placeholder data (shape mirrors API)
-├── state/
-│   └── auth.tsx             ← AuthProvider + useAuth (tonight: in-memory)
-├── i18n/
-│   ├── index.ts             ← i18next init (LT default, EN fallback)
-│   └── locales/{lt,en}.json
-├── lib/
-│   ├── cx.ts                ← class-name helper
-│   └── motion.ts            ← shared easing + duration tokens
-└── test/
-    ├── setup.ts             ← jsdom shims (matchMedia, localStorage)
-    └── render.tsx           ← test render with i18n + auth providers
+├── App.tsx              top-level layout choreography (band morph)
+├── main.tsx             React root, AuthProvider, i18n bootstrap
+├── components/          landing, auth panels, dashboard rail + grid, template cards
+├── pages/               AuthCallback · JoinInviteView · PublicTemplateView
+│                        LegalPage · NotFound
+├── state/auth.tsx       AuthProvider + useAuth (session via httpOnly cookie)
+├── lib/api.ts           fetch wrapper — credentials: 'include'
+├── i18n/                i18next init + lt/en locales
+├── data/                landing carousel config, dashboard shapes
+└── test/                jsdom shims and a render helper with providers
+
+server/index.js          production static server + /t/:slug + AASA + /version.json
 ```
 
-## Notes for the next wire-up pass
+## Deployment
 
-- Beta signup form persists to `localStorage["souply.betaSignups"]` — swap for Mailerlite/Resend.
-- OAuth buttons fire `onAuthenticated('login' | 'signup')` — wire to souply-api `/api/auth/google` + `/api/auth/apple`.
-- JWT goes in an **httpOnly cookie** (`SameSite=Lax`) on web, not localStorage.
-- Templates grid reads from `sampleTemplates`; replace with `GET /api/basket-templates/user/{userId}`.
+Multi-stage `Dockerfile`, with `docker-compose.staging.yml` and `docker-compose.prod.yml`
+for the two deployed environments. Commits follow Conventional Commits, enforced by
+commitlint via husky.
+
+## Status and licence
+
+Actively developed and deployed. This repository is published so the work can be read;
+it is not currently accepting contributions, and no open-source licence is granted —
+all rights reserved.

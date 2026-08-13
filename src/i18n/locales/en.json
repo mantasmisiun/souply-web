@@ -29,6 +29,20 @@
       "privateBody": "The creator made this template private, so it can't be viewed.",
       "openInApp": "Open in the app",
       "getSouply": "Get Souply"
+    },
+    "joinInvite": {
+      "loading": "Loading…",
+      "invalidTitle": "This invite is no longer valid",
+      "invalidBody": "The link is wrong, revoked or expired. Ask for a fresh link or QR code.",
+      "householdTitle": "You're invited to join a household",
+      "householdTitleNamed": "You're invited to join “{{name}}”",
+      "tripTitle": "You're invited to a shared shopping trip",
+      "tripTitleNamed": "You're invited to the “{{name}}” trip",
+      "members": "{{count}} members",
+      "openHint": "Open the invite in the Souply app — if it didn't open automatically, tap the button below.",
+      "desktopHint": "Invites are accepted in the Souply app on your phone — open this link there.",
+      "openInApp": "Open in the app",
+      "getSouply": "Get Souply"
     }
   },
   "lang": {
