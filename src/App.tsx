@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PublicTemplateView } from './pages/PublicTemplateView';
+import { JoinInviteView } from './pages/JoinInviteView';
 import { AuthCallback } from './pages/AuthCallback';
 import { LegalPage } from './pages/LegalPage';
 import { NotFound } from './pages/NotFound';
@@ -76,6 +77,7 @@ export default function App() {
             <Route path="/" element={<LandingOrDashboard />} />
             <Route path="/dashboard" element={<LandingOrDashboard />} />
             <Route path="/t/:slug" element={<PublicTemplateView />} />
+            <Route path="/join/:code" element={<JoinInviteView />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/legal/privacy" element={<LegalPage kind="privacy" />} />
             <Route path="/legal/terms" element={<LegalPage kind="terms" />} />

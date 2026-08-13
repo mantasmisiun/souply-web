@@ -8,8 +8,18 @@
           "MPCNLCFS2R.lt.souply.app.dev"
         ],
         "components": [
-          { "/": "/t/*", "comment": "Shared template links" },
-          { "/": "/@*", "comment": "Creator profile links" }
+          {
+            "/": "/t/*",
+            "comment": "Shared template links"
+          },
+          {
+            "/": "/@*",
+            "comment": "Creator profile links"
+          },
+          {
+            "/": "/join/*",
+            "comment": "Trip/household invite links"
+          }
         ]
       }
     ]
