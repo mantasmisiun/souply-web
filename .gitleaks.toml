@@ -1,0 +1,17 @@
+# Extends the built-in rule set rather than replacing it, so new default
+# rules arrive with a gitleaks upgrade instead of needing a copy-paste.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Template files carry placeholders by definition"
+paths = [
+  '''\.env\.(example|sample|template)$''',
+  '''\.gitleaks\.toml$''',
+]
+
+[[allowlists]]
+description = """Vite test-mode flags for the gated dev-auth button. The dev \
+user id is an all-zeros UUID and the production build excludes it, guarded by \
+the verify:prod-clean bundle check."""
+paths = ['''\.env\.test$''']
