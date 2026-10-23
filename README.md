@@ -92,7 +92,7 @@ server/index.js          production static server + /t/:slug + AASA + /version.j
 
 ## Deployment
 
-Multi-stage `Dockerfile`, with `docker-compose.staging.yml` and `docker-compose.prod.yml`
+Multi-stage `Dockerfile`, with `docker-compose.prod.yml` (staging is built from souply-api's `docker-compose.staging.yml`, like prod on Oracle)
 for the two deployed environments. Commits follow Conventional Commits, enforced by
 commitlint via husky.
 
